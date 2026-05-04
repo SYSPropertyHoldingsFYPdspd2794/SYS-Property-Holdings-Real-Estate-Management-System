@@ -65,7 +65,7 @@ body {
 <div class="d-flex">
 <?php if (isset($_SESSION['account_id'])):?>
 <a href="dashboard.php" class="btn btn-outline-light me-2">My Dashboard</a>
-<a href="/SYS-Property-Holdings-Real-Estate-Management-System/logout.php" class="btn btn-danger">Logout</a>
+<a href="\SYS-Property-Holdings-Real-Estate-Management-System\SYS-Property-Holdings-Real-Estate-Management-System\logout.php" class="btn btn-danger">Logout</a>
 <?php else:?>
 <a href="login.php" class="btn btn-primary">Sign In</a>
 <?php endif;?>
