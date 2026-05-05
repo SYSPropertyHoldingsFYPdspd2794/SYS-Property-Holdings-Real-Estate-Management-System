@@ -1,8 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'CUSTOMER') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'CUSTOMER') {
     header("Location:../login.php");
     exit();
 }
@@ -18,9 +16,7 @@ $user_income = $user_stmt->get_result()->fetch_assoc()['monthly_income'];
 
 if ($_SERVER === 'POST') {
     $prop_id = $_POST['property_id'];
-    if (!isset($_FILES['document']) |
-
-| $_FILES['document']['error']!== UPLOAD_ERR_OK) {
+    if (!isset($_FILES['document']) || $_FILES['document']['error']!== UPLOAD_ERR_OK) {
         $error = "Mandatory income declaration document is missing.";
     } else {
         $tmp_name = $_FILES['document']['tmp_name'];
@@ -28,9 +24,7 @@ if ($_SERVER === 'POST') {
         $size = $_FILES['document']['size'];
         $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
         
-        if ($ext!== 'pdf' |
-
-| $size > 5242880) {
+        if ($ext!== 'pdf' || $size > 5242880) {
             $error = "Invalid file. Document must be in PDF format and under 5MB.";
         } else {
             $insert_app = $conn->prepare("INSERT INTO affordable_housing_applications (customer_id, property_id, status) VALUES (?,?, 'PENDING_REVIEW')");
