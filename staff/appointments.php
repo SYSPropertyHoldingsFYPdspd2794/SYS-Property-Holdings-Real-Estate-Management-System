@@ -1,8 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'STAFF') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'STAFF') {
     header("Location:../login.php");
     exit();
 }
@@ -66,9 +64,7 @@ include '../includes/header.php';
                                     $bg = 'secondary';
                                     if ($row['status'] === 'ASSIGNED') $bg = 'primary';
                                     if ($row['status'] === 'COMPLETED') $bg = 'success';
-                                    if ($row['status'] === 'NO_SHOW' |
-
-| $row['status'] === 'CANCELLED') $bg = 'danger';
+                                    if ($row['status'] === 'NO_SHOW' || $row['status'] === 'CANCELLED') $bg = 'danger';
                                    ?>
                                     <span class="badge bg-<?php echo $bg;?>"><?php echo htmlspecialchars($row['status']);?></span>
                                 </td>
