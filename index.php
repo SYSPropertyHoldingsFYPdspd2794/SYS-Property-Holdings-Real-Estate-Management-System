@@ -89,30 +89,30 @@
 </div>
 </section>
 
-<section class="container my-5 py-5 text-center">
-<h2 class="fw-bold mb-5">Your O2O Property Journey</h2>
-<div class="row">
-<div class="col-md-3 mb-4">
-<i class="fas fa-laptop-house step-icon"></i>
-<h5 class="fw-bold">1. Explore 3D Catalogs</h5>
-<p class="text-muted">Browse our extensive online inventory and find your perfect match.</p>
-</div>
-<div class="col-md-3 mb-4">
-<i class="fas fa-calculator step-icon"></i>
-<h5 class="fw-bold">2. Financial Pre-Check</h5>
-<p class="text-muted">Use our smart calculator and upload abstracts for secure review.</p>
-</div>
-<div class="col-md-3 mb-4">
-<i class="fas fa-map-marked-alt step-icon"></i>
-<h5 class="fw-bold">3. Offline Showroom Tour</h5>
-<p class="text-muted">Visit our physical locations for a personalized guided experience.</p>
-</div>
-<div class="col-md-3 mb-4">
-<i class="fas fa-key step-icon"></i>
-<h5 class="fw-bold">4. Secure Ownership</h5>
-<p class="text-muted">Finalize contracts offline and receive the keys to your new home.</p>
-</div>
-</div>
+<section class="container-fluid my-5 py-5 text-center">
+    <h2 class="fw-bold mb-5">Your O2O Property Journey</h2>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-3 col-sm-6 mb-4">
+            <i class="fas fa-laptop-house step-icon"></i>
+            <h5 class="fw-bold">1. Explore 3D Catalogs</h5>
+            <p class="text-muted">Browse our extensive online inventory and find your perfect match.</p>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-4">
+            <i class="fas fa-calculator step-icon"></i>
+            <h5 class="fw-bold">2. Financial Pre-Check</h5>
+            <p class="text-muted">Use our smart calculator and upload abstracts for secure review.</p>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-4">
+            <i class="fas fa-map-marked-alt step-icon"></i>
+            <h5 class="fw-bold">3. Offline Showroom Tour</h5>
+            <p class="text-muted">Visit our physical locations for a personalized guided experience.</p>
+        </div>
+
+    </div>
 </section>
 
 <section class="bg-light py-5">
