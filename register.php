@@ -3,9 +3,9 @@ include 'includes/header.php';
 include 'includes/db_connect.php'; 
 
 $error_message = '';
+$show_duplicate_alert = false; // Flag to trigger the dialog box
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect and sanitize input data
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
@@ -19,22 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirm_password) {
         $error_message = 'Passwords do not match.';
     } else {
+        // Check if email already exists
         $stmt_check = $conn->prepare("SELECT email FROM accounts WHERE email = ?");
         $stmt_check->bind_param("s", $email);
         $stmt_check->execute();
         $stmt_check->store_result();
 
         if ($stmt_check->num_rows > 0) {
-            $error_message = "The email address '$email' is already registered. Please use another one.";
+            // Trigger the Dialog Box flag instead of a standard error message
+            $show_duplicate_alert = true;
             $stmt_check->close();
         } else {
             $stmt_check->close();
-            
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $role = 'CUSTOMER';
 
             $conn->begin_transaction();
-
             try {
                 $stmt_account = $conn->prepare("INSERT INTO accounts (email, password_hash, role) VALUES (?,?,?)");
                 $stmt_account->bind_param("sss", $email, $hashed_password, $role);
@@ -47,10 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_customer->execute();
 
                 $conn->commit();
-                
                 header("Location: login.php?registration=success");
                 exit();
-
             } catch (Exception $e) {
                 $conn->rollback();
                 $error_message = "Registration failed. Please try again later.";
@@ -60,6 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<!-- Include SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body p-5">
                     <h2 class="text-center fw-bold mb-4">Create an Account</h2>
 
+                    <!-- Standard banner for non-duplicate errors (like password mismatch) -->
                     <?php if ($error_message !== ''): ?>
                         <div class="alert alert-danger">
                             <?php echo htmlspecialchars($error_message); ?>
@@ -74,16 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <form method="POST" action="register.php">
+                        <!-- Form Fields -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Full Name</label>
-                                <input type="text" name="full_name" class="form-control" 
-                                       value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
+                                <input type="text" name="full_name" class="form-control" value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email Address</label>
-                                <input type="email" name="email" class="form-control" 
-                                       value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                                <input type="email" name="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                             </div>
                         </div>
 
@@ -101,8 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone Number</label>
-                                <input type="text" name="phone_number" class="form-control" 
-                                       value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>" required>
+                                <input type="text" name="phone_number" class="form-control" value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
@@ -117,18 +117,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Dependents Count</label>
-                                <input type="number" name="dependents_count" class="form-control" min="0" 
-                                       value="<?php echo isset($_POST['dependents_count']) ? htmlspecialchars($_POST['dependents_count']) : '0'; ?>" required>
+                                <input type="number" name="dependents_count" class="form-control" min="0" value="<?php echo isset($_POST['dependents_count']) ? htmlspecialchars($_POST['dependents_count']) : '0'; ?>" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Occupation</label>
-                                <input type="text" name="occupation" class="form-control" 
-                                       value="<?php echo isset($_POST['occupation']) ? htmlspecialchars($_POST['occupation']) : ''; ?>" required>
+                                <input type="text" name="occupation" class="form-control" value="<?php echo isset($_POST['occupation']) ? htmlspecialchars($_POST['occupation']) : ''; ?>" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Monthly Income (RM)</label>
-                                <input type="number" step="0.01" name="monthly_income" class="form-control" 
-                                       value="<?php echo isset($_POST['monthly_income']) ? htmlspecialchars($_POST['monthly_income']) : ''; ?>" required>
+                                <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo isset($_POST['monthly_income']) ? htmlspecialchars($_POST['monthly_income']) : ''; ?>" required>
                             </div>
                         </div>
 
@@ -142,5 +139,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 Script Trigger -->
+<?php if ($show_duplicate_alert): ?>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Duplicate Email',
+        text: 'The email address "<?php echo $email; ?>" is already registered. Please use a different email or login to your existing account.',
+        confirmButtonColor: '#0d6efd'
+    });
+</script>
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
