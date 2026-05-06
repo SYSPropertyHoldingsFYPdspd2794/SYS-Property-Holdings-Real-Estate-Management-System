@@ -36,11 +36,12 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
+<!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <div class="container my-5">
     <div class="mb-5">
-        <h2 class="fw-bold m-0"><i class="fas fa-calendar-check text-primary me-2"></i>Appointments</h2>
+        <h2 class="fw-bold m-0"><i class="fas fa-calendar-check text-primary me-2"></i>My Assigned Appointments</h2>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'updated'): ?>

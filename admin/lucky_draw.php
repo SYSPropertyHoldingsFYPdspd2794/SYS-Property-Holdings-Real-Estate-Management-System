@@ -6,16 +6,12 @@ if (!isset($_SESSION['role']) |
     header("Location:../login.php");
     exit();
 }
-include '../includes/db_connect.php';
-
 $account_id = $_SESSION['account_id'];
 $alert = '';
 
 if ($_SERVER === 'POST' && isset($_POST['property_id'], $_POST['draw_limit'])) {
     $prop_id = intval($_POST['property_id']);
     $limit = intval($_POST['draw_limit']);
-
-    $stmt = $conn->prepare("UPDATE affordable_housing_applications SET status = 'WINNER' WHERE property_id =? AND status = 'APPROVED_FOR_DRAW' ORDER BY RAND() LIMIT?");
     $stmt->bind_param("ii", $prop_id, $limit);
     if ($stmt->execute()) {
         $log_stmt = $conn->prepare("INSERT INTO audit_logs (account_id, action_type, entity_type, entity_id) VALUES (?, 'LUCKY_DRAW_EXECUTED', 'property_id',?)");

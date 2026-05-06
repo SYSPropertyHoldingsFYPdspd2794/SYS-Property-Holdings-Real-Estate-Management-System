@@ -1,10 +1,6 @@
 <?php
 session_start();
 
-/** 
- * DIRECT ACCESS BYPASS
- * Manually setting session variables to bypass login and show header buttons.
- */
 $_SESSION['role'] = 'STAFF'; 
 $_SESSION['account_id'] = 1; 
 $_SESSION['full_name'] = 'Staff Member';
@@ -15,11 +11,9 @@ include '../includes/db_connect.php';
 $account_id = $_SESSION['account_id'];
 $alert_msg = '';
 
-// BUG FIX: Changed $_SERVER to $_SERVER['REQUEST_METHOD']
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['phone_number'])) {
     $phone = $_POST['phone_number'];
     
-    // Using staff_id as the primary key for the update
     $stmt_upd = $conn->prepare("UPDATE staff SET phone_number = ? WHERE staff_id = ?");
     $stmt_upd->bind_param("si", $phone, $account_id);
     
@@ -30,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['phone_number'])) {
     }
 }
 
-// Fetch user details
 $stmt = $conn->prepare("SELECT s.*, a.email FROM staff s JOIN accounts a ON s.staff_id = a.account_id WHERE s.staff_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
@@ -40,7 +33,7 @@ include '../includes/header.php';
 ?>
 
 <div class="container my-5">
-    <!-- Header Row consistent with other pages -->
+    
     <div class="mb-5">
         <h2 class="fw-bold m-0"><i class="fas fa-user-circle text-primary me-2"></i>My Profile</h2>
     </div>
