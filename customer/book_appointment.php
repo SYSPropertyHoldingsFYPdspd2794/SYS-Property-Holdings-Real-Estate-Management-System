@@ -9,7 +9,7 @@ include '../includes/db_connect.php';
 $account_id = $_SESSION['account_id'];
 $error = '';
 
-if ($_SERVER === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
     $prop_id = $_POST['property_id'];
     $service = $_POST['service_type'];
     $date = $_POST['appointment_date'];

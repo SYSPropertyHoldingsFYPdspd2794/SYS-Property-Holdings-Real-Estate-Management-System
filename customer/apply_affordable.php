@@ -49,6 +49,7 @@ if ($_SERVER === 'POST') {
     }
 }
 
+
 $props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND property_type = 'AFFORDABLE'");
 $preselect = isset($_GET['id'])? intval($_GET['id']) : 0;
 
@@ -68,8 +69,8 @@ include '../includes/header.php';
                         <div class="mb-4">
                             <label class="form-label fw-bold">Select Government Property</label>
                             <select name="property_id" class="form-select form-select-lg" required>
-                                <option value="" disabled <?php echo $preselect === 0? 'selected' : '';?>>Choose a property...</option>
-                                <?php while ($p = $props->fetch_assoc()):?>
+                                <option value="" <?php echo $preselect === 0? 'selected' : '';?>>None</option>
+                                                                <?php while ($p = $props->fetch_assoc()):?>
                                     <option value="<?php echo $p['property_id'];?>" <?php echo $preselect === (int)$p['property_id']? 'selected' : '';?>>
                                         <?php echo htmlspecialchars($p['project_name']. ' ('. $p['state']. ')');?>
                                     </option>

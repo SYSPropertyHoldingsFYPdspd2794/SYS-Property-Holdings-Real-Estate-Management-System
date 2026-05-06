@@ -6,13 +6,11 @@ if (!isset($_SESSION['role']) |
     header("Location:../login.php");
     exit();
 }
-include '../includes/db_connect.php';
-
 $alert = '';
 
-if ($_SERVER === 'POST') {
-    $rate = $_POST;
-    $days = $_POST;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $rate = $_POST['BASE_INTEREST_RATE'];
+    $days = $_POST['DATA_RETENTION_DAYS'];
 
     $stmt1 = $conn->prepare("UPDATE system_settings SET setting_value =? WHERE setting_key = 'BASE_INTEREST_RATE'");
     $stmt1->bind_param("s", $rate);
@@ -25,7 +23,7 @@ if ($_SERVER === 'POST') {
     $alert = '<div class="alert alert-success fw-bold">System settings updated successfully.</div>';
 }
 
-$settings =;
+$settings = [];
 $res = $conn->query("SELECT * FROM system_settings");
 while ($row = $res->fetch_assoc()) {
     $settings[$row['setting_key']] = $row;
@@ -45,13 +43,13 @@ include '../includes/header.php';
                     <form method="POST">
                         <div class="mb-4">
                             <label class="form-label fw-bold fs-5">Base Interest Rate (%)</label>
-                            <input type="text" name="BASE_INTEREST_RATE" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['setting_value']);?>" required>
-                            <small class="text-muted"><?php echo htmlspecialchars($settings['description']);?></small>
+                            <input type="text" name="BASE_INTEREST_RATE" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['BASE_INTEREST_RATE']['setting_value']);?>" required>
+                            <small class="text-muted"><?php echo htmlspecialchars($settings['BASE_INTEREST_RATE']['description']);?></small>
                         </div>
                         <div class="mb-5">
                             <label class="form-label fw-bold fs-5">Data Retention Days (PDPA)</label>
-                            <input type="number" name="DATA_RETENTION_DAYS" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['setting_value']);?>" required>
-                            <small class="text-muted"><?php echo htmlspecialchars($settings['description']);?></small>
+                            <input type="number" name="DATA_RETENTION_DAYS" class="form-control form-control-lg" value="<?php echo htmlspecialchars($settings['DATA_RETENTION_DAYS']['setting_value']);?>" required>
+                            <small class="text-muted"><?php echo htmlspecialchars($settings['DATA_RETENTION_DAYS']['description']);?></small>
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Save Configuration</button>
                     </form>

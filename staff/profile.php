@@ -1,13 +1,9 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'STAFF') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'STAFF') {
     header("Location:../login.php");
     exit();
 }
-include '../includes/db_connect.php';
-
 $account_id = $_SESSION['account_id'];
 $alert_msg = '';
 

@@ -1,8 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'ADMIN') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'ADMIN') {
     header("Location:../login.php");
     exit();
 }
@@ -16,6 +14,7 @@ $total_leads = $res_leads->fetch_assoc()['count'];
 
 $res_app = $conn->query("SELECT COUNT(*) as count FROM affordable_housing_applications WHERE status = 'PENDING_REVIEW'");
 $total_app = $res_app->fetch_assoc()['count'];
+
 
 $res_cust = $conn->query("SELECT COUNT(*) as count FROM accounts WHERE role = 'CUSTOMER'");
 $total_cust = $res_cust->fetch_assoc()['count'];
@@ -91,7 +90,6 @@ include '../includes/header.php';
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('leadsChart').getContext('2d');
     new Chart(ctx, {
@@ -103,13 +101,3 @@ include '../includes/header.php';
         options: {
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                }
-            }
-        }
-    });
-</script>
-
-<?php include '../includes/footer.php';?>
-
