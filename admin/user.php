@@ -1,45 +1,55 @@
 <?php
 session_start();
-
-/** 
- * DIRECT ACCESS BYPASS
- */
-$_SESSION['role'] = 'ADMIN'; 
-$_SESSION['account_id'] = 1; 
-$_SESSION['full_name'] = 'System Admin';
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
+    header("Location:../login.php");
+    exit();
+}
 
 include '../includes/db_connect.php';
 
+$alert = '';
+$allowed_roles = ['STAFF', 'ADMIN'];
+
 // Handle Registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['role'])) {
-    $email = $_POST['email'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'], $_POST['role'], $_POST['full_name'])) {
+    $email = trim($_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
-    $name = $_POST['full_name'];
-    $phone = isset($_POST['phone']) ? $_POST['phone'] : '';
-    
-    // 1. Insert into accounts table
-    $stmt = $conn->prepare("INSERT INTO accounts (email, password_hash, role) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $email, $password, $role);
-    
-    if ($stmt->execute()) {
+    $name = trim($_POST['full_name']);
+    $phone = trim($_POST['phone'] ?? '');
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !in_array($role, $allowed_roles, true)) {
+        $alert = '<div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">Invalid email or role selected.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+    } else {
+        try {
+            $conn->begin_transaction();
+
+            // 1. Insert into accounts table
+            $stmt = $conn->prepare("INSERT INTO accounts (email, password_hash, role) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $email, $password, $role);
+            $stmt->execute();
+
         $new_id = $conn->insert_id;
-        
-        // 2. Insert into specific sub-tables based on role
-        if ($role === 'STAFF') {
-            $state = $_POST['assigned_state'];
-            $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?)");
-            $st->bind_param("isss", $new_id, $name, $phone, $state);
-            $st->execute();
-        } else if ($role === 'ADMIN') {
-            $dept = 'HQ Administration';
-            $st = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?)");
-            $st->bind_param("iss", $new_id, $name, $dept);
-            $st->execute();
+
+            // 2. Insert into specific sub-tables based on role
+            if ($role === 'STAFF') {
+                $state = trim($_POST['assigned_state'] ?? '');
+                $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?)");
+                $st->bind_param("isss", $new_id, $name, $phone, $state);
+                $st->execute();
+            } else if ($role === 'ADMIN') {
+                $st = $conn->prepare("INSERT INTO admins (admin_id, full_name) VALUES (?, ?)");
+                $st->bind_param("is", $new_id, $name);
+                $st->execute();
+            }
+
+            $conn->commit();
+            header("Location: user.php?msg=success");
+            exit();
+        } catch (Exception $e) {
+            $conn->rollback();
+            $alert = '<div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">Failed to register user. The email may already exist.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
-        
-        header("Location: user.php?msg=success");
-        exit();
     }
 }
 
@@ -52,7 +62,10 @@ $query = "
     SELECT 
         a.account_id, a.email, a.role, 
         COALESCE(s.full_name, ad.full_name) as full_name,
-        COALESCE(s.assigned_state, ad.department) as detail
+        CASE
+            WHEN a.role = 'ADMIN' THEN 'HQ Administration'
+            ELSE s.assigned_state
+        END as detail
     FROM accounts a
     LEFT JOIN staff s ON a.account_id = s.staff_id
     LEFT JOIN admins ad ON a.account_id = ad.admin_id
@@ -67,6 +80,8 @@ include '../includes/header.php';
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <div class="container my-5">
+    <?php echo $alert; ?>
+
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'success'): ?>
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i> User registered successfully!

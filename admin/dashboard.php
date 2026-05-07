@@ -19,12 +19,12 @@ $total_app = $res_app->fetch_assoc()['count'];
 $res_cust = $conn->query("SELECT COUNT(*) as count FROM accounts WHERE role = 'CUSTOMER'");
 $total_cust = $res_cust->fetch_assoc()['count'];
 
-$chart_data =;
-$chart_labels =;
+$chart_data = [];
+$chart_labels = [];
 $res_chart = $conn->query("SELECT p.state, COUNT(a.appointment_id) as lead_count FROM appointments a JOIN properties p ON a.property_id = p.property_id GROUP BY p.state");
 while ($row = $res_chart->fetch_assoc()) {
-    $chart_labels = $row['state'];
-    $chart_data = $row['lead_count'];
+    $chart_labels[] = $row['state'];
+    $chart_data[] = (int)$row['lead_count'];
 }
 
 include '../includes/header.php';
@@ -82,7 +82,7 @@ include '../includes/header.php';
                         <a href="properties.php" class="btn btn-dark btn-lg fw-bold">Manage Inventory</a>
                         <a href="appointments.php" class="btn btn-primary btn-lg fw-bold">Assign Leads</a>
                         <a href="lucky_draw.php" class="btn btn-success btn-lg fw-bold">Execute Lucky Draw</a>
-                        <a href="users.php" class="btn btn-outline-dark btn-lg fw-bold">Manage Staff</a>
+                        <a href="user.php" class="btn btn-outline-dark btn-lg fw-bold">Manage Staff</a>
                     </div>
                 </div>
             </div>
@@ -90,14 +90,33 @@ include '../includes/header.php';
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('leadsChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
             labels: <?php echo json_encode($chart_labels);?>,
-            datasets:
+            datasets: [{
+                label: 'Pending Leads',
+                data: <?php echo json_encode($chart_data);?>,
+                backgroundColor: 'rgba(13, 110, 253, 0.75)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1
+            }]
         },
         options: {
+            responsive: true,
             scales: {
                 y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+<?php include '../includes/footer.php'; ?>
