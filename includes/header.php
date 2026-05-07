@@ -51,23 +51,22 @@ body {
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
 <div class="container">
-<a class="navbar-brand fw-bold" href="index.php">SYS Property</a>
+<a class="navbar-brand fw-bold" href="/index.php">SYS Property</a>
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 <span class="navbar-toggler-icon"></span>
 </button>
 <div class="collapse navbar-collapse" id="navbarNav">
 <ul class="navbar-nav me-auto">
-<li class="nav-item"><a href="/SYS-Property-Holdings-Real-Estate-Management-System/index.php" class="nav-link" href="#">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="#">Properties</a></li>
+<li class="nav-item"><a class="nav-link" href="/index.php">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="#">Government Housing</a></li>
 <li class="nav-item"><a class="nav-link" href="#">Showrooms</a></li>
 </ul>
 <div class="d-flex">
 <?php if (isset($_SESSION['account_id'])):?>
 <a href="dashboard.php" class="btn btn-outline-light me-2">My Dashboard</a>
-<a href="/SYS-Property-Holdings-Real-Estate-Management-System/logout.php" class="btn btn-danger">Logout</a>
+<a href="/logout.php" class="btn btn-danger">Logout</a>
 <?php else:?>
-<a href="login.php" class="btn btn-primary">Sign In</a>
+<a href="/login.php" class="btn btn-primary">Sign In</a>
 <?php endif;?>
 </div>
 </div>
