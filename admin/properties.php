@@ -1,43 +1,51 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'ADMIN') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'ADMIN') {
     header("Location:../login.php");
     exit();
 }
 include '../includes/db_connect.php';
 
-if ($_SERVER === 'POST' && isset($_POST['action'])) {
+$allowed_statuses = ['ACTIVE', 'SOLD_OUT', 'ARCHIVED'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
+        $code = $_POST['property_code'];
         $name = $_POST['project_name'];
         $state = $_POST['state'];
         $type = $_POST['property_type'];
-        $price = $_POST['price'];
-        $total = $_POST['total_units'];
-        $avail = $_POST['available_units'];
-        $stmt = $conn->prepare("INSERT INTO properties (project_name, state, property_type, price, total_units, available_units, status) VALUES (?,?,?,?,?,?, 'ACTIVE')");
-        $stmt->bind_param("sssdii", $name, $state, $type, $price, $total, $avail);
+        $price = (float)$_POST['price'];
+        $total = (int)$_POST['total_units'];
+        $avail = (int)$_POST['available_units'];
+        $built_up = (int)$_POST['built_up_sqft'];
+        $image_filename = $_POST['image_filename'];
+        $image_keyword = $_POST['image_search_keyword'];
+        $is_affordable = $type === 'AFFORDABLE' ? 1 : 0;
+        $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, available_units, built_up_sqft, image_filename, image_search_keyword, is_affordable, status) VALUES (?,?,?,?,?,?,?,?,?,?,?, 'ACTIVE')");
+        $stmt->bind_param("ssssdiiissi", $code, $name, $state, $type, $price, $total, $avail, $built_up, $image_filename, $image_keyword, $is_affordable);
         $stmt->execute();
     } elseif ($_POST['action'] === 'edit') {
-        $id = $_POST['property_id'];
-        $price = $_POST['price'];
-        $avail = $_POST['available_units'];
+        $id = (int)$_POST['property_id'];
+        $price = (float)$_POST['price'];
+        $avail = (int)$_POST['available_units'];
         $stmt = $conn->prepare("UPDATE properties SET price =?, available_units =? WHERE property_id =?");
         $stmt->bind_param("dii", $price, $avail, $id);
         $stmt->execute();
     } elseif ($_POST['action'] === 'archive') {
-        $id = $_POST['property_id'];
+        $id = (int)$_POST['property_id'];
         $status = $_POST['status'];
-        $stmt = $conn->prepare("UPDATE properties SET status =? WHERE property_id =?");
-        $stmt->bind_param("si", $status, $id);
-        $stmt->execute();
+        if (in_array($status, $allowed_statuses, true)) {
+            $stmt = $conn->prepare("UPDATE properties SET status =? WHERE property_id =?");
+            $stmt->bind_param("si", $status, $id);
+            $stmt->execute();
+        }
     }
     header("Location: properties.php");
     exit();
 }
 
 $res = $conn->query("SELECT * FROM properties ORDER BY property_id DESC");
+$property_modals = '';
 
 include '../includes/header.php';
 ?>
@@ -88,6 +96,7 @@ include '../includes/header.php';
                                 </td>
                             </tr>
 
+                            <?php ob_start();?>
                             <div class="modal fade" id="editModal<?php echo $row['property_id'];?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -146,6 +155,7 @@ include '../includes/header.php';
                                 </div>
                             </div>
 
+                            <?php $property_modals .= ob_get_clean();?>
                         <?php endwhile;?>
                     </tbody>
                 </table>
@@ -153,6 +163,8 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+
+<?php echo $property_modals;?>
 
 <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -165,7 +177,11 @@ include '../includes/header.php';
                 <div class="modal-body">
                     <input type="hidden" name="action" value="add">
                     <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Property Code</label>
+                            <input type="text" name="property_code" class="form-control" required>
+                        </div>
+                        <div class="col-md-8">
                             <label class="form-label fw-bold">Project Name</label>
                             <input type="text" name="project_name" class="form-control" required>
                         </div>
@@ -198,6 +214,20 @@ include '../includes/header.php';
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Available Units</label>
                             <input type="number" name="available_units" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Built-up Sqft</label>
+                            <input type="number" name="built_up_sqft" class="form-control" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Image Filename</label>
+                            <input type="text" name="image_filename" class="form-control" placeholder="example.jpg" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Image Search Keyword</label>
+                            <input type="text" name="image_search_keyword" class="form-control" required>
                         </div>
                     </div>
                 </div>

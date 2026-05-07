@@ -1,29 +1,79 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) |
-
-| $_SESSION['role']!== 'ADMIN') {
+if (!isset($_SESSION['role']) || $_SESSION['role']!== 'ADMIN') {
     header("Location:../login.php");
     exit();
 }
+include '../includes/db_connect.php';
+
 $account_id = $_SESSION['account_id'];
 $alert = '';
 
-if ($_SERVER === 'POST' && isset($_POST['property_id'], $_POST['draw_limit'])) {
-    $prop_id = intval($_POST['property_id']);
-    $limit = intval($_POST['draw_limit']);
-    $stmt->bind_param("ii", $prop_id, $limit);
-    if ($stmt->execute()) {
-        $log_stmt = $conn->prepare("INSERT INTO audit_logs (account_id, action_type, entity_type, entity_id) VALUES (?, 'LUCKY_DRAW_EXECUTED', 'property_id',?)");
-        $log_stmt->bind_param("ii", $account_id, $prop_id);
-        $log_stmt->execute();
-        $alert = '<div class="alert alert-success fw-bold">Algorithmic lucky draw executed successfully.</div>';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['property_id'], $_POST['draw_limit'])) {
+    $prop_id = (int)$_POST['property_id'];
+    $limit = (int)$_POST['draw_limit'];
+
+    if ($prop_id <= 0 || $limit <= 0) {
+        $alert = '<div class="alert alert-danger fw-bold">Please select a property and enter a valid number of winners.</div>';
     } else {
-        $alert = '<div class="alert alert-danger fw-bold">Failed to execute lucky draw.</div>';
+        try {
+            $conn->begin_transaction();
+
+            $prop_stmt = $conn->prepare("SELECT available_units FROM properties WHERE property_id = ? AND is_affordable = 1 AND status = 'ACTIVE' FOR UPDATE");
+            $prop_stmt->bind_param("i", $prop_id);
+            $prop_stmt->execute();
+            $property = $prop_stmt->get_result()->fetch_assoc();
+
+            if (!$property) {
+                throw new Exception('Selected property is not available for lucky draw.');
+            }
+
+            $available_units = (int)$property['available_units'];
+            if ($available_units <= 0) {
+                throw new Exception('This property has no available units left.');
+            }
+
+            $draw_limit = min($limit, $available_units);
+            $candidate_stmt = $conn->prepare("SELECT application_id FROM affordable_housing_applications WHERE property_id = ? AND status = 'APPROVED_FOR_DRAW' ORDER BY RAND() LIMIT ?");
+            $candidate_stmt->bind_param("ii", $prop_id, $draw_limit);
+            $candidate_stmt->execute();
+            $candidate_result = $candidate_stmt->get_result();
+
+            $winner_ids = [];
+            while ($row = $candidate_result->fetch_assoc()) {
+                $winner_ids[] = (int)$row['application_id'];
+            }
+
+            if (count($winner_ids) === 0) {
+                throw new Exception('No approved applicants are available for this property.');
+            }
+
+            $winner_count = count($winner_ids);
+            $placeholders = implode(',', array_fill(0, $winner_count, '?'));
+            $types = str_repeat('i', $winner_count);
+            $update_stmt = $conn->prepare("UPDATE affordable_housing_applications SET status = 'WINNER' WHERE application_id IN ($placeholders)");
+            $update_stmt->bind_param($types, ...$winner_ids);
+            $update_stmt->execute();
+
+            $status = $available_units - $winner_count <= 0 ? 'SOLD_OUT' : 'ACTIVE';
+            $unit_stmt = $conn->prepare("UPDATE properties SET available_units = available_units - ?, status = ? WHERE property_id = ?");
+            $unit_stmt->bind_param("isi", $winner_count, $status, $prop_id);
+            $unit_stmt->execute();
+
+            $log_stmt = $conn->prepare("INSERT INTO audit_logs (account_id, action_type, entity_type, entity_id) VALUES (?, 'LUCKY_DRAW_EXECUTED', 'property_id', ?)");
+            $log_stmt->bind_param("ii", $account_id, $prop_id);
+            $log_stmt->execute();
+
+            $conn->commit();
+            $alert = '<div class="alert alert-success fw-bold">Lucky draw executed successfully. '.$winner_count.' winner(s) selected.</div>';
+        } catch (Exception $e) {
+            $conn->rollback();
+            $alert = '<div class="alert alert-danger fw-bold">'.htmlspecialchars($e->getMessage()).'</div>';
+        }
     }
 }
 
-$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE property_type = 'AFFORDABLE' AND status = 'ACTIVE'");
+$props = $conn->query("SELECT property_id, project_name, state, available_units FROM properties WHERE is_affordable = 1 AND status = 'ACTIVE' AND available_units > 0");
 $winners = $conn->query("SELECT a.application_id, c.full_name, c.monthly_income, p.project_name, p.state FROM affordable_housing_applications a JOIN customers c ON a.customer_id = c.customer_id JOIN properties p ON a.property_id = p.property_id WHERE a.status = 'WINNER' ORDER BY a.application_id DESC");
 
 include '../includes/header.php';
@@ -42,7 +92,7 @@ include '../includes/header.php';
                         <option value="" disabled selected>Select a property pool...</option>
                         <?php while ($p = $props->fetch_assoc()):?>
                             <option value="<?php echo $p['property_id'];?>">
-                                <?php echo htmlspecialchars($p['project_name']. ' ('. $p['state']. ')');?>
+                                <?php echo htmlspecialchars($p['project_name']. ' ('. $p['state']. ') - '. $p['available_units']. ' unit(s) available');?>
                             </option>
                         <?php endwhile;?>
                     </select>
