@@ -4,6 +4,7 @@ include 'includes/db_connect.php';
 
 $error_message = '';
 $show_duplicate_alert = false; // Flag to trigger the dialog box
+$show_success_alert = false; // Flag to trigger successful registration dialog
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -47,8 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_customer->execute();
 
                 $conn->commit();
-                header("Location: login.php?registration=success");
-                exit();
+                $show_success_alert = true;
             } catch (Exception $e) {
                 $conn->rollback();
                 $error_message = "Registration failed. Please try again later.";
@@ -148,6 +148,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         title: 'Duplicate Email',
         text: 'The email address "<?php echo $email; ?>" is already registered. Please use a different email or login to your existing account.',
         confirmButtonColor: '#0d6efd'
+    });
+</script>
+<?php endif; ?>
+
+<?php if ($show_success_alert): ?>
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Register Successfully',
+        text: 'Register successfully.',
+        confirmButtonColor: '#0d6efd'
+    }).then(() => {
+        window.location.href = 'login.php?registration=success';
     });
 </script>
 <?php endif; ?>
