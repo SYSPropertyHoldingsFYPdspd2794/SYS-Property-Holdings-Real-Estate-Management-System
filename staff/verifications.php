@@ -1,22 +1,16 @@
 <?php
-session_start();
-
-/** 
- * DIRECT ACCESS BYPASS
- * Manually setting session variables to ensure the header.php 
- * displays the "My Dashboard" and "Logout" buttons correctly.
- */
-$_SESSION['role'] = 'STAFF'; 
-$_SESSION['account_id'] = 1; 
-$_SESSION['full_name'] = 'Staff Member';
-$_SESSION['region'] = 'Johor'; // Matches your assigned_state logic
-
+// 1. Include dependencies
 include '../includes/db_connect.php';
+include '../includes/auth_check.php';
+
+// 2. Validate session and restrict DB connection
+// This fixed the "Call to undefined function" error
+protect_staff_page('STAFF', $conn);
 
 $account_id = $_SESSION['account_id']; 
 $assigned_state = $_SESSION['region']; 
 
-// Handle approval/rejection (POST)
+// 3. Handle Approval/Rejection Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['application_id'], $_POST['action'])) {
     $app_id = intval($_POST['application_id']);
     $status = ($_POST['action'] === 'APPROVE') ? 'APPROVED_FOR_DRAW' : 'REJECTED';
@@ -32,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['application_id'], $_P
 
 include '../includes/header.php';
 
-// Fetch pending applications
+// 4. Fetch pending applications for the staff's region
 $stmt_apps = $conn->prepare("SELECT a.application_id, a.application_date, c.full_name, c.monthly_income, p.project_name, d.file_path 
                              FROM affordable_housing_applications a 
                              JOIN customers c ON a.customer_id = c.customer_id 
@@ -47,20 +41,19 @@ $result = $stmt_apps->get_result();
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <div class="container my-5">
-    <!-- Clean Header Row: Buttons are handled by includes/header.php -->
     <div class="mb-5">
         <h2 class="fw-bold m-0"><i class="fas fa-file-signature text-success me-2"></i>Affordable Housing Verifications</h2>
     </div>
     
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'success'): ?>
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            <strong>Success!</strong> Application has been processed and status updated.
+            <strong>Success!</strong> Application has been processed.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
     <div class="alert alert-warning text-dark fw-bold mb-4 shadow-sm">
-        <i class="fas fa-exclamation-triangle me-2"></i>Ensure the uploaded financial abstract strictly aligns with the customer's declared monthly income.
+        <i class="fas fa-exclamation-triangle me-2"></i>Regional Check: Currently viewing <strong><?php echo htmlspecialchars($assigned_state); ?></strong>.
     </div>
 
     <div class="card shadow-sm border-0">
@@ -69,11 +62,11 @@ $result = $stmt_apps->get_result();
                 <table id="verificationsTable" class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>Application Date</th>
+                            <th>Date</th>
                             <th>Customer Name</th>
-                            <th>Declared Income (RM)</th>
-                            <th>Property Requested</th>
-                            <th>Financial Document</th>
+                            <th>Income (RM)</th>
+                            <th>Property</th>
+                            <th>Document</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -81,20 +74,20 @@ $result = $stmt_apps->get_result();
                         <?php if ($result->num_rows > 0): ?>
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($row['application_date']))); ?></td>
+                                    <td><?php echo htmlspecialchars(date('Y-m-d', strtotime($row['application_date']))); ?></td>
                                     <td><?php echo htmlspecialchars($row['full_name']); ?></td>
                                     <td class="fw-bold text-success"><?php echo number_format($row['monthly_income'], 2); ?></td>
                                     <td><?php echo htmlspecialchars($row['project_name']); ?></td>
                                     <td>
-                                        <a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
-                                            <i class="fas fa-file-pdf me-1"></i>View Abstract
+                                        <a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-pdf"></i> View
                                         </a>
                                     </td>
                                     <td>
-                                        <form method="POST" class="d-inline" onsubmit="return confirm('Confirm this decision?');">
+                                        <form method="POST" class="d-inline" onsubmit="return confirm('Process this application?');">
                                             <input type="hidden" name="application_id" value="<?php echo $row['application_id']; ?>">
-                                            <button type="submit" name="action" value="APPROVE" class="btn btn-sm btn-success fw-bold px-3">Approve</button>
-                                            <button type="submit" name="action" value="REJECT" class="btn btn-sm btn-danger fw-bold px-3 ms-1">Reject</button>
+                                            <button type="submit" name="action" value="APPROVE" class="btn btn-sm btn-success">Approve</button>
+                                            <button type="submit" name="action" value="REJECT" class="btn btn-sm btn-danger">Reject</button>
                                         </form>
                                     </td>
                                 </tr>

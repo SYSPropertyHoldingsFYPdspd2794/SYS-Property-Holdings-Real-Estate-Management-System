@@ -1,88 +1,117 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role']!== 'CUSTOMER') {
-    header("Location:../login.php");
-    exit();
-}
+// 1. Include Database Connection and Security Middleware
 include '../includes/db_connect.php';
+include '../includes/auth_check.php';
+
+/**
+ * TASK: Validate session roles and restrict unauthorized database connections.
+ * This function handles the logic: if not a 'CUSTOMER', it kills the $conn and redirects.
+ */
+protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 $alert_msg = '';
 $alert_type = '';
 
-if ($_SERVER === 'POST') {
-    $phone = $_POST['phone_number'];
+// 2. Handle Profile Update (POST Request)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $phone = trim($_POST['phone_number']);
     $marital = $_POST['marital_status'];
-    $dep = $_POST['dependents_count'];
-    $occ = $_POST['occupation'];
-    $inc = $_POST['monthly_income'];
+    $dep = intval($_POST['dependents_count']);
+    $occ = trim($_POST['occupation']);
+    $inc = floatval($_POST['monthly_income']);
+
+    // Prepare statement to prevent SQL Injection
     $update = $conn->prepare("UPDATE customers SET phone_number=?, marital_status=?, dependents_count=?, occupation=?, monthly_income=? WHERE customer_id=?");
     $update->bind_param("ssisdi", $phone, $marital, $dep, $occ, $inc, $account_id);
+
     if ($update->execute()) {
-        $alert_msg = "Profile updated successfully.";
+        $alert_msg = "Profile updated successfully!";
         $alert_type = "success";
     } else {
-        $alert_msg = "Update failed.";
+        $alert_msg = "Error updating profile. Please try again.";
         $alert_type = "danger";
     }
 }
 
-$stmt = $conn->prepare("SELECT c.*, a.email FROM customers c JOIN accounts a ON c.customer_id = a.account_id WHERE c.customer_id =?");
+// 3. Fetch Latest User Data to display in the form
+$stmt = $conn->prepare("SELECT c.*, a.email FROM customers c JOIN accounts a ON c.customer_id = a.account_id WHERE c.customer_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 
 include '../includes/header.php';
 ?>
+
 <div class="container my-5">
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-5">
-            <h3 class="fw-bold mb-4">My Profile</h3>
-            <?php if ($alert_msg!== ''):?>
-                <div class="alert alert-<?php echo $alert_type;?>"><?php echo $alert_msg;?></div>
-            <?php endif;?>
-            <form method="POST">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Email</label>
-                        <input type="email" class="form-control bg-light" value="<?php echo htmlspecialchars($user['email']);?>" readonly>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Full Name</label>
-                        <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['full_name']);?>" readonly>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <h3 class="fw-bold mb-4"><i class="fas fa-user-circle text-primary me-2"></i>My Profile</h3>
+
+                    <?php if ($alert_msg !== ''): ?>
+                        <div class="alert alert-<?php echo $alert_type; ?> alert-dismissible fade show shadow-sm" role="alert">
+                            <i class="fas <?php echo ($alert_type === 'success') ? 'fa-check-circle' : 'fa-exclamation-triangle'; ?> me-2"></i>
+                            <?php echo $alert_msg; ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email Address</label>
+                                <input type="email" class="form-control bg-light" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                                <small class="text-muted italic">Account email cannot be modified.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Full Name</label>
+                                <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['full_name']); ?>" readonly>
+                                <small class="text-muted italic">Identity name is verified and locked.</small>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Phone Number</label>
+                                <input type="text" name="phone_number" class="form-control border-primary" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Marital Status</label>
+                                <select name="marital_status" class="form-select border-primary" required>
+                                    <option value="SINGLE" <?php echo ($user['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
+                                    <option value="MARRIED" <?php echo ($user['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
+                                    <option value="DIVORCED" <?php echo ($user['marital_status'] === 'DIVORCED') ? 'selected' : ''; ?>>Divorced</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Dependents Count</label>
+                                <input type="number" name="dependents_count" class="form-control border-primary" value="<?php echo htmlspecialchars($user['dependents_count']); ?>" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Occupation</label>
+                                <input type="text" name="occupation" class="form-control border-primary" value="<?php echo htmlspecialchars($user['occupation']); ?>" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Monthly Income (RM)</label>
+                                <input type="number" step="0.01" name="monthly_income" class="form-control border-primary" value="<?php echo htmlspecialchars($user['monthly_income']); ?>" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
+                                <i class="fas fa-save me-2"></i>Update Profile Information
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Phone Number</label>
-                        <input type="text" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user['phone_number']);?>" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Marital Status</label>
-                        <select name="marital_status" class="form-select" required>
-                            <option value="SINGLE" <?php echo $user['marital_status'] === 'SINGLE'? 'selected' : '';?>>Single</option>
-                            <option value="MARRIED" <?php echo $user['marital_status'] === 'MARRIED'? 'selected' : '';?>>Married</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Dependents Count</label>
-                        <input type="number" name="dependents_count" class="form-control" value="<?php echo htmlspecialchars($user['dependents_count']);?>" min="0" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Occupation</label>
-                        <input type="text" name="occupation" class="form-control" value="<?php echo htmlspecialchars($user['occupation']);?>" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Monthly Income (RM)</label>
-                        <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo htmlspecialchars($user['monthly_income']);?>" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3 px-4 fw-bold">Update Profile</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-<?php include '../includes/footer.php';?>
 
+<?php include '../includes/footer.php'; ?>
