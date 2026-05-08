@@ -82,7 +82,7 @@ include '../includes/header.php';
                         <a href="properties.php" class="btn btn-dark btn-lg fw-bold">Manage Inventory</a>
                         <a href="appointments.php" class="btn btn-primary btn-lg fw-bold">Assign Leads</a>
                         <a href="lucky_draw.php" class="btn btn-success btn-lg fw-bold">Execute Lucky Draw</a>
-                        <a href="user.php" class="btn btn-outline-dark btn-lg fw-bold">Manage Staff</a>
+                        <a href="user.php" class="btn btn-outline-dark btn-lg fw-bold">Manage Users</a>
                     </div>
                 </div>
             </div>

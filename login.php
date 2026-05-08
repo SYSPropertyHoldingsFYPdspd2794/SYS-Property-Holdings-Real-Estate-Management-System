@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($role === 'STAFF') {
                 header('Location: staff/dashboard.php');
             } else { // CUSTOMER
-                header('Location: customer/profile.php');
+                header('Location: customer/dashboard.php');
             }
             // --- YOUR REQUESTED LOGIC END ---
             

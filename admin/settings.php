@@ -1,11 +1,9 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) |
+include '../includes/db_connect.php';
+include '../includes/auth_check.php';
 
-| $_SESSION['role']!== 'ADMIN') {
-    header("Location:../login.php");
-    exit();
-}
+protect_admin_page('ADMIN', $conn);
+
 $alert = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

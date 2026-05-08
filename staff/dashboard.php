@@ -1,12 +1,8 @@
 <?php
-session_start();
-
-$_SESSION['role'] = 'STAFF'; 
-$_SESSION['account_id'] = 1; // Ensure this ID exists in your 'staff' table
-$_SESSION['full_name'] = 'Staff Member';
-$_SESSION['region'] = 'Johor'; 
-
 include '../includes/db_connect.php';
+include '../includes/auth_check.php';
+
+protect_staff_page('STAFF', $conn);
 
 $account_id = $_SESSION['account_id'];
 
@@ -21,7 +17,7 @@ if ($staff_result->num_rows > 0) {
     $assigned_state = $staff_data['assigned_state'];
 } else {
     $staff_id = $account_id;
-    $assigned_state = "Not Assigned";
+    $assigned_state = '';
 }
 
 $stmt_appt = $conn->prepare("SELECT COUNT(*) as pending_appt FROM appointments WHERE assigned_staff_id = ? AND status = 'ASSIGNED'");
@@ -29,10 +25,13 @@ $stmt_appt->bind_param("i", $staff_id);
 $stmt_appt->execute();
 $pending_appt = $stmt_appt->get_result()->fetch_assoc()['pending_appt'];
 
-$stmt_app = $conn->prepare("SELECT COUNT(*) as pending_app FROM affordable_housing_applications a JOIN properties p ON a.property_id = p.property_id WHERE p.state = ? AND a.status = 'PENDING_REVIEW'");
-$stmt_app->bind_param("s", $assigned_state);
-$stmt_app->execute();
-$pending_app = $stmt_app->get_result()->fetch_assoc()['pending_app'];
+$pending_app = 0;
+if ($assigned_state !== '') {
+    $stmt_app = $conn->prepare("SELECT COUNT(*) as pending_app FROM affordable_housing_applications a JOIN properties p ON a.property_id = p.property_id WHERE p.state = ? AND a.status = 'PENDING_REVIEW'");
+    $stmt_app->bind_param("s", $assigned_state);
+    $stmt_app->execute();
+    $pending_app = $stmt_app->get_result()->fetch_assoc()['pending_app'];
+}
 
 include '../includes/header.php';
 ?>
@@ -42,7 +41,7 @@ include '../includes/header.php';
     
     <div class="alert alert-info shadow-sm border-0 d-flex align-items-center fw-bold mb-5" style="background-color: #e0f7fa;">
         <i class="fas fa-map-marker-alt text-primary me-2"></i>
-        Assigned Region: <?php echo htmlspecialchars($assigned_state); ?>
+        Assigned Region: <?php echo htmlspecialchars($assigned_state !== '' ? $assigned_state : 'Not Assigned'); ?>
     </div>
 
     <div class="row">

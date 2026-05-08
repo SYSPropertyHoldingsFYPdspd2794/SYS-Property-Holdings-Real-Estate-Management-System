@@ -8,18 +8,23 @@ include '../includes/auth_check.php';
 protect_staff_page('STAFF', $conn);
 
 $account_id = $_SESSION['account_id']; 
-$assigned_state = $_SESSION['region']; 
+
+$stmt_staff = $conn->prepare("SELECT assigned_state FROM staff WHERE staff_id = ?");
+$stmt_staff->bind_param("i", $account_id);
+$stmt_staff->execute();
+$staff = $stmt_staff->get_result()->fetch_assoc();
+$assigned_state = $staff['assigned_state'] ?? '';
 
 // 3. Handle Approval/Rejection Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['application_id'], $_POST['action'])) {
     $app_id = intval($_POST['application_id']);
     $status = ($_POST['action'] === 'APPROVE') ? 'APPROVED_FOR_DRAW' : 'REJECTED';
     
-    $stmt_upd = $conn->prepare("UPDATE affordable_housing_applications SET status = ?, reviewed_by_staff_id = ? WHERE application_id = ?");
-    $stmt_upd->bind_param("sii", $status, $account_id, $app_id);
+    $stmt_upd = $conn->prepare("UPDATE affordable_housing_applications a JOIN properties p ON a.property_id = p.property_id SET a.status = ?, a.reviewed_by_staff_id = ? WHERE a.application_id = ? AND p.state = ?");
+    $stmt_upd->bind_param("siis", $status, $account_id, $app_id, $assigned_state);
     
     if ($stmt_upd->execute()) {
-        header("Location: verification.php?msg=success");
+        header("Location: verifications.php?msg=success");
         exit();
     }
 }

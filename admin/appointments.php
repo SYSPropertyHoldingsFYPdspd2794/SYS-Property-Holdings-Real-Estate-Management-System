@@ -7,7 +7,7 @@ protect_admin_page('ADMIN', $conn);
 
 $account_id = $_SESSION['account_id'];
 
-if ($_SERVER === 'POST' && isset($_POST['appointment_id'], $_POST['assigned_staff_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_id'], $_POST['assigned_staff_id'])) {
     $appt_id = $_POST['appointment_id'];
     $staff_id = $_POST['assigned_staff_id'];
     $stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id =?, status = 'ASSIGNED' WHERE appointment_id =?");

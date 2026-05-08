@@ -88,11 +88,7 @@ function calculateLoan() {
     
     const loanAmount = price - (price * downpaymentPerc);
     
-    if (loanAmount <= 0 |
-
-| tenureMonths <= 0 |
-| isNaN(loanAmount) |
-| isNaN(tenureMonths)) {
+    if (loanAmount <= 0 || tenureMonths <= 0 || isNaN(loanAmount) || isNaN(tenureMonths)) {
         document.getElementById('monthlyResult').innerText = "RM 0.00";
         return;
     }

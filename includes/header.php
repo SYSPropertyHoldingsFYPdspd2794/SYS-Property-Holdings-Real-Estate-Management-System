@@ -9,13 +9,17 @@ $current_folder = basename(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'
 $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
 
 $dashboard_link = $root_prefix . 'login.php';
+$profile_link = $root_prefix . 'login.php';
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'ADMIN') {
         $dashboard_link = $root_prefix . 'admin/dashboard.php';
+        $profile_link = $root_prefix . 'admin/profile.php';
     } elseif ($_SESSION['role'] === 'STAFF') {
         $dashboard_link = $root_prefix . 'staff/dashboard.php';
+        $profile_link = $root_prefix . 'staff/profile.php';
     } elseif ($_SESSION['role'] === 'CUSTOMER') {
         $dashboard_link = $root_prefix . 'customer/dashboard.php';
+        $profile_link = $root_prefix . 'customer/profile.php';
     }
 }
 ?>
@@ -81,7 +85,15 @@ body {
 </ul>
 <div class="d-flex">
 <?php if (isset($_SESSION['account_id'])):?>
-<a href="<?php echo htmlspecialchars($dashboard_link); ?>" class="btn btn-outline-light me-2">My Dashboard</a>
+<div class="dropdown me-2">
+<button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+My Account
+</button>
+<ul class="dropdown-menu dropdown-menu-end">
+<li><a class="dropdown-item" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
+<li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>">Profile</a></li>
+</ul>
+</div>
 <a href="<?php echo htmlspecialchars($root_prefix . 'logout.php'); ?>" class="btn btn-danger">Logout</a>
 <?php else:?>
 <a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary">Sign In</a>

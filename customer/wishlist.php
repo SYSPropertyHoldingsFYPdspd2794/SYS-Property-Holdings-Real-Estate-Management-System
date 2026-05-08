@@ -16,7 +16,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS wishlists (
     FOREIGN KEY(property_id) REFERENCES properties(property_id) ON DELETE CASCADE
 )");
 
-if ($_SERVER === 'POST' && isset($_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
         $prop_id = intval($_POST['property_id']);
         $check = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id =? AND property_id =?");

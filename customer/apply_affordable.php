@@ -14,7 +14,7 @@ $user_stmt->bind_param("i", $account_id);
 $user_stmt->execute();
 $user_income = $user_stmt->get_result()->fetch_assoc()['monthly_income'];
 
-if ($_SERVER === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prop_id = $_POST['property_id'];
     if (!isset($_FILES['document']) || $_FILES['document']['error']!== UPLOAD_ERR_OK) {
         $error = "Mandatory income declaration document is missing.";
