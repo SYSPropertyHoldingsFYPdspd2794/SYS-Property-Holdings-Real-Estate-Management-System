@@ -1,45 +1,68 @@
 <?php
+/**
+ * TASK: Logic to execute an UPDATE statement on the customers table 
+ * based on the active session ID.
+ */
+
 // 1. Include Database Connection and Security Middleware
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
 
-/**
- * TASK: Validate session roles and restrict unauthorized database connections.
- * This function handles the logic: if not a 'CUSTOMER', it kills the $conn and redirects.
- */
+// 2. Validate session roles and restrict unauthorized database connections.
+// This ensures ONLY a CUSTOMER can reach this logic.
 protect_customer_page('CUSTOMER', $conn);
 
-$account_id = $_SESSION['account_id'];
+// 3. GET THE ACTIVE SESSION ID
+// This is the core requirement of your task.
+$account_id = $_SESSION['account_id']; 
+
 $alert_msg = '';
 $alert_type = '';
 
-// 2. Handle Profile Update (POST Request)
+// 4. EXECUTE UPDATE LOGIC (Triggered when the form is submitted)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Collect and sanitize data from the form
     $phone = trim($_POST['phone_number']);
     $marital = $_POST['marital_status'];
     $dep = intval($_POST['dependents_count']);
     $occ = trim($_POST['occupation']);
     $inc = floatval($_POST['monthly_income']);
 
-    // Prepare statement to prevent SQL Injection
-    $update = $conn->prepare("UPDATE customers SET phone_number=?, marital_status=?, dependents_count=?, occupation=?, monthly_income=? WHERE customer_id=?");
-    $update->bind_param("ssisdi", $phone, $marital, $dep, $occ, $inc, $account_id);
+    // LOGIC: The UPDATE statement using the ACTIVE SESSION ID ($account_id)
+    $sql = "UPDATE customers SET 
+                phone_number = ?, 
+                marital_status = ?, 
+                dependents_count = ?, 
+                occupation = ?, 
+                monthly_income = ? 
+            WHERE customer_id = ?";
 
-    if ($update->execute()) {
-        $alert_msg = "Profile updated successfully!";
+    $update_stmt = $conn->prepare($sql);
+    
+    // Bind parameters to the query 
+    // ssisdi = string, string, integer, string, double(float), integer (ID)
+    $update_stmt->bind_param("ssisdi", $phone, $marital, $dep, $occ, $inc, $account_id);
+
+    if ($update_stmt->execute()) {
+        $alert_msg = "Profile successfully updated for Session ID: " . $account_id;
         $alert_type = "success";
     } else {
-        $alert_msg = "Error updating profile. Please try again.";
+        $alert_msg = "Error updating database: " . $conn->error;
         $alert_type = "danger";
     }
+    
+    // Terminate statement to free resources
+    $update_stmt->close();
 }
 
-// 3. Fetch Latest User Data to display in the form
+// 5. FETCH REFRESHED DATA
+// Fetch the latest data after the update so the user sees the changes in the form.
 $stmt = $conn->prepare("SELECT c.*, a.email FROM customers c JOIN accounts a ON c.customer_id = a.account_id WHERE c.customer_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 
+// 6. Include Page Header
 include '../includes/header.php';
 ?>
 
@@ -61,14 +84,12 @@ include '../includes/header.php';
                     <form method="POST">
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Email Address</label>
+                                <label class="form-label fw-bold">Email (Read Only)</label>
                                 <input type="email" class="form-control bg-light" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
-                                <small class="text-muted italic">Account email cannot be modified.</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Full Name</label>
+                                <label class="form-label fw-bold">Full Name (Read Only)</label>
                                 <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['full_name']); ?>" readonly>
-                                <small class="text-muted italic">Identity name is verified and locked.</small>
                             </div>
                         </div>
 
@@ -104,7 +125,7 @@ include '../includes/header.php';
 
                         <div class="d-flex justify-content-end mt-4">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
-                                <i class="fas fa-save me-2"></i>Update Profile Information
+                                <i class="fas fa-save me-2"></i>Update Profile
                             </button>
                         </div>
                     </form>
