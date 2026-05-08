@@ -51,7 +51,7 @@ include '../includes/header.php';
                 <div class="card-body p-4">
                     <h5 class="fw-bold"><i class="fas fa-calendar-alt text-primary me-2"></i>My Pending Appointments</h5>
                     <h1 class="display-4 fw-bold text-dark mt-3"><?php echo $pending_appt; ?></h1>
-                    <a href="appointment.php" class="btn btn-primary mt-3 fw-bold px-4">Manage Appointments</a>
+                    <a href="appointments.php" class="btn btn-primary mt-3 fw-bold px-4">Manage Appointments</a>
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@ include '../includes/header.php';
                 <div class="card-body p-4">
                     <h5 class="fw-bold"><i class="fas fa-file-signature text-success me-2"></i>Regional Housing Applications</h5>
                     <h1 class="display-4 fw-bold text-dark mt-3"><?php echo $pending_app; ?></h1>
-                    <a href="verification.php" class="btn btn-success mt-3 fw-bold px-4">Review Applications</a>
+                    <a href="verifications.php" class="btn btn-success mt-3 fw-bold px-4">Review Applications</a>
                 </div>
             </div>
         </div>
