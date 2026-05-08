@@ -1,37 +1,37 @@
 <?php
-// 安全锁 1：开启严格的 MySQLi 错误报告模式，用异常 (Exception) 代替致命崩溃
+// Safety Lock 1: Enable strict MySQLi error reporting
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
-    // 判断当前运行环境：如果是本地电脑
+    // Environment Check: Local XAMPP
     if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {
         $host = "localhost";
         $user = "root";
         $password = "";
         $dbname = "sys_property_db";
     } 
-    // 如果不是本地（那就是跑在 InfinityFree 线上了）
+    // Environment Check: Live Server (InfinityFree)
     else {
-        $host = "ftpupload.net"; // 【必须修改】替换成 InfinityFree 的 MySQL Hostname
+        $host = "sql102.infinityfree.com"; // 【CRITICAL】Replace this with your InfinityFree MySQL Hostname
         $user = "if0_41857411";
-        $password = "SYSProperty2026"; // 【必须修改】填入你的线上密码
+        $password = "SYSProperty2026";
         $dbname = "if0_41857411_sys_property_db";
     }
 
-    // 统一建立连接
+    // Establish Connection
     $conn = new mysqli($host, $user, $password, $dbname);
     
-    // 安全锁 2：强制设定字符集，防止你的中文字符存入数据库变成乱码 "???"
+    // Safety Lock 2: Enforce character set to prevent encoding issues
     $conn->set_charset("utf8mb4");
 
 } catch (mysqli_sql_exception $e) {
-    // 安全锁 3：优雅的崩溃处理（不暴露系统隐私）
+    // Safety Lock 3: Graceful error handling
     if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {
-        // 本地测试时，显示详细错误方便你们团队除错 (Debug)
-        die("🚨 数据库连接失败 (仅本地可见): " . $e->getMessage());
+        // Detailed error for local debugging
+        die("🚨 Database Connection Failed (Local Only): " . $e->getMessage());
     } else {
-        // 线上运行时，如果数据库宕机，只显示给导师和用户友好的提示，绝不暴露后台信息
-        die("🚧 SYS Property Holdings 系统维护中，无法连接到数据中心，请稍后再试。");
+        // Safe, generic error for production
+        die("🚧 SYS Property Holdings System is currently under maintenance. Unable to connect to the data center. Please try again later.");
     }
 }
 ?>
