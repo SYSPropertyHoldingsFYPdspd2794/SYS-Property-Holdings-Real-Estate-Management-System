@@ -1,5 +1,30 @@
 <?php
-include 'db_connect.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include_once __DIR__ . '/db_connect.php';
+
+$script_dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$script_dir = rtrim($script_dir, '/');
+$current_folder = basename($script_dir);
+
+if (in_array($current_folder, ['admin', 'customer', 'staff'], true)) {
+    $script_dir = rtrim(dirname($script_dir), '/');
+}
+
+$base_url = ($script_dir === '' || $script_dir === '.') ? '' : $script_dir;
+
+$dashboard_link = $base_url . '/login.php';
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'ADMIN') {
+        $dashboard_link = $base_url . '/admin/dashboard.php';
+    } elseif ($_SESSION['role'] === 'STAFF') {
+        $dashboard_link = $base_url . '/staff/dashboard.php';
+    } elseif ($_SESSION['role'] === 'CUSTOMER') {
+        $dashboard_link = $base_url . '/customer/dashboard.php';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,22 +76,22 @@ body {
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
 <div class="container">
-<a class="navbar-brand fw-bold" href="/index.php">SYS Property</a>
+<a class="navbar-brand fw-bold" href="<?php echo htmlspecialchars($base_url . '/index.php'); ?>">SYS Property</a>
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 <span class="navbar-toggler-icon"></span>
 </button>
 <div class="collapse navbar-collapse" id="navbarNav">
 <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="/index.php">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($base_url . '/index.php'); ?>">Home</a></li>
 <li class="nav-item"><a class="nav-link" href="#">Government Housing</a></li>
 <li class="nav-item"><a class="nav-link" href="#">Showrooms</a></li>
 </ul>
 <div class="d-flex">
 <?php if (isset($_SESSION['account_id'])):?>
-<a href="dashboard.php" class="btn btn-outline-light me-2">My Dashboard</a>
-<a href="/logout.php" class="btn btn-danger">Logout</a>
+<a href="<?php echo htmlspecialchars($dashboard_link); ?>" class="btn btn-outline-light me-2">My Dashboard</a>
+<a href="<?php echo htmlspecialchars($base_url . '/logout.php'); ?>" class="btn btn-danger">Logout</a>
 <?php else:?>
-<a href="/login.php" class="btn btn-primary">Sign In</a>
+<a href="<?php echo htmlspecialchars($base_url . '/login.php'); ?>" class="btn btn-primary">Sign In</a>
 <?php endif;?>
 </div>
 </div>
