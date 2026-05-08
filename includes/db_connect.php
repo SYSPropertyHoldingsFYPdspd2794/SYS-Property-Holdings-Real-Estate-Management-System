@@ -12,9 +12,9 @@ try {
     } 
     // 如果不是本地（那就是跑在 InfinityFree 线上了）
     else {
-        $host = "sqlXXX.epizy.com"; // 【必须修改】替换成 InfinityFree 的 MySQL Hostname
+        $host = "ftpupload.net"; // 【必须修改】替换成 InfinityFree 的 MySQL Hostname
         $user = "if0_41857411";
-        $password = "你的FTP隐藏密码"; // 【必须修改】填入你的线上密码
+        $password = "SYSProperty2026"; // 【必须修改】填入你的线上密码
         $dbname = "if0_41857411_sys_property_db";
     }
 
