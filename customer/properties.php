@@ -1,110 +1,165 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role']!== 'CUSTOMER') {
-    header("Location:../login.php");
-    exit();
-}
-include '../includes/db_connect.php';
-include '../includes/header.php';
+/**
+ * PROJECT: SYS Property Holdings
+ * MODULE: Customer - Property Catalog (US13, US19)
+ * DESCRIPTION: Fixed Image Loading using mapping between DB types and folder names.
+ */
 
-$property_id = isset($_GET['id'])? intval($_GET['id']) : 0;
-$stmt = $conn->prepare("SELECT * FROM properties WHERE property_id =?");
-$stmt->bind_param("i", $property_id);
-$stmt->execute();
-$property = $stmt->get_result()->fetch_assoc();
+// 1. INITIALIZATION: Header provides $conn and $root_prefix
+include_once '../includes/header.php';
+include_once '../includes/header.php';
+/** @var string $root_prefix */
+/** @var mysqli $conn */
+require_once '../includes/auth_check.php';
 
-if (!$property) {
-    echo "<div class='container my-5'><h3 class='text-danger'>Property not found.</h3></div>";
-    include '../includes/footer.php';
-    exit();
-}
-
-$rate_stmt = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
-$rate = $rate_stmt->fetch_assoc()['setting_value'];
+// 2. SECURITY: Load team auth logic
+require_once '../includes/auth_check.php';
+protect_customer_page('CUSTOMER', $conn);
 ?>
+
 <div class="container my-5">
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow border-0 h-100">
-                <div class="card-body p-5">
-                    <span class="badge bg-primary mb-3 fs-6 px-3 py-2"><?php echo htmlspecialchars($property['property_type']);?></span>
-                    <h1 class="fw-bold mb-3"><?php echo htmlspecialchars($property['project_name']);?></h1>
-                    <p class="fs-4 text-muted"><i class="fas fa-map-marker-alt me-2 text-danger"></i><?php echo htmlspecialchars($property['state']);?></p>
-                    <hr class="my-4">
-                    <div class="row text-center mb-5">
-                        <div class="col p-3 border-end">
-                            <p class="mb-1 text-muted text-uppercase fw-bold">Available Units</p>
-                            <h2 class="fw-bold"><?php echo htmlspecialchars($property['available_units']);?></h2>
-                        </div>
-                        <div class="col p-3">
-                            <p class="mb-1 text-muted text-uppercase fw-bold">Selling Price</p>
-                            <h2 class="fw-bold text-success">RM <?php echo number_format($property['price'], 2);?></h2>
-                        </div>
-                    </div>
-                    <div class="d-grid mt-auto">
-                        <?php if ($property['property_type'] === 'AFFORDABLE'):?>
-                            <a href="apply_affordable.php?id=<?php echo $property['property_id'];?>" class="btn btn-success btn-lg fw-bold py-3">Apply for Gov Housing</a>
-                        <?php else:?>
-                            <a href="book_appointment.php?id=<?php echo $property['property_id'];?>" class="btn btn-dark btn-lg fw-bold py-3">Book Showroom Viewing</a>
-                        <?php endif;?>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow border-0 h-100 bg-light">
-                <div class="card-body p-5">
-                    <h3 class="fw-bold mb-4"><i class="fas fa-calculator me-2 text-primary"></i>Dynamic Loan Calculator</h3>
-                    <input type="hidden" id="propertyPrice" value="<?php echo $property['price'];?>">
-                    <input type="hidden" id="interestRate" value="<?php echo $rate;?>">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Base Interest Rate (%)</label>
-                        <input type="text" class="form-control form-control-lg bg-white" value="<?php echo htmlspecialchars($rate);?>" readonly>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Downpayment (%)</label>
-                        <input type="number" id="downpayment" class="form-control form-control-lg" value="10" min="0" max="100">
-                    </div>
-                    <div class="mb-5">
-                        <label class="form-label fw-bold">Loan Tenure (Years)</label>
-                        <input type="number" id="tenure" class="form-control form-control-lg" value="35" min="5" max="35">
-                    </div>
-                    <div class="p-4 bg-white border border-primary rounded text-center shadow-sm">
-                        <p class="mb-2 text-muted fw-bold text-uppercase">Estimated Monthly Installment</p>
-                        <h1 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h1>
-                    </div>
-                </div>
-            </div>
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <h2 class="fw-bold display-5 text-dark">Properties Catalog</h2>
+            <p class="lead text-secondary">Discover exclusive listings in our O2O management system.</p>
+            <hr class="w-25 mx-auto bg-primary" style="height: 3px; border-radius: 5px; opacity: 1;">
         </div>
     </div>
-</div>
-<script>
-function calculateLoan() {
-    const price = parseFloat(document.getElementById('propertyPrice').value);
-    const ratePercentage = parseFloat(document.getElementById('interestRate').value);
-    const monthlyRate = (ratePercentage / 100) / 12;
-    const downpaymentPerc = parseFloat(document.getElementById('downpayment').value) / 100;
-    const tenureMonths = parseFloat(document.getElementById('tenure').value) * 12;
-    
-    const loanAmount = price - (price * downpaymentPerc);
-    
-    if (loanAmount <= 0 || tenureMonths <= 0 || isNaN(loanAmount) || isNaN(tenureMonths)) {
-        document.getElementById('monthlyResult').innerText = "RM 0.00";
-        return;
-    }
-    
-    let monthlyInstallment = 0;
-    if (monthlyRate > 0) {
-        monthlyInstallment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
-    } else {
-        monthlyInstallment = loanAmount / tenureMonths;
-    }
-    
-    document.getElementById('monthlyResult').innerText = "RM " + monthlyInstallment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-}
-document.getElementById('downpayment').addEventListener('input', calculateLoan);
-document.getElementById('tenure').addEventListener('input', calculateLoan);
-window.addEventListener('load', calculateLoan);
-</script>
-<?php include '../includes/footer.php';?>
 
+    <div class="row">
+        <?php
+        /**
+         * FETCH DATA FROM DATABASE
+         */
+        $sql = "SELECT * FROM properties WHERE status = 'ACTIVE' OR status = 'AVAILABLE' ORDER BY property_id DESC";
+        $result = $conn->query($sql);
+
+        if (!$result) {
+            echo '<div class="col-12 alert alert-danger">SQL Error: ' . htmlspecialchars($conn->error) . '</div>';
+        } elseif ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                
+                // --- IMAGE MAPPING LOGIC ---
+                // Get data from DB
+                $dbType = strtolower(trim($row['property_type']));
+                $stateName = ucfirst(strtolower(trim($row['state']))); // e.g., "Johor"
+                
+                $folder = "";
+                $filePrefix = "";
+
+                /**
+                 * Mapping Logic based on your provided screenshots:
+                 * DB: Commercial -> Folder: 3. COMMERCIAL, File: Commercial
+                 * DB: Standard -> Folder: 4. TERRACE, File: Terrace
+                 * DB: Affordable -> Folder: 1. APARTMENT, File: Apartment
+                 * DB: Bungalow -> Folder: 2. BUNGALOW, File: Bungalow
+                 */
+                switch($dbType) {
+                    case 'commercial':
+                        $folder = "3. COMMERCIAL/";
+                        $filePrefix = "Commercial";
+                        break;
+                    case 'standard':
+                        $folder = "4. TERRACE/";
+                        $filePrefix = "Terrace";
+                        break;
+                    case 'affordable':
+                        $folder = "1. APARTMENT/";
+                        $filePrefix = "Apartment";
+                        break;
+                    case 'bungalow':
+                        $folder = "2. BUNGALOW/";
+                        $filePrefix = "Bungalow";
+                        break;
+                    case 'apartment':
+                        $folder = "1. APARTMENT/";
+                        $filePrefix = "Apartment";
+                        break;
+                    case 'terrace':
+                        $folder = "4. TERRACE/";
+                        $filePrefix = "Terrace";
+                        break;
+                    default:
+                        $folder = ""; 
+                        $filePrefix = ucfirst($dbType);
+                }
+
+                // Directory path
+                $catalogDir = $root_prefix . "C:\xampp\htdocs\SYS_Property\SYS-Property-Holdings-Real-Estate-Management-System\SYS Property Catalog";
+                $finalImg = $catalogDir . "placeholder.jpg"; // Default fallback
+
+                // Scan for the file with different extensions
+                $extensions = ['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'];
+                $fileName = $filePrefix . " - " . $stateName; // e.g., "Apartment - Johor"
+
+                foreach ($extensions as $ext) {
+                    $testPath = $catalogDir . $folder . $fileName . "." . $ext;
+                    // Check if file exists on the server
+                    if (file_exists($testPath)) {
+                        $finalImg = $testPath;
+                        break;
+                    }
+                }
+
+                // Data Formatting
+                $formattedPrice = number_format($row['price'], 2);
+                $availableUnits = isset($row['available_units']) ? $row['available_units'] : 0;
+                ?>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                        
+                        <div class="position-relative bg-light" style="height: 250px;">
+                            <img src="<?php echo htmlspecialchars($finalImg); ?>" 
+                                 class="w-100 h-100" 
+                                 alt="Property" 
+                                 style="object-fit: cover; object-position: center;"
+                                 onerror="this.src='<?php echo $catalogDir; ?>placeholder.jpg';">
+                            
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 shadow">
+                                <?php echo htmlspecialchars($row['property_type']); ?>
+                            </span>
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark mb-1 text-truncate">
+                                <?php echo htmlspecialchars($row['project_name']); ?>
+                            </h5>
+                            <p class="text-muted small mb-4">
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($stateName); ?>
+                            </p>
+                            
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block fw-bold" style="font-size: 0.7rem;">PRICE FROM</small>
+                                    <h4 class="text-success fw-bold mb-0">RM <?php echo $formattedPrice; ?></h4>
+                                </div>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" 
+                                   class="btn btn-dark rounded-pill px-4 shadow-sm">
+                                   Details
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 py-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-door-open me-1"></i> Units Available: 
+                                <strong class="text-dark"><?php echo $availableUnits; ?></strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <?php
+            }
+        } else {
+            echo '<div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="lead text-muted">No properties available.</p>
+                  </div>';
+        }
+        ?>
+    </div>
+</div>
+
+<?php include_once $root_prefix . 'includes/footer.php'; ?>

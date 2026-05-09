@@ -10,44 +10,62 @@ $alert_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
-        $old_pass = $_POST['old_password'];
-        $new_pass = $_POST['new_password'];
+        $old_pass = $_POST['old_password'] ?? '';
+        $new_pass = $_POST['new_password'] ?? '';
 
-        $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
-        $stmt_check->bind_param("i", $account_id);
-        $stmt_check->execute();
-        $res = $stmt_check->get_result()->fetch_assoc();
-
-        if ($res && password_verify($old_pass, $res['password_hash'])) {
-            $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
-            $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
-            $update_pass->bind_param("si", $hashed_password, $account_id);
-
-            if ($update_pass->execute()) {
-                $alert_msg = 'Password successfully hashed and updated.';
-                $alert_type = 'success';
-            }
-        } else {
-            $alert_msg = 'Verification failed: Current password incorrect.';
+        if (strlen($new_pass) < 8) {
+            $alert_msg = 'New password must be at least 8 characters.';
             $alert_type = 'danger';
+        } else {
+            $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
+            $stmt_check->bind_param("i", $account_id);
+            $stmt_check->execute();
+            $res = $stmt_check->get_result()->fetch_assoc();
+
+            if ($res && password_verify($old_pass, $res['password_hash'])) {
+                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
+                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $update_pass->bind_param("si", $hashed_password, $account_id);
+
+                if ($update_pass->execute()) {
+                    $alert_msg = 'Password updated successfully.';
+                    $alert_type = 'success';
+                }
+            } else {
+                $alert_msg = 'Verification failed: Current password incorrect.';
+                $alert_type = 'danger';
+            }
         }
     }
 
     if (isset($_POST['update_profile'])) {
-        $email = trim($_POST['email']);
-        $full_name = trim($_POST['full_name']);
-        $department = trim($_POST['department']);
+        $email = trim($_POST['email'] ?? '');
+        $full_name = trim($_POST['full_name'] ?? '');
+        $department = trim($_POST['department'] ?? '');
 
-        $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
-        $upd_acc->bind_param("si", $email, $account_id);
-        $upd_acc->execute();
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $full_name === '' || $department === '') {
+            $alert_msg = 'Please enter a valid email, full name, and department.';
+            $alert_type = 'danger';
+        } else {
+            try {
+                $conn->begin_transaction();
 
-        $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
-        $update_stmt->bind_param("iss", $account_id, $full_name, $department);
+                $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
+                $upd_acc->bind_param("si", $email, $account_id);
+                $upd_acc->execute();
 
-        if ($update_stmt->execute()) {
-            $alert_msg = 'Profile and email successfully updated.';
-            $alert_type = 'success';
+                $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
+                $update_stmt->bind_param("iss", $account_id, $full_name, $department);
+                $update_stmt->execute();
+
+                $conn->commit();
+                $alert_msg = 'Profile and email successfully updated.';
+                $alert_type = 'success';
+            } catch (Exception $e) {
+                $conn->rollback();
+                $alert_msg = 'Profile update failed. Please check if the email is already used.';
+                $alert_type = 'danger';
+            }
         }
     }
 }
