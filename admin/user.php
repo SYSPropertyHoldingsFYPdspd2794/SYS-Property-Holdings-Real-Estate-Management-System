@@ -21,6 +21,21 @@ function alert_box($type, $message)
         . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 }
 
+function table_column_exists($conn, $table, $column)
+{
+    try {
+        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
+        $stmt->bind_param("ss", $table, $column);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        return ((int)($row['total'] ?? 0)) > 0;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+$admin_has_department = table_column_exists($conn, 'admins', 'department');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     $transaction_started = false;
@@ -59,6 +74,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $state = trim($_POST['assigned_state'] ?? '');
                 $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?)");
                 $st->bind_param("isss", $new_id, $name, $phone, $state);
+                $st->execute();
+            } elseif ($admin_has_department) {
+                $department = trim($_POST['department'] ?? '');
+                if ($department === '') {
+                    $department = 'HQ Administration';
+                }
+
+                $st = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?)");
+                $st->bind_param("iss", $new_id, $name, $department);
                 $st->execute();
             } else {
                 $st = $conn->prepare("INSERT INTO admins (admin_id, full_name) VALUES (?, ?)");
@@ -112,6 +136,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), phone_number = VALUES(phone_number), assigned_state = VALUES(assigned_state)");
                 $st->bind_param("isss", $account_id, $name, $phone, $state);
                 $st->execute();
+            } elseif ($admin_has_department) {
+                $department = trim($_POST['department'] ?? '');
+                if ($department === '') {
+                    $department = 'HQ Administration';
+                }
+
+                $st = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
+                $st->bind_param("iss", $account_id, $name, $department);
+                $st->execute();
             } else {
                 $st = $conn->prepare("INSERT INTO admins (admin_id, full_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name)");
                 $st->bind_param("is", $account_id, $name);
@@ -133,15 +166,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
+$admin_department_select = $admin_has_department ? "ad.department" : "'HQ Administration' AS department";
+$admin_detail_expr = $admin_has_department ? "COALESCE(ad.department, 'HQ Administration')" : "'HQ Administration'";
+
 $query = "
     SELECT
         a.account_id,
         a.email,
         a.role,
         CASE
-            WHEN a.role = 'CUSTOMER' THEN c.full_name
-            WHEN a.role = 'STAFF' THEN s.full_name
-            ELSE ad.full_name
+            WHEN a.role = 'CUSTOMER' THEN COALESCE(c.full_name, s.full_name, ad.full_name)
+            WHEN a.role = 'STAFF' THEN COALESCE(s.full_name, c.full_name, ad.full_name)
+            ELSE COALESCE(ad.full_name, c.full_name, s.full_name)
         END AS full_name,
         COALESCE(c.phone_number, s.phone_number, '') AS phone_number,
         c.marital_status,
@@ -149,10 +185,11 @@ $query = "
         c.occupation,
         c.monthly_income,
         s.assigned_state,
+        $admin_department_select,
         CASE
             WHEN a.role = 'CUSTOMER' THEN COALESCE(c.occupation, 'Customer')
             WHEN a.role = 'STAFF' THEN COALESCE(s.assigned_state, 'Not Assigned')
-            ELSE COALESCE(ad.department, 'HQ Administration')
+            ELSE $admin_detail_expr
         END AS detail
     FROM accounts a
     LEFT JOIN customers c ON a.account_id = c.customer_id
@@ -209,7 +246,7 @@ include '../includes/header.php';
                             if ($role === 'CUSTOMER') $badge = 'success';
                             ?>
                             <tr>
-                                <td>#<?php echo (int)$u['account_id']; ?></td>
+                                <td data-order="<?php echo (int)$u['account_id']; ?>">#<?php echo (int)$u['account_id']; ?></td>
                                 <td class="fw-bold"><?php echo htmlspecialchars($u['full_name'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($u['email']); ?></td>
                                 <td><span class="badge bg-<?php echo $badge; ?>"><?php echo htmlspecialchars($role); ?></span></td>
@@ -248,49 +285,60 @@ include '../includes/header.php';
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label fw-bold">Role</label>
-                                                        <select name="role" class="form-select" required>
+                                                        <select name="role" class="form-select edit-role-select" required onchange="toggleEditFields(this)">
                                                             <option value="CUSTOMER" <?php echo ($role === 'CUSTOMER') ? 'selected' : ''; ?>>Customer</option>
                                                             <option value="STAFF" <?php echo ($role === 'STAFF') ? 'selected' : ''; ?>>Staff</option>
                                                             <option value="ADMIN" <?php echo ($role === 'ADMIN') ? 'selected' : ''; ?>>Administrator</option>
                                                         </select>
                                                     </div>
 
-                                                    <div class="col-12">
+                                                    <div class="col-12 edit-role-field edit-customer-field">
                                                         <hr class="my-2">
                                                         <h6 class="fw-bold text-muted mb-0">Customer Fields</h6>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6 edit-role-field edit-customer-field edit-staff-field">
                                                         <label class="form-label fw-bold">Phone Number</label>
                                                         <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($u['phone_number'] ?? ''); ?>">
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6 edit-role-field edit-customer-field">
                                                         <label class="form-label fw-bold">Marital Status</label>
                                                         <select name="marital_status" class="form-select">
                                                             <option value="SINGLE" <?php echo ($u['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
                                                             <option value="MARRIED" <?php echo ($u['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 edit-role-field edit-customer-field">
                                                         <label class="form-label fw-bold">Dependents</label>
                                                         <input type="number" name="dependents_count" class="form-control" min="0" value="<?php echo htmlspecialchars($u['dependents_count'] ?? 0); ?>">
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 edit-role-field edit-customer-field">
                                                         <label class="form-label fw-bold">Occupation</label>
                                                         <input type="text" name="occupation" class="form-control" value="<?php echo htmlspecialchars($u['occupation'] ?? ''); ?>">
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 edit-role-field edit-customer-field">
                                                         <label class="form-label fw-bold">Monthly Income (RM)</label>
                                                         <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo htmlspecialchars($u['monthly_income'] ?? 0); ?>">
                                                     </div>
 
-                                                    <div class="col-12">
+                                                    <div class="col-12 edit-role-field edit-staff-field">
                                                         <hr class="my-2">
                                                         <h6 class="fw-bold text-muted mb-0">Staff Fields</h6>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6 edit-role-field edit-staff-field">
                                                         <label class="form-label fw-bold">Assigned State</label>
                                                         <input type="text" name="assigned_state" class="form-control" value="<?php echo htmlspecialchars($u['assigned_state'] ?? ''); ?>">
                                                     </div>
+
+                                                    <?php if ($admin_has_department): ?>
+                                                        <div class="col-12 edit-role-field edit-admin-field">
+                                                            <hr class="my-2">
+                                                            <h6 class="fw-bold text-muted mb-0">Admin Fields</h6>
+                                                        </div>
+                                                        <div class="col-md-6 edit-role-field edit-admin-field">
+                                                            <label class="form-label fw-bold">Department</label>
+                                                            <input type="text" name="department" class="form-control" value="<?php echo htmlspecialchars($u['department'] ?? 'HQ Administration'); ?>">
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -351,6 +399,12 @@ include '../includes/header.php';
                             <label class="form-label fw-bold">Assigned State</label>
                             <input type="text" name="assigned_state" class="form-control">
                         </div>
+                        <?php if ($admin_has_department): ?>
+                            <div class="col-md-6 role-field admin-field">
+                                <label class="form-label fw-bold">Department</label>
+                                <input type="text" name="department" class="form-control" value="HQ Administration">
+                            </div>
+                        <?php endif; ?>
                         <div class="col-md-6 role-field customer-field">
                             <label class="form-label fw-bold">Marital Status</label>
                             <select name="marital_status" class="form-select">
@@ -403,7 +457,29 @@ include '../includes/header.php';
         if (role === 'STAFF') {
             document.querySelectorAll('.staff-field').forEach((field) => field.classList.remove('d-none'));
         }
+        if (role === 'ADMIN') {
+            document.querySelectorAll('.admin-field').forEach((field) => field.classList.remove('d-none'));
+        }
     }
+
+    function toggleEditFields(select) {
+        const role = select.value;
+        const modal = select.closest('.modal');
+        modal.querySelectorAll('.edit-role-field').forEach((field) => {
+            field.classList.add('d-none');
+        });
+        if (role === 'CUSTOMER') {
+            modal.querySelectorAll('.edit-customer-field').forEach((field) => field.classList.remove('d-none'));
+        }
+        if (role === 'STAFF') {
+            modal.querySelectorAll('.edit-staff-field').forEach((field) => field.classList.remove('d-none'));
+        }
+        if (role === 'ADMIN') {
+            modal.querySelectorAll('.edit-admin-field').forEach((field) => field.classList.remove('d-none'));
+        }
+    }
+
+    document.querySelectorAll('.edit-role-select').forEach((select) => toggleEditFields(select));
 </script>
 
 <?php include '../includes/footer.php'; ?>
