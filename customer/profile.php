@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
     if (isset($_POST['save_details'])) {
         $email = trim($_POST['email']);
         $full_name = trim($_POST['full_name']);
@@ -41,23 +40,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $occupation = trim($_POST['occupation']);
         $income = floatval($_POST['monthly_income']);
 
+        // 1. Update Accounts Table
         $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
         $upd_acc->bind_param("si", $email, $account_id);
         $upd_acc->execute();
 
+        // 2. Update Customers Table
         $sql = "INSERT INTO customers (customer_id, full_name, phone_number, marital_status, dependents_count, occupation, monthly_income)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), phone_number = VALUES(phone_number), marital_status = VALUES(marital_status), dependents_count = VALUES(dependents_count), occupation = VALUES(occupation), monthly_income = VALUES(monthly_income)";
+                ON DUPLICATE KEY UPDATE 
+                full_name = VALUES(full_name), 
+                phone_number = VALUES(phone_number), 
+                marital_status = VALUES(marital_status), 
+                dependents_count = VALUES(dependents_count), 
+                occupation = VALUES(occupation), 
+                monthly_income = VALUES(monthly_income)";
+        
         $update_stmt = $conn->prepare($sql);
         $update_stmt->bind_param("isssisd", $account_id, $full_name, $phone, $marital, $dependents, $occupation, $income);
 
         if ($update_stmt->execute()) {
             $alert_msg = 'Profile details updated successfully.';
             $alert_type = 'success';
+            
+            // Refresh local session data to show changes immediately
+            $_SESSION['user_email'] = $email;
         }
     }
 }
 
+// FETCH DATA AFTER UPDATES: Ensures the $user array has the most recent DB values
 $stmt = $conn->prepare("SELECT c.*, a.email FROM accounts a LEFT JOIN customers c ON a.account_id = c.customer_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
@@ -112,8 +124,9 @@ include '../includes/header.php';
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
                                 <select name="marital_status" class="form-select" required>
-                                    <option value="Single" <?php echo ($user['marital_status'] ?? '') == 'Single' ? 'selected' : ''; ?>>Single</option>
-                                    <option value="Married" <?php echo ($user['marital_status'] ?? '') == 'Married' ? 'selected' : ''; ?>>Married</option>
+                                    <!-- FIXED LOGIC: Strict comparison for dropdown selection -->
+                                    <option value="Single" <?php echo (isset($user['marital_status']) && $user['marital_status'] == 'Single') ? 'selected' : ''; ?>>Single</option>
+                                    <option value="Married" <?php echo (isset($user['marital_status']) && $user['marital_status'] == 'Married') ? 'selected' : ''; ?>>Married</option>
                                 </select>
                             </div>
                         </div>
