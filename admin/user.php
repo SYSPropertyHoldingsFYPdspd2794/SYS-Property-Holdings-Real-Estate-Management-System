@@ -34,6 +34,76 @@ function table_column_exists($conn, $table, $column)
     }
 }
 
+function table_exists($conn, $table)
+{
+    try {
+        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?");
+        $stmt->bind_param("s", $table);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        return ((int)($row['total'] ?? 0)) > 0;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+function execute_account_delete($conn, $account_id)
+{
+    if (table_exists($conn, 'audit_logs')) {
+        $stmt = $conn->prepare("UPDATE audit_logs SET account_id = NULL WHERE account_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+    }
+
+    if (table_exists($conn, 'affordable_housing_applications')) {
+        $stmt = $conn->prepare("UPDATE affordable_housing_applications SET reviewed_by_staff_id = NULL WHERE reviewed_by_staff_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+
+        $stmt = $conn->prepare("DELETE FROM affordable_housing_applications WHERE customer_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+    }
+
+    if (table_exists($conn, 'appointments')) {
+        $stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id = NULL WHERE assigned_staff_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+
+        $stmt = $conn->prepare("DELETE FROM appointments WHERE customer_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+    }
+
+    if (table_exists($conn, 'documents')) {
+        $stmt = $conn->prepare("DELETE FROM documents WHERE customer_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+    }
+
+    if (table_exists($conn, 'wishlists')) {
+        $stmt = $conn->prepare("DELETE FROM wishlists WHERE customer_id = ?");
+        $stmt->bind_param("i", $account_id);
+        $stmt->execute();
+    }
+
+    foreach (['admins' => 'admin_id', 'staff' => 'staff_id', 'customers' => 'customer_id'] as $table => $id_column) {
+        if (table_exists($conn, $table)) {
+            $stmt = $conn->prepare("DELETE FROM $table WHERE $id_column = ?");
+            $stmt->bind_param("i", $account_id);
+            $stmt->execute();
+        }
+    }
+
+    $stmt = $conn->prepare("DELETE FROM accounts WHERE account_id = ?");
+    $stmt->bind_param("i", $account_id);
+    $stmt->execute();
+
+    if ($stmt->affected_rows < 1) {
+        throw new Exception('Account was not found or has already been removed.');
+    }
+}
+
 $admin_has_department = table_column_exists($conn, 'admins', 'department');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -41,6 +111,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $transaction_started = false;
 
     try {
+        if ($action === 'delete') {
+            $account_id = (int)($_POST['account_id'] ?? 0);
+
+            if ($account_id <= 0) {
+                throw new Exception('Invalid account selected for removal.');
+            }
+
+            if ($account_id === (int)($_SESSION['account_id'] ?? 0)) {
+                throw new Exception('You cannot remove your own admin account while logged in.');
+            }
+
+            $conn->begin_transaction();
+            $transaction_started = true;
+
+            execute_account_delete($conn, $account_id);
+
+            $conn->commit();
+            $transaction_started = false;
+            redirect_user_page('deleted');
+        }
+
         if ($action === 'create') {
             $email = trim($_POST['email'] ?? '');
             $raw_password = $_POST['password'] ?? '';
@@ -210,7 +301,13 @@ include '../includes/header.php';
 
     <?php if (isset($_GET['msg'])): ?>
         <?php
-        $message = $_GET['msg'] === 'updated' ? 'User updated successfully.' : 'User registered successfully.';
+        if ($_GET['msg'] === 'updated') {
+            $message = 'User updated successfully.';
+        } elseif ($_GET['msg'] === 'deleted') {
+            $message = 'User removed successfully.';
+        } else {
+            $message = 'User registered successfully.';
+        }
         ?>
         <?php echo alert_box('success', $message); ?>
     <?php endif; ?>
@@ -252,9 +349,18 @@ include '../includes/header.php';
                                 <td><span class="badge bg-<?php echo $badge; ?>"><?php echo htmlspecialchars($role); ?></span></td>
                                 <td><?php echo htmlspecialchars($u['detail'] ?? 'N/A'); ?></td>
                                 <td>
-                                    <button class="btn btn-sm btn-dark fw-bold" data-bs-toggle="modal" data-bs-target="#editModal<?php echo (int)$u['account_id']; ?>">
-                                        Edit
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-dark fw-bold" data-bs-toggle="modal" data-bs-target="#editModal<?php echo (int)$u['account_id']; ?>">
+                                            Edit
+                                        </button>
+                                        <form method="POST" class="m-0" onsubmit="return confirm('Remove this account permanently?');">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="account_id" value="<?php echo (int)$u['account_id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Remove account" <?php echo ((int)$u['account_id'] === (int)($_SESSION['account_id'] ?? 0)) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
 
