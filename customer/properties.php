@@ -1,110 +1,80 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role']!== 'CUSTOMER') {
-    header("Location:../login.php");
-    exit();
-}
 include '../includes/db_connect.php';
-include '../includes/header.php';
+include '../includes/auth_check.php';
 
-$property_id = isset($_GET['id'])? intval($_GET['id']) : 0;
-$stmt = $conn->prepare("SELECT * FROM properties WHERE property_id =?");
-$stmt->bind_param("i", $property_id);
-$stmt->execute();
-$property = $stmt->get_result()->fetch_assoc();
+protect_customer_page('CUSTOMER', $conn);
 
-if (!$property) {
-    echo "<div class='container my-5'><h3 class='text-danger'>Property not found.</h3></div>";
-    include '../includes/footer.php';
-    exit();
+$type = $_GET['type'] ?? '';
+$allowed_types = ['AFFORDABLE', 'TERRACE', 'BUNGALOW', 'COMMERCIAL', 'APARTMENT'];
+
+if ($type !== '' && in_array($type, $allowed_types, true)) {
+    $stmt = $conn->prepare("SELECT * FROM properties WHERE status = 'ACTIVE' AND property_type = ? ORDER BY property_id DESC");
+    $stmt->bind_param("s", $type);
+    $stmt->execute();
+    $properties = $stmt->get_result();
+} else {
+    $properties = $conn->query("SELECT * FROM properties WHERE status = 'ACTIVE' ORDER BY property_id DESC");
 }
 
-$rate_stmt = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
-$rate = $rate_stmt->fetch_assoc()['setting_value'];
+include '../includes/header.php';
 ?>
+
 <div class="container my-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-building text-primary me-2"></i>Property Catalog</h2>
+            <p class="text-muted mb-0">Browse active SYS Property projects and continue to details, booking, or affordable housing applications.</p>
+        </div>
+        <form method="GET" class="d-flex gap-2">
+            <select name="type" class="form-select" onchange="this.form.submit()">
+                <option value="">All Types</option>
+                <?php foreach ($allowed_types as $property_type): ?>
+                    <option value="<?php echo htmlspecialchars($property_type); ?>" <?php echo $type === $property_type ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars(ucwords(strtolower(str_replace('_', ' ', $property_type)))); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <?php if ($type !== ''): ?>
+                <a href="properties.php" class="btn btn-outline-secondary">Clear</a>
+            <?php endif; ?>
+        </form>
+    </div>
+
     <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow border-0 h-100">
-                <div class="card-body p-5">
-                    <span class="badge bg-primary mb-3 fs-6 px-3 py-2"><?php echo htmlspecialchars($property['property_type']);?></span>
-                    <h1 class="fw-bold mb-3"><?php echo htmlspecialchars($property['project_name']);?></h1>
-                    <p class="fs-4 text-muted"><i class="fas fa-map-marker-alt me-2 text-danger"></i><?php echo htmlspecialchars($property['state']);?></p>
-                    <hr class="my-4">
-                    <div class="row text-center mb-5">
-                        <div class="col p-3 border-end">
-                            <p class="mb-1 text-muted text-uppercase fw-bold">Available Units</p>
-                            <h2 class="fw-bold"><?php echo htmlspecialchars($property['available_units']);?></h2>
+        <?php if ($properties->num_rows > 0): ?>
+            <?php while ($row = $properties->fetch_assoc()): ?>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <span class="badge bg-primary"><?php echo htmlspecialchars($row['property_type']); ?></span>
+                                <span class="badge bg-success"><?php echo (int)$row['available_units']; ?> unit(s)</span>
+                            </div>
+                            <h4 class="fw-bold mb-2"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                            <p class="text-muted mb-2"><i class="fas fa-map-marker-alt text-danger me-2"></i><?php echo htmlspecialchars($row['state']); ?></p>
+                            <p class="text-muted mb-3"><i class="fas fa-ruler-combined text-primary me-2"></i><?php echo number_format((int)$row['built_up_sqft']); ?> sqft</p>
+                            <h4 class="text-success fw-bold mb-4">RM <?php echo number_format((float)$row['price'], 2); ?></h4>
+                            <div class="mt-auto d-flex gap-2">
+                                <a href="property_detail.php?id=<?php echo (int)$row['property_id']; ?>" class="btn btn-dark fw-bold flex-fill">View Details</a>
+                                <form method="POST" action="wishlist.php" class="m-0">
+                                    <input type="hidden" name="action" value="add">
+                                    <input type="hidden" name="property_id" value="<?php echo (int)$row['property_id']; ?>">
+                                    <button type="submit" class="btn btn-outline-danger" title="Add to wishlist">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="col p-3">
-                            <p class="mb-1 text-muted text-uppercase fw-bold">Selling Price</p>
-                            <h2 class="fw-bold text-success">RM <?php echo number_format($property['price'], 2);?></h2>
-                        </div>
-                    </div>
-                    <div class="d-grid mt-auto">
-                        <?php if ($property['property_type'] === 'AFFORDABLE'):?>
-                            <a href="apply_affordable.php?id=<?php echo $property['property_id'];?>" class="btn btn-success btn-lg fw-bold py-3">Apply for Gov Housing</a>
-                        <?php else:?>
-                            <a href="book_appointment.php?id=<?php echo $property['property_id'];?>" class="btn btn-dark btn-lg fw-bold py-3">Book Showroom Viewing</a>
-                        <?php endif;?>
                     </div>
                 </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <div class="col-12 text-center py-5">
+                <i class="far fa-folder-open display-1 text-muted mb-3"></i>
+                <h4 class="text-muted">No active properties found.</h4>
             </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow border-0 h-100 bg-light">
-                <div class="card-body p-5">
-                    <h3 class="fw-bold mb-4"><i class="fas fa-calculator me-2 text-primary"></i>Dynamic Loan Calculator</h3>
-                    <input type="hidden" id="propertyPrice" value="<?php echo $property['price'];?>">
-                    <input type="hidden" id="interestRate" value="<?php echo $rate;?>">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Base Interest Rate (%)</label>
-                        <input type="text" class="form-control form-control-lg bg-white" value="<?php echo htmlspecialchars($rate);?>" readonly>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Downpayment (%)</label>
-                        <input type="number" id="downpayment" class="form-control form-control-lg" value="10" min="0" max="100">
-                    </div>
-                    <div class="mb-5">
-                        <label class="form-label fw-bold">Loan Tenure (Years)</label>
-                        <input type="number" id="tenure" class="form-control form-control-lg" value="35" min="5" max="35">
-                    </div>
-                    <div class="p-4 bg-white border border-primary rounded text-center shadow-sm">
-                        <p class="mb-2 text-muted fw-bold text-uppercase">Estimated Monthly Installment</p>
-                        <h1 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>
-<script>
-function calculateLoan() {
-    const price = parseFloat(document.getElementById('propertyPrice').value);
-    const ratePercentage = parseFloat(document.getElementById('interestRate').value);
-    const monthlyRate = (ratePercentage / 100) / 12;
-    const downpaymentPerc = parseFloat(document.getElementById('downpayment').value) / 100;
-    const tenureMonths = parseFloat(document.getElementById('tenure').value) * 12;
-    
-    const loanAmount = price - (price * downpaymentPerc);
-    
-    if (loanAmount <= 0 || tenureMonths <= 0 || isNaN(loanAmount) || isNaN(tenureMonths)) {
-        document.getElementById('monthlyResult').innerText = "RM 0.00";
-        return;
-    }
-    
-    let monthlyInstallment = 0;
-    if (monthlyRate > 0) {
-        monthlyInstallment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
-    } else {
-        monthlyInstallment = loanAmount / tenureMonths;
-    }
-    
-    document.getElementById('monthlyResult').innerText = "RM " + monthlyInstallment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-}
-document.getElementById('downpayment').addEventListener('input', calculateLoan);
-document.getElementById('tenure').addEventListener('input', calculateLoan);
-window.addEventListener('load', calculateLoan);
-</script>
-<?php include '../includes/footer.php';?>
 
+<?php include '../includes/footer.php'; ?>

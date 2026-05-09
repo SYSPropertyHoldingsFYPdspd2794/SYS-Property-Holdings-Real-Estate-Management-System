@@ -125,8 +125,8 @@ include '../includes/header.php';
                                 <label class="form-label fw-bold">Marital Status</label>
                                 <select name="marital_status" class="form-select" required>
                                     <!-- FIXED LOGIC: Strict comparison for dropdown selection -->
-                                    <option value="Single" <?php echo (isset($user['marital_status']) && $user['marital_status'] == 'Single') ? 'selected' : ''; ?>>Single</option>
-                                    <option value="Married" <?php echo (isset($user['marital_status']) && $user['marital_status'] == 'Married') ? 'selected' : ''; ?>>Married</option>
+                                    <option value="SINGLE" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
+                                    <option value="MARRIED" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
                                 </select>
                             </div>
                         </div>

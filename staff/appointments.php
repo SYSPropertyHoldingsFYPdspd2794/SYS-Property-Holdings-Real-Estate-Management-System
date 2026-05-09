@@ -11,19 +11,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $appt_id = intval($_POST['appointment_id']);
     $status = $_POST['status'];
     $remarks = $_POST['staff_remarks'];
-    
-    $stmt_upd = $conn->prepare("UPDATE appointments SET status = ?, staff_remarks = ? WHERE appointment_id = ? AND assigned_staff_id = ?");
-    $stmt_upd->bind_param("ssii", $status, $remarks, $appt_id, $account_id);
-    
-    if ($stmt_upd->execute()) {
-        header("Location: appointments.php?msg=updated");
-        exit();
+
+    $allowed_statuses = ['ASSIGNED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+    if (in_array($status, $allowed_statuses, true)) {
+        $stmt_upd = $conn->prepare("UPDATE appointments SET status = ?, staff_remarks = ? WHERE appointment_id = ? AND assigned_staff_id = ?");
+        $stmt_upd->bind_param("ssii", $status, $remarks, $appt_id, $account_id);
+
+        if ($stmt_upd->execute()) {
+            header("Location: appointments.php?msg=updated");
+            exit();
+        }
     }
 }
 
 include '../includes/header.php';
 
-$stmt = $conn->prepare("SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.service_type, a.status, c.full_name, c.phone_number, p.project_name 
+$stmt = $conn->prepare("SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.service_type, a.status, a.staff_remarks, c.full_name, c.phone_number, p.project_name 
                         FROM appointments a 
                         JOIN customers c ON a.customer_id = c.customer_id 
                         JOIN properties p ON a.property_id = p.property_id 
@@ -32,6 +35,7 @@ $stmt = $conn->prepare("SELECT a.appointment_id, a.appointment_date, a.appointme
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$appointment_modals = '';
 ?>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
@@ -75,6 +79,41 @@ $result = $stmt->get_result();
                                     <?php endif; ?>
                                 </td>
                             </tr>
+                            <?php ob_start(); ?>
+                            <div class="modal fade" id="modalAppt<?php echo (int)$row['appointment_id']; ?>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-dark text-white">
+                                            <h5 class="modal-title fw-bold">Update Appointment</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="POST">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="action" value="update">
+                                                <input type="hidden" name="appointment_id" value="<?php echo (int)$row['appointment_id']; ?>">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Status</label>
+                                                    <select name="status" class="form-select" required>
+                                                        <option value="ASSIGNED" <?php echo $row['status'] === 'ASSIGNED' ? 'selected' : ''; ?>>Assigned</option>
+                                                        <option value="COMPLETED" <?php echo $row['status'] === 'COMPLETED' ? 'selected' : ''; ?>>Completed</option>
+                                                        <option value="CANCELLED" <?php echo $row['status'] === 'CANCELLED' ? 'selected' : ''; ?>>Cancelled</option>
+                                                        <option value="NO_SHOW" <?php echo $row['status'] === 'NO_SHOW' ? 'selected' : ''; ?>>No Show</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Staff Remarks</label>
+                                                    <textarea name="staff_remarks" class="form-control" rows="4"><?php echo htmlspecialchars($row['staff_remarks'] ?? ''); ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary fw-bold">Save Update</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $appointment_modals .= ob_get_clean(); ?>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
@@ -82,6 +121,8 @@ $result = $stmt->get_result();
         </div>
     </div>
 </div>
+
+<?php echo $appointment_modals; ?>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
