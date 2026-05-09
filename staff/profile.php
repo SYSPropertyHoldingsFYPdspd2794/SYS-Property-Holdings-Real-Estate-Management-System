@@ -1,48 +1,80 @@
 <?php
-// 1. Include Dependencies
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
 
-// 2. Validate session roles and restrict unauthorized database connections.
 protect_staff_page('STAFF', $conn);
 
-// REQUIREMENT: Get the ACTIVE SESSION ID
-// This ID identifies exactly which staff member is logged in.
 $account_id = $_SESSION['account_id']; 
-
 $alert_msg = '';
 
-// 3. TASK LOGIC: Execute an UPDATE statement based on the active session ID.
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['phone_number'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    // Capture and sanitize input
-    $phone = trim($_POST['phone_number']);
-    
-    // PREPARED STATEMENT: Targets the 'staff' table.
-    // The WHERE clause strictly uses the $account_id from the active session.
-    $stmt_upd = $conn->prepare("UPDATE staff SET phone_number = ? WHERE staff_id = ?");
-    
-    // Bind parameters: 's' for string (phone), 'i' for integer (session id)
-    $stmt_upd->bind_param("si", $phone, $account_id);
-    
-    if ($stmt_upd->execute()) {
-        $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Update Successful! Record for Session ID: ' . $account_id . ' has been updated.
-                      </div>';
-    } else {
-        $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">
-                        <i class="fas fa-times-circle me-2"></i>
-                        Failed to update database: ' . $conn->error . '
-                      </div>';
+    // --- SECTION A: HASH THE NEW PASSWORD (Task #9) ---
+    if (isset($_POST['update_password'])) {
+        $old_pass = $_POST['old_password'] ?? '';
+        $new_pass = $_POST['new_password'] ?? '';
+        $confirm_pass = $_POST['confirm_password'] ?? '';
+
+        if ($old_pass === '' || $new_pass === '' || $confirm_pass === '') {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Please fill in all password fields.</div>';
+        } elseif ($new_pass !== $confirm_pass) {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">New password and confirm password do not match.</div>';
+        } else {
+            $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
+            $stmt_check->bind_param("i", $account_id);
+            $stmt_check->execute();
+            $res = $stmt_check->get_result()->fetch_assoc();
+            $stmt_check->close();
+
+            if (!$res || !password_verify($old_pass, $res['password_hash'])) {
+                $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Current password incorrect.</div>';
+            } else {
+                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
+                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $update_pass->bind_param("si", $hashed_password, $account_id);
+
+                if ($update_pass->execute()) {
+                    $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Password successfully updated!</div>';
+                } else {
+                    $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Failed to update password.</div>';
+                }
+
+                $update_pass->close();
+            }
+        }
     }
-    
-    // Close statement to free up database resources
-    $stmt_upd->close();
+
+    // --- SECTION B: UPDATE STAFF RECORD & EMAIL ---
+    if (isset($_POST['update_staff'])) {
+        $email = trim($_POST['email']);
+        $full_name = trim($_POST['full_name']);
+        $state = trim($_POST['assigned_state']);
+        $phone = trim($_POST['phone_number']);
+        
+        // 1. Update Email in 'accounts' table
+        $update_email = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
+        $update_email->bind_param("si", $email, $account_id);
+        $update_email->execute();
+
+        // 2. Update Details in 'staff' table
+        $stmt_upd = $conn->prepare("UPDATE staff SET full_name = ?, assigned_state = ?, phone_number = ? WHERE staff_id = ?");
+        $stmt_upd->bind_param("sssi", $full_name, $state, $phone, $account_id);
+        
+        if ($stmt_upd->execute()) {
+            if ($stmt_upd->affected_rows >= 0) {
+                $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Staff record and email updated successfully!</div>';
+            }
+        } else {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Failed to update staff record.</div>';
+        }
+        $stmt_upd->close();
+    }
 }
 
-// 4. Fetch the refreshed data for display in the form
-$stmt = $conn->prepare("SELECT s.*, a.email FROM staff s JOIN accounts a ON s.staff_id = a.account_id WHERE s.staff_id = ?");
+$stmt = $conn->prepare("SELECT a.email, s.full_name, s.assigned_state, s.phone_number 
+                        FROM accounts a 
+                        LEFT JOIN staff s ON a.account_id = s.staff_id 
+                        WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
@@ -52,47 +84,72 @@ include '../includes/header.php';
 
 <div class="container my-5">
     <div class="mb-5">
-        <h2 class="fw-bold m-0"><i class="fas fa-user-circle text-primary me-2"></i>My Profile</h2>
+        <h2 class="fw-bold m-0"><i class="fas fa-user-circle text-primary me-2"></i>My Profile & Security</h2>
     </div>
 
-    <div class="row justify-content-center">
+    <?php echo $alert_msg; ?>
+
+    <div class="row g-4">
+        <!-- Security Section -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4 text-warning"><i class="fas fa-lock me-2"></i>Security</h4>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Current Password</label>
+                            <input type="password" name="old_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">New Password</label>
+                            <input type="password" name="new_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required>
+                        </div>
+                        <button type="submit" name="update_password" class="btn btn-warning w-100 fw-bold">Update Credentials</button>
+                        <div class="text-center mt-3">
+                            <a href="https://wa.link/k61mrv" target="_blank" rel="noopener noreferrer" class="fw-bold text-decoration-none">
+                                Forgot password?
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Information Section -->
         <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
                     <h4 class="fw-bold mb-4 text-dark border-bottom pb-2">Staff Information</h4>
-                    
-                    <?php echo $alert_msg; ?>
-                    
                     <form method="POST">
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email Address</label>
-                                <input type="email" class="form-control bg-light" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
-                                <small class="text-muted italic">Managed by HQ</small>
+                                <!-- FIXED: Removed 'readonly', added 'name="email"', and changed class to remove 'bg-light' -->
+                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Full Name</label>
-                                <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['full_name']); ?>" readonly>
-                                <small class="text-muted italic">Managed by HR</small>
+                                <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" required>
                             </div>
                         </div>
                         
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Assigned State</label>
-                                <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['assigned_state']); ?>" readonly>
+                                <input type="text" name="assigned_state" class="form-control" value="<?php echo htmlspecialchars($user['assigned_state'] ?? ''); ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-primary">Phone Number</label>
-                                <input type="text" name="phone_number" class="form-control border-primary" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required>
-                                <small class="text-info italic">Update your contact details here.</small>
+                                <input type="text" name="phone_number" class="form-control border-primary" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" required>
                             </div>
                         </div>
                         
-                        <hr class="my-4">
-                        
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
+                            <button type="submit" name="update_staff" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
                                 <i class="fas fa-save me-2"></i>Update Staff Record
                             </button>
                         </div>
