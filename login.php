@@ -1,9 +1,10 @@
 <?php
 // 1. ALWAYS put session_start() at the very top before any HTML or includes
-session_start(); 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 include 'includes/db_connect.php'; 
-include 'includes/header.php';
 
 $error_message = '';
 
@@ -50,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Invalid email or password.';
     }
 }
+
+include 'includes/header.php';
 ?>
 
 <div class="container my-5">

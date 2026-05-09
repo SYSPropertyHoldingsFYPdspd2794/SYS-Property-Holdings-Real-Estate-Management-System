@@ -12,7 +12,8 @@ $error = '';
 $user_stmt = $conn->prepare("SELECT monthly_income FROM customers WHERE customer_id =?");
 $user_stmt->bind_param("i", $account_id);
 $user_stmt->execute();
-$user_income = $user_stmt->get_result()->fetch_assoc()['monthly_income'];
+$user = $user_stmt->get_result()->fetch_assoc();
+$user_income = (float)($user['monthly_income'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prop_id = $_POST['property_id'];
