@@ -9,6 +9,7 @@ $alert_msg = '';
 $alert_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     if (isset($_POST['update_password'])) {
         $old_pass = $_POST['old_password'];
         $new_pass = $_POST['new_password'];
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $alert_type = 'danger';
         }
     }
+
 
     if (isset($_POST['save_details'])) {
         $email = trim($_POST['email']);
@@ -115,6 +117,7 @@ include '../includes/header.php';
                                 </select>
                             </div>
                         </div>
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Occupation</label>

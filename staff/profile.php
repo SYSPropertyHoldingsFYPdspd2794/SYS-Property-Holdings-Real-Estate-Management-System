@@ -8,7 +8,6 @@ $account_id = $_SESSION['account_id'];
 $alert_msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // SECTION A: Password Hashing (Task #9)
     if (isset($_POST['update_password'])) {
         $old_pass = $_POST['old_password'];
         $new_pass = $_POST['new_password'];
@@ -29,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // SECTION B: Staff Record & Email Update
     if (isset($_POST['update_staff'])) {
         $email = trim($_POST['email']);
         $full_name = trim($_POST['full_name']);
