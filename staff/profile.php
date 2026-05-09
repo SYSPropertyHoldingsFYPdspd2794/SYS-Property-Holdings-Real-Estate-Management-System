@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Staff Information Update Logic (Assigned State Removed)
+    // Staff Information Update Logic (Assigned State is kept READ-ONLY)
     if (isset($_POST['update_staff'])) {
         $email = trim($_POST['email']);
         $full_name = trim($_POST['full_name']);
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upd_acc->bind_param("si", $email, $account_id);
         $upd_acc->execute();
 
-        // SQL updated: Removed assigned_state from INSERT and ON DUPLICATE KEY UPDATE
+        // Notice: assigned_state is NOT included in the UPDATE part to prevent hacking
         $sql = "INSERT INTO staff (staff_id, full_name, phone_number) VALUES (?, ?, ?) 
                 ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), phone_number = VALUES(phone_number)";
         $stmt_upd = $conn->prepare($sql);
@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch Query updated: Removed s.assigned_state
-$stmt = $conn->prepare("SELECT a.email, s.full_name, s.phone_number FROM accounts a LEFT JOIN staff s ON a.account_id = s.staff_id WHERE a.account_id = ?");
+// Fetch Query: Re-added s.assigned_state so it can be displayed
+$stmt = $conn->prepare("SELECT a.email, s.full_name, s.assigned_state, s.phone_number FROM accounts a LEFT JOIN staff s ON a.account_id = s.staff_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
@@ -113,7 +113,13 @@ include '../includes/header.php';
                             </div>
                         </div>
                         <div class="row mb-4">
-                            <div class="col-md-12">
+                            <!-- FEEDBACK IMPLEMENTATION: Assigned State as Read-Only -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted">Assigned Region (Locked)</label>
+                                <input type="text" class="form-control bg-light" value="<?php echo htmlspecialchars($user['assigned_state'] ?? 'N/A'); ?>" readonly>
+                                <small class="text-muted">Contact Admin to change your region.</small>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone Number</label>
                                 <input type="text" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" required>
                             </div>
