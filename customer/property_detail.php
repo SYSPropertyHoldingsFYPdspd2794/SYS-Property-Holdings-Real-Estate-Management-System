@@ -1,143 +1,232 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * FILE: customer/property_detail.php
- * DESCRIPTION: Specific property details with loan calculator (US17, US21, US22).
+ * MODULE: Customer - Property Details
+ * DESCRIPTION: Features dynamic loan calculator, robust image mapping, and interactive modal zoom.
  */
 
 include_once '../includes/header.php';
-
 include_once '../includes/header.php';
 /** @var string $root_prefix */
 /** @var mysqli $conn */
 require_once '../includes/auth_check.php';
-
 require_once '../includes/auth_check.php';
 protect_customer_page('CUSTOMER', $conn);
 
-// Get and Sanitize ID
-$pid = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Fetch Data
 $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ?");
-$stmt->bind_param("i", $pid);
+$stmt->bind_param("i", $property_id);
 $stmt->execute();
 $property = $stmt->get_result()->fetch_assoc();
 
 if (!$property) {
-    header("Location: properties.php");
+    echo "<div class='container my-5 text-center'><h3 class='text-danger'>Property not found.</h3></div>";
+    include_once '../includes/footer.php';
     exit();
 }
 
-// Fetch Interest Rate from Settings (US21)
-$res_rate = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
-$base_rate = ($res_rate && $res_rate->num_rows > 0) ? $res_rate->fetch_assoc()['setting_value'] : 3.5;
+$rate_stmt = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
+$rate = ($rate_stmt && $rate_stmt->num_rows > 0) ? $rate_stmt->fetch_assoc()['setting_value'] : 3.5;
 
-/* =========================================================
-   IMAGE SCANNER LOGIC (Synced with properties.php)
-   ========================================================= */
-$typeRaw = strtoupper(trim($property['property_type']));
-$typeName = ucfirst(strtolower($typeRaw));
-$stateName = ucfirst(strtolower(trim($property['state'])));
-$baseName = $typeName . " - " . $stateName;
+// Safety Checks for Missing Data
+$sqft_display = isset($property['built_up_sqft']) && !empty($property['built_up_sqft']) ? number_format($property['built_up_sqft']) : "N/A";
+$income_limit_display = "N/A";
+if (isset($property['applicant_income_limit']) && $property['applicant_income_limit'] > 0) {
+    $income_limit_display = "Below RM " . number_format($property['applicant_income_limit']);
+}
+$availableUnits = isset($property['available_units']) ? $property['available_units'] : (isset($property['total_units']) ? $property['total_units'] : 0);
 
-$folderMap = ['APARTMENT'=>'1. APARTMENT/', 'BUNGALOW'=>'2. BUNGALOW/', 'COMMERCIAL'=>'3. COMMERCIAL/', 'TERRACE'=>'4. TERRACE/'];
-$subFolder = isset($folderMap[$typeRaw]) ? $folderMap[$typeRaw] : "";
-$extensions = ['jpg','jpeg','png','JPG','JPEG','PNG'];
-$finalImg = $root_prefix . "uploads/properties/placeholder.jpg";
+// --- IMAGE MAPPING LOGIC ---
+$dbType = strtolower(trim($property['property_type']));
+$rawState = trim($property['state']);
 
-foreach ($extensions as $ext) {
-    $p1 = $root_prefix . "uploads/properties/" . $subFolder . $baseName . "." . $ext;
-    if (file_exists($p1)) { $finalImg = $p1; break; }
+if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
+if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
+
+$stateName = ucwords(strtolower($rawState)); 
+$folder = ""; $filePrefix = "";
+
+switch($dbType) {
+    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
+    case 'standard': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
+    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
+    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
+    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
+    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
+    default: $folder = ucfirst($dbType) . "/"; $filePrefix = ucfirst($dbType);
+}
+
+$baseDir = $root_prefix . "SYS Property Catalog/";
+$fileName = $filePrefix . " - " . $stateName;
+$finalImg = $baseDir . "placeholder.jpg"; 
+
+$exts = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
+foreach ($exts as $ext) {
+    $testPath = $baseDir . $folder . $fileName . "." . $ext;
+    if (file_exists($testPath)) {
+        $finalImg = $testPath;
+        break;
+    }
 }
 ?>
 
 <div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="properties.php">Catalog</a></li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page"><?php echo htmlspecialchars($property['project_name']); ?></li>
+        </ol>
+    </nav>
+
     <div class="row">
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <img src="<?php echo $finalImg; ?>" class="img-fluid" style="height: 450px; width: 100%; object-fit: cover;">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
-                        <span class="badge bg-primary px-3 py-2 fs-6"><?php echo $typeName; ?></span>
-                    </div>
-                    <p class="text-muted fs-5"><i class="fas fa-map-marker-alt text-danger me-2"></i><?php echo $stateName; ?></p>
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 overflow-hidden h-100">
+                
+                <div class="position-relative" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoomModal">
+                    <img src="<?php echo htmlspecialchars($finalImg); ?>" 
+                         class="w-100 image-zoom-target" 
+                         alt="<?php echo htmlspecialchars($property['project_name']); ?>" 
+                         style="height: 400px; object-fit: cover; transition: opacity 0.3s;">
                     
+                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay" style="opacity: 0; transition: opacity 0.3s;">
+                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow">
+                            <i class="fas fa-search-plus me-2"></i>Click to Enlarge
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="fw-bold mb-0 text-dark"><?php echo htmlspecialchars($property['project_name']); ?></h2>
+                        <span class="badge bg-primary fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($property['property_type']); ?></span>
+                    </div>
+                    
+                    <p class="fs-5 text-muted mb-4"><i class="fas fa-map-marker-alt me-2 text-danger"></i><?php echo htmlspecialchars($property['state']); ?></p>
                     <hr class="my-4">
                     
-                    <div class="row g-4 text-center">
-                        <div class="col-6 col-md-3">
-                            <small class="text-muted d-block fw-bold">SQFT</small>
-                            <span class="fs-5 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
+                    <div class="row text-center mb-4">
+                        <div class="col-4 border-end">
+                            <small class="d-block text-muted text-uppercase fw-bold mb-1">SQFT</small>
+                            <span class="fs-5 fw-bold text-dark"><?php echo $sqft_display; ?></span>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <small class="text-muted d-block fw-bold">UNITS</small>
-                            <span class="fs-5 fw-bold"><?php echo $property['total_units']; ?></span>
+                        <div class="col-4 border-end">
+                            <small class="d-block text-muted text-uppercase fw-bold mb-1">UNITS</small>
+                            <span class="fs-5 fw-bold text-dark"><?php echo $availableUnits; ?></span>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <small class="text-muted d-block fw-bold">INCOME LIMIT</small>
-                            <span class="fs-5 fw-bold text-danger">Below RM <?php echo number_format($property['applicant_income_limit']); ?></span>
+                        <div class="col-4">
+                            <small class="d-block text-muted text-uppercase fw-bold mb-1">INCOME LIMIT</small>
+                            <span class="fs-6 fw-bold <?php echo ($income_limit_display !== 'N/A') ? 'text-danger' : 'text-dark'; ?>">
+                                <?php echo $income_limit_display; ?>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 100px;">
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100 bg-light">
                 <div class="card-header bg-dark text-white p-4">
-                    <h4 class="mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Loan Calculator</h4>
+                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Loan Calculator</h4>
                 </div>
-                <div class="card-body p-4">
-                    <h3 class="text-success fw-bold mb-4">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
-                    <input type="hidden" id="rawPrice" value="<?php echo $property['price']; ?>">
+                <div class="card-body p-4 p-lg-5">
+                    <h3 class="text-success fw-bold mb-4 border-bottom border-2 pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
                     
-                    <div class="mb-3">
+                    <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
+                    <input type="hidden" id="interestRate" value="<?php echo $rate; ?>">
+                    
+                    <div class="mb-4">
                         <label class="form-label fw-bold">Downpayment (%)</label>
-                        <select class="form-select" id="downPerc" onchange="calculate()">
-                            <option value="10">10%</option>
+                        <select id="downpayment" class="form-select form-select-lg">
+                            <option value="10">10% (Standard)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
                         </select>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary">35</span> Years</label>
-                        <input type="range" class="form-range" min="5" max="35" id="tenureRange" value="35" oninput="calculate()">
+                    
+                    <div class="mb-5">
+                        <label class="form-label fw-bold">Loan Tenure: <span id="tenureLabel" class="text-primary">35</span> Years</label>
+                        <input type="range" id="tenure" class="form-range" value="35" min="5" max="35">
                     </div>
-
-                    <div class="mb-4 text-center p-4 bg-light rounded-4">
-                        <p class="text-muted small fw-bold mb-1">MONTHLY REPAYMENT</p>
-                        <h2 class="text-success fw-bold mb-0" id="resultLabel">RM 0.00</h2>
-                        <small class="text-muted italic mt-2 d-block">Interest Rate: <?php echo $base_rate; ?>% (p.a)</small>
-                        <input type="hidden" id="intRate" value="<?php echo $base_rate; ?>">
+                    
+                    <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
+                        <p class="mb-2 text-muted fw-bold text-uppercase small">Estimated Monthly Installment</p>
+                        <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
+                        <small class="text-muted d-block mt-2">Interest Rate: <?php echo htmlspecialchars($rate); ?>% (p.a)</small>
                     </div>
-
-                    <a href="booking.php?id=<?php echo $pid; ?>" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold">Book Appointment</a>
+                    
+                    <div class="d-grid mt-auto">
+                        <?php if ($property['property_type'] === 'AFFORDABLE'): ?>
+                            <a href="apply_affordable.php?id=<?php echo $property['property_id']; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow-sm">
+                                Apply for Gov Housing
+                            </a>
+                        <?php else: ?>
+                            <a href="book_appointment.php?id=<?php echo $property['property_id']; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow-sm">
+                                Book Showroom Viewing
+                            </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-transparent border-0">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-0">
+        <img src="<?php echo htmlspecialchars($finalImg); ?>" class="img-fluid rounded shadow-lg" alt="Zoomed Property Image">
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    /* CSS logic to reveal the 'Click to Enlarge' hint when hovered */
+    .position-relative:hover .zoom-overlay {
+        opacity: 1 !important;
+    }
+    .position-relative:hover .image-zoom-target {
+        opacity: 0.85;
+    }
+</style>
+
 <script>
-function calculate() {
-    const price = parseFloat(document.getElementById('rawPrice').value);
-    const downPerc = parseFloat(document.getElementById('downPerc').value) / 100;
-    const years = parseInt(document.getElementById('tenureRange').value);
-    const annualRate = parseFloat(document.getElementById('intRate').value) / 100;
+function calculateLoan() {
+    const price = parseFloat(document.getElementById('propertyPrice').value);
+    const ratePercentage = parseFloat(document.getElementById('interestRate').value);
+    const monthlyRate = (ratePercentage / 100) / 12;
+    const downpaymentPerc = parseFloat(document.getElementById('downpayment').value) / 100;
     
-    document.getElementById('tenureLabel').innerText = years;
+    const tenureYears = parseInt(document.getElementById('tenure').value);
+    document.getElementById('tenureLabel').innerText = tenureYears;
+    const tenureMonths = tenureYears * 12;
     
-    const principal = price * (1 - downPerc);
-    const monthlyRate = annualRate / 12;
-    const n = years * 12;
+    const loanAmount = price - (price * downpaymentPerc);
     
-    const monthly = (principal * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
-    document.getElementById('resultLabel').innerText = "RM " + monthly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if (loanAmount <= 0 || tenureMonths <= 0 || isNaN(loanAmount) || isNaN(tenureMonths)) {
+        document.getElementById('monthlyResult').innerText = "RM 0.00";
+        return;
+    }
+    
+    let monthlyInstallment = 0;
+    if (monthlyRate > 0) {
+        monthlyInstallment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+    } else {
+        monthlyInstallment = loanAmount / tenureMonths;
+    }
+    
+    document.getElementById('monthlyResult').innerText = "RM " + monthlyInstallment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
-window.onload = calculate;
+
+document.getElementById('downpayment').addEventListener('change', calculateLoan);
+document.getElementById('tenure').addEventListener('input', calculateLoan);
+window.addEventListener('load', calculateLoan);
 </script>
 
-<?php include_once $root_prefix . 'includes/footer.php'; ?>
+<?php include_once '../includes/footer.php'; ?>
