@@ -152,7 +152,7 @@ $query = "
         CASE
             WHEN a.role = 'CUSTOMER' THEN COALESCE(c.occupation, 'Customer')
             WHEN a.role = 'STAFF' THEN COALESCE(s.assigned_state, 'Not Assigned')
-            ELSE 'HQ Administration'
+            ELSE COALESCE(ad.department, 'HQ Administration')
         END AS detail
     FROM accounts a
     LEFT JOIN customers c ON a.account_id = c.customer_id
