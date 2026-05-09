@@ -8,6 +8,21 @@ $account_id = $_SESSION['account_id'];
 $alert_msg = '';
 $alert_type = '';
 
+function table_column_exists($conn, $table, $column)
+{
+    try {
+        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
+        $stmt->bind_param("ss", $table, $column);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        return ((int)($row['total'] ?? 0)) > 0;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+$admin_has_department = table_column_exists($conn, 'admins', 'department');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
         $old_pass = $_POST['old_password'] ?? '';
@@ -43,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $full_name = trim($_POST['full_name'] ?? '');
         $department = trim($_POST['department'] ?? '');
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $full_name === '' || $department === '') {
-            $alert_msg = 'Please enter a valid email, full name, and department.';
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $full_name === '' || ($admin_has_department && $department === '')) {
+            $alert_msg = $admin_has_department ? 'Please enter a valid email, full name, and department.' : 'Please enter a valid email and full name.';
             $alert_type = 'danger';
         } else {
             try {
@@ -54,8 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $upd_acc->bind_param("si", $email, $account_id);
                 $upd_acc->execute();
 
-                $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
-                $update_stmt->bind_param("iss", $account_id, $full_name, $department);
+                if ($admin_has_department) {
+                    $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
+                    $update_stmt->bind_param("iss", $account_id, $full_name, $department);
+                } else {
+                    $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name)");
+                    $update_stmt->bind_param("is", $account_id, $full_name);
+                }
                 $update_stmt->execute();
 
                 $conn->commit();
@@ -70,7 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$stmt = $conn->prepare("SELECT ad.full_name, ad.department, a.email FROM accounts a LEFT JOIN admins ad ON a.account_id = ad.admin_id WHERE a.account_id = ?");
+$admin_department_select = $admin_has_department ? "ad.department" : "'HQ Administration' AS department";
+$stmt = $conn->prepare("SELECT ad.full_name, $admin_department_select, a.email FROM accounts a LEFT JOIN admins ad ON a.account_id = ad.admin_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $admin = $stmt->get_result()->fetch_assoc();
@@ -116,10 +137,12 @@ include '../includes/header.php';
                             <label class="form-label fw-bold">Full Name</label>
                             <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($admin['full_name'] ?? ''); ?>" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Department</label>
-                            <input type="text" name="department" class="form-control" value="<?php echo htmlspecialchars($admin['department'] ?? ''); ?>" required>
-                        </div>
+                        <?php if ($admin_has_department): ?>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Department</label>
+                                <input type="text" name="department" class="form-control" value="<?php echo htmlspecialchars($admin['department'] ?? ''); ?>" required>
+                            </div>
+                        <?php endif; ?>
                         <button type="submit" name="update_profile" class="btn btn-primary fw-bold px-4">Save Changes</button>
                     </form>
                 </div>
