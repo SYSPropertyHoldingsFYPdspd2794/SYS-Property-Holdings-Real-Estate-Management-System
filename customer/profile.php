@@ -13,23 +13,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_pass = $_POST['new_password'] ?? '';
         $confirm_pass = $_POST['confirm_password'] ?? '';
 
-        $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
-        $stmt_check->bind_param("i", $account_id);
-        $stmt_check->execute();
-        $res = $stmt_check->get_result()->fetch_assoc();
-
-        if ($new_pass !== $confirm_pass) {
+        if ($old_pass === '' || $new_pass === '' || $confirm_pass === '') {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Please fill in all password fields.</div>';
+        } elseif ($new_pass !== $confirm_pass) {
             $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">New password and confirm password do not match.</div>';
-        } elseif ($res && password_verify($old_pass, $res['password_hash'])) {
-            $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
-            $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
-            $update_pass->bind_param("si", $hashed_password, $account_id);
-
-            if ($update_pass->execute()) {
-                $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Password successfully updated!</div>';
-            }
         } else {
-            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Current password incorrect.</div>';
+            $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
+            $stmt_check->bind_param("i", $account_id);
+            $stmt_check->execute();
+            $res = $stmt_check->get_result()->fetch_assoc();
+            $stmt_check->close();
+
+            if (!$res || !password_verify($old_pass, $res['password_hash'])) {
+                $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Current password incorrect.</div>';
+            } else {
+                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
+                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $update_pass->bind_param("si", $hashed_password, $account_id);
+
+                if ($update_pass->execute()) {
+                    $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Password successfully updated!</div>';
+                } else {
+                    $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Failed to update password.</div>';
+                }
+                $update_pass->close();
+            }
         }
     }
 
@@ -48,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update_email = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
             $update_email->bind_param("si", $email, $account_id);
             $update_email->execute();
+            $update_email->close();
 
             $sql = "UPDATE customers SET
                     full_name = ?,
@@ -57,12 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     occupation = ?,
                     monthly_income = ?
                     WHERE customer_id = ?";
-
             $stmt_upd = $conn->prepare($sql);
             $stmt_upd->bind_param("sssisdi", $full_name, $phone, $marital, $dep, $occ, $inc, $account_id);
 
             if ($stmt_upd->execute()) {
                 $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Customer profile and email updated successfully!</div>';
+            } else {
+                $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Failed to update customer profile.</div>';
             }
             $stmt_upd->close();
         }
@@ -107,9 +117,7 @@ include '../includes/header.php';
                         </div>
                         <button type="submit" name="update_password" class="btn btn-warning w-100 fw-bold">Update Credentials</button>
                         <div class="text-center mt-3">
-                            <a href="https://wa.link/k61mrv" target="_blank" rel="noopener noreferrer" class="fw-bold text-decoration-none">
-                                Forgot password?
-                            </a>
+                            <a href="https://wa.link/k61mrv" target="_blank" rel="noopener noreferrer" class="fw-bold text-decoration-none">Forgot password?</a>
                         </div>
                     </form>
                 </div>
