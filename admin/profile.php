@@ -27,9 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
         $old_pass = $_POST['old_password'] ?? '';
         $new_pass = $_POST['new_password'] ?? '';
+        $confirm_pass = $_POST['confirm_password'] ?? '';
 
         if (strlen($new_pass) < 8) {
             $alert_msg = 'New password must be at least 8 characters.';
+            $alert_type = 'danger';
+        } elseif ($new_pass !== $confirm_pass) {
+            $alert_msg = 'New password and confirmation do not match.';
             $alert_type = 'danger';
         } else {
             $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
@@ -117,6 +121,10 @@ include '../includes/header.php';
                         <div class="mb-3">
                             <label class="form-label small fw-bold">New Password</label>
                             <input type="password" name="new_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <button type="submit" name="update_password" class="btn btn-warning w-100 fw-bold mt-2">Update Password</button>
                     </form>

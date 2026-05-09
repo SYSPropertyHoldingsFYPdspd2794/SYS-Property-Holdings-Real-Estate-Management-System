@@ -11,23 +11,33 @@ $alert_type = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['update_password'])) {
-        $old_pass = $_POST['old_password'];
-        $new_pass = $_POST['new_password'];
-        $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
-        $stmt_check->bind_param("i", $account_id);
-        $stmt_check->execute();
-        $res = $stmt_check->get_result()->fetch_assoc();
+        $old_pass = $_POST['old_password'] ?? '';
+        $new_pass = $_POST['new_password'] ?? '';
+        $confirm_pass = $_POST['confirm_password'] ?? '';
 
-        if ($res && password_verify($old_pass, $res['password_hash'])) {
-            $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
-            $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
-            $update_pass->bind_param("si", $hashed_password, $account_id);
-            $update_pass->execute();
-            $alert_msg = 'Password successfully updated.';
-            $alert_type = 'success';
-        } else {
-            $alert_msg = 'Current password incorrect.';
+        if (strlen($new_pass) < 8) {
+            $alert_msg = 'New password must be at least 8 characters.';
             $alert_type = 'danger';
+        } elseif ($new_pass !== $confirm_pass) {
+            $alert_msg = 'New password and confirmation do not match.';
+            $alert_type = 'danger';
+        } else {
+            $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
+            $stmt_check->bind_param("i", $account_id);
+            $stmt_check->execute();
+            $res = $stmt_check->get_result()->fetch_assoc();
+
+            if ($res && password_verify($old_pass, $res['password_hash'])) {
+                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
+                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $update_pass->bind_param("si", $hashed_password, $account_id);
+                $update_pass->execute();
+                $alert_msg = 'Password successfully updated.';
+                $alert_type = 'success';
+            } else {
+                $alert_msg = 'Current password incorrect.';
+                $alert_type = 'danger';
+            }
         }
     }
 
@@ -96,7 +106,12 @@ include '../includes/header.php';
                             <label class="form-label small fw-bold">New Password</label>
                             <input type="password" name="new_password" class="form-control" required>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required>
+                        </div>
                         <button type="submit" name="update_password" class="btn btn-dark w-100 fw-bold">Update Password</button>
+                        <a href="https://wa.link/y3cz3o" class="btn btn-link w-100 mt-2 fw-bold" target="_blank" rel="noopener">Forgot Password?</a>
                     </form>
                 </div>
             </div>
