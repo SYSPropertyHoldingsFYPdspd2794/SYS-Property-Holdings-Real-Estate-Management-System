@@ -16,7 +16,7 @@ if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'ADMIN') {
         $dashboard_link = $root_prefix . 'admin/dashboard.php';
         $profile_link = $root_prefix . 'admin/profile.php';
-        $wishlist_link = '#'; // Wishlist is customer-only
+        $wishlist_link = '#'; 
     } elseif ($_SESSION['role'] === 'STAFF') {
         $dashboard_link = $root_prefix . 'staff/dashboard.php';
         $profile_link = $root_prefix . 'staff/profile.php';
@@ -54,8 +54,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 <div class="collapse navbar-collapse" id="navbarNav">
 <ul class="navbar-nav me-auto">
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Government Housing</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Showrooms</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>">Government Housing</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>">Showrooms</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="fas fa-heart me-1"></i>Wishlist</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>

@@ -2,50 +2,75 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: about_us.php (ROOT DIRECTORY)
- * DESCRIPTION: Corporate Information based on Sim Yeow Seng Group and Pagoh Jaya.
+ * DESCRIPTION: Diversified corporate profile resembling top-tier developers.
  */
 include_once 'includes/header.php';
 ?>
-<div class="container my-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-dark">About SYS Property Holdings</h1>
-        <p class="lead text-muted w-75 mx-auto">A proud subsidiary of the Sim Yeow Seng Group.</p>
-        <hr class="w-25 mx-auto mt-4 mb-5 border-primary border-2 opacity-75">
+<div class="container-fluid bg-light py-5">
+    <div class="container my-4 text-center">
+        <h6 class="text-uppercase fw-bold text-primary tracking-widest mb-2">Master Community Developer</h6>
+        <h1 class="display-3 fw-bold text-dark mb-4">Building Sustainable Futures</h1>
+        <p class="lead text-muted w-75 mx-auto">SYS Property Holdings is at the forefront of Malaysia's real estate revolution. We don't just build houses; we engineer interconnected, smart communities powered by our proprietary Online-to-Offline (O2O) ecosystem.</p>
     </div>
+</div>
 
-    <div class="row align-items-center mb-5">
+<div class="container my-5 py-5">
+    <div class="row g-5 align-items-center mb-5">
         <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" class="img-fluid rounded-4 shadow-sm" alt="SYS Headquarters">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="SYS Vision">
         </div>
-        <div class="col-lg-6 p-lg-5">
-            <h2 class="fw-bold mb-4">A Legacy of Excellence Since 1949</h2>
-            <p class="fs-5 text-muted mb-4">Established in 1949, the <strong>Sim Yeow Seng Group</strong> has grown into a diversified powerhouse with core operations in property development, heavy and civil engineering construction, premix, and quarrying. Our robust foundations have allowed us to shape the modern landscape of Malaysia.</p>
-            <p class="fs-5 text-muted">With strategically located offices in Kuala Lumpur and Pagoh, Johor, we are perfectly positioned to drive regional development forward.</p>
+        <div class="col-lg-6 px-lg-5">
+            <h2 class="fw-bold mb-4">Our Vision & Mission</h2>
+            <p class="fs-5 text-muted mb-4">To be the undisputed leader in delivering innovative property solutions that enrich lives and safeguard the environment for future generations.</p>
+            <ul class="list-unstyled fs-5 text-muted">
+                <li class="mb-3"><i class="fas fa-bullseye text-primary me-3"></i> <strong>Innovation First:</strong> Pioneering the O2O property browsing experience.</li>
+                <li class="mb-3"><i class="fas fa-bullseye text-primary me-3"></i> <strong>Integrity:</strong> Transparent pricing with zero hidden online fees.</li>
+                <li class="mb-3"><i class="fas fa-bullseye text-primary me-3"></i> <strong>Inclusivity:</strong> Strong partnerships to deliver affordable housing.</li>
+            </ul>
         </div>
     </div>
 
-    <div class="row mb-5 text-center g-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 bg-light rounded-4 p-4">
-                <i class="fas fa-building fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Pagoh Jaya</h4>
-                <p class="text-muted">Operating under the renowned Sim Yeow Seng umbrella, Pagoh Jaya (2000) Sdn Bhd leads our large-scale residential and commercial development projects.</p>
+    <div class="text-center mb-5 mt-5 pt-4">
+        <h2 class="fw-bold text-dark">Our Pillars of Excellence</h2>
+        <p class="text-muted">Driving growth across multiple disciplines.</p>
+    </div>
+
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
+                <div class="mb-3"><i class="fas fa-city fa-3x text-primary"></i></div>
+                <h5 class="fw-bold">Integrated Townships</h5>
+                <p class="text-muted small">Developing self-sustaining cities that integrate residential, commercial, and recreational spaces.</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 bg-light rounded-4 p-4">
-                <i class="fas fa-hard-hat fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Heavy Construction</h4>
-                <p class="text-muted">Our civil engineering division handles major infrastructure, utilizing our proprietary supply chain to build reliable environments.</p>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
+                <div class="mb-3"><i class="fas fa-leaf fa-3x text-success"></i></div>
+                <h5 class="fw-bold">Green Architecture</h5>
+                <p class="text-muted small">Committed to low-carbon footprints and environmentally friendly building materials.</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 bg-light rounded-4 p-4">
-                <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">O2O Real Estate</h4>
-                <p class="text-muted">SYS Property Holdings brings a seamless Online-to-Offline experience, connecting prospective homeowners directly to our premium developments.</p>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
+                <div class="mb-3"><i class="fas fa-handshake fa-3x text-warning"></i></div>
+                <h5 class="fw-bold">Government Synergy</h5>
+                <p class="text-muted small">Authorized partners for RMMJ and RSKU, ensuring housing accessibility for the B40 & M40.</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift">
+                <div class="mb-3"><i class="fas fa-mobile-alt fa-3x text-info"></i></div>
+                <h5 class="fw-bold">O2O Integration</h5>
+                <p class="text-muted small">Browse online, transact securely offline. A seamless digital bridge to your physical home.</p>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.tracking-widest { letter-spacing: 3px; }
+.hover-lift { transition: transform 0.3s; border-bottom: 4px solid transparent; }
+.hover-lift:hover { transform: translateY(-10px); border-bottom: 4px solid #0d6efd; }
+</style>
+
 <?php include_once 'includes/footer.php'; ?>
