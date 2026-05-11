@@ -1,10 +1,11 @@
 <?php
 include 'includes/header.php';
 include 'includes/db_connect.php'; 
+include 'includes/functions.php'; 
 
 $error_message = '';
-$show_duplicate_alert = false; // Flag to trigger the dialog box
-$show_success_alert = false; // Flag to trigger successful registration dialog
+$show_duplicate_alert = false; 
+$show_success_alert = false; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -12,22 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'];
     $full_name = mysqli_real_escape_string($conn, $_POST['full_name']);
     $phone_number = mysqli_real_escape_string($conn, $_POST['phone_number']);
-    $marital_status = $_POST['marital_status'];
+    $marital_status = $_POST['marital_status'] ?? '';
     $dependents_count = (int)$_POST['dependents_count'];
     $occupation = mysqli_real_escape_string($conn, $_POST['occupation']);
     $monthly_income = (float)$_POST['monthly_income'];
 
-    if ($password !== $confirm_password) {
+    if (!validate_password_strength($password)) {
+        $error_message = 'Password is too weak. Please follow the requirements below.';
+    } elseif ($password !== $confirm_password) {
         $error_message = 'Passwords do not match.';
     } else {
-        // Check if email already exists
         $stmt_check = $conn->prepare("SELECT email FROM accounts WHERE email = ?");
         $stmt_check->bind_param("s", $email);
         $stmt_check->execute();
         $stmt_check->store_result();
 
         if ($stmt_check->num_rows > 0) {
-            // Trigger the Dialog Box flag instead of a standard error message
             $show_duplicate_alert = true;
             $stmt_check->close();
         } else {
@@ -58,55 +59,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!-- Include SweetAlert2 Library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10 col-lg-8">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-5">
-                    <h2 class="text-center fw-bold mb-4">Create an Account</h2>
+                    <h2 class="text-center fw-bold mb-5">Create an Account</h2>
 
-                    <!-- Standard banner for non-duplicate errors (like password mismatch) -->
                     <?php if ($error_message !== ''): ?>
-                        <div class="alert alert-danger">
-                            <?php echo htmlspecialchars($error_message); ?>
+                        <div class="alert alert-danger shadow-sm border-0 mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i> <?php echo htmlspecialchars($error_message); ?>
                         </div>
                     <?php endif; ?>
 
                     <form method="POST" action="register.php">
-                        <!-- Form Fields -->
-                        <div class="row mb-3">
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Full Name</label>
-                                <input type="text" name="full_name" class="form-control" value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
+                                <input type="text" name="full_name" class="form-control py-2" value="<?php echo isset($_POST['full_name']) ? htmlspecialchars($_POST['full_name']) : ''; ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email Address</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                                <input type="email" name="email" class="form-control py-2" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-2">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Password</label>
-                                <input type="password" name="password" class="form-control" required>
+                                <input type="password" name="password" class="form-control py-2" required onkeyup="checkPasswordRealtime(this.value, 'reg_')">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Confirm Password</label>
-                                <input type="password" name="confirm_password" class="form-control" required>
+                                <input type="password" name="confirm_password" class="form-control py-2" required>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="p-3 border rounded bg-light shadow-sm">
+                                    <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-between align-items-center">
+                                        <li id="reg_length" class="text-danger small mx-2 my-1"><i class="fas fa-times-circle me-1"></i> 8+ Characters</li>
+                                        <li id="reg_upper" class="text-danger small mx-2 my-1"><i class="fas fa-times-circle me-1"></i> Uppercase (A-Z)</li>
+                                        <li id="reg_lower" class="text-danger small mx-2 my-1"><i class="fas fa-times-circle me-1"></i> Lowercase (a-z)</li>
+                                        <li id="reg_number" class="text-danger small mx-2 my-1"><i class="fas fa-times-circle me-1"></i> Number (0-9)</li>
+                                        <li id="reg_symbol" class="text-danger small mx-2 my-1"><i class="fas fa-times-circle me-1"></i> Symbol (@#$!)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone Number</label>
-                                <input type="text" name="phone_number" class="form-control" value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>" required>
+                                <input type="text" name="phone_number" class="form-control py-2" value="<?php echo isset($_POST['phone_number']) ? htmlspecialchars($_POST['phone_number']) : ''; ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
-                                <select name="marital_status" class="form-select" required>
+                                <select name="marital_status" class="form-select py-2" required>
                                     <option value="" disabled <?php echo !isset($_POST['marital_status']) ? 'selected' : ''; ?>>Select Status</option>
                                     <option value="SINGLE" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'SINGLE') ? 'selected' : ''; ?>>Single</option>
                                     <option value="MARRIED" <?php echo (isset($_POST['marital_status']) && $_POST['marital_status'] == 'MARRIED') ? 'selected' : ''; ?>>Married</option>
@@ -114,39 +126,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-4">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Dependents Count</label>
-                                <input type="number" name="dependents_count" class="form-control" min="0" value="<?php echo isset($_POST['dependents_count']) ? htmlspecialchars($_POST['dependents_count']) : '0'; ?>" required>
+                                <label class="form-label fw-bold">Dependents</label>
+                                <input type="number" name="dependents_count" class="form-control py-2" min="0" value="<?php echo isset($_POST['dependents_count']) ? htmlspecialchars($_POST['dependents_count']) : '0'; ?>" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Occupation</label>
-                                <input type="text" name="occupation" class="form-control" value="<?php echo isset($_POST['occupation']) ? htmlspecialchars($_POST['occupation']) : ''; ?>" required>
+                                <input type="text" name="occupation" class="form-control py-2" value="<?php echo isset($_POST['occupation']) ? htmlspecialchars($_POST['occupation']) : ''; ?>" required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Monthly Income (RM)</label>
-                                <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo isset($_POST['monthly_income']) ? htmlspecialchars($_POST['monthly_income']) : ''; ?>" required>
+                                <label class="form-label fw-bold">Income (RM)</label>
+                                <input type="number" step="0.01" name="monthly_income" class="form-control py-2" value="<?php echo isset($_POST['monthly_income']) ? htmlspecialchars($_POST['monthly_income']) : ''; ?>" required>
                             </div>
                         </div>
 
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Register Now</button>
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">Register Now</button>
                         </div>
                     </form>
-
+                    <div class="text-center mt-4">
+                        <span class="text-muted">Already have an account?</span> <a href="login.php" class="fw-bold text-decoration-none">Login here</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SweetAlert2 Script Trigger -->
 <?php if ($show_duplicate_alert): ?>
 <script>
     Swal.fire({
         icon: 'error',
-        title: 'Duplicate Email',
-        text: 'The email address "<?php echo $email; ?>" is already registered. Please use a different email or login to your existing account.',
+        title: 'Email Already Registered',
+        text: 'The email "<?php echo $email; ?>" is already in use. Please use another or login.',
         confirmButtonColor: '#0d6efd'
     });
 </script>
@@ -156,8 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
     Swal.fire({
         icon: 'success',
-        title: 'Register Successfully',
-        text: 'Register successfully.',
+        title: 'Registration Successful',
+        text: 'Welcome to SYS Property Holdings!',
         confirmButtonColor: '#0d6efd'
     }).then(() => {
         window.location.href = 'login.php?registration=success';
