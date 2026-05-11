@@ -8,10 +8,6 @@
 // Notice path changes: includes are now direct
 include_once 'includes/header.php';
 require_once 'includes/auth_check.php';
-include_once '../includes/header.php';
-/** @var string $root_prefix */
-/** @var mysqli $conn */
-require_once '../includes/auth_check.php';
 protect_staff_admin_page($conn);
 
 $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';

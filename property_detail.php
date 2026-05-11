@@ -2,15 +2,12 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: property_detail.php (ROOT DIRECTORY)
- * DESCRIPTION: Internal details view. Booking functions are disabled for Staff/Admin.
+ * DESCRIPTION: Internal details view for Staff/Admin. 
+ * Includes dynamic bank interest rates and custom slider. Booking is disabled.
  */
 
 include_once 'includes/header.php';
 require_once 'includes/auth_check.php';
-include_once '../includes/header.php';
-/** @var string $root_prefix */
-/** @var mysqli $conn */
-require_once '../includes/auth_check.php';
 protect_staff_admin_page($conn);
 
 $property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -25,9 +22,10 @@ if (!$property) {
     exit();
 }
 
-$rate_stmt = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
-$rate = ($rate_stmt && $rate_stmt->num_rows > 0) ? $rate_stmt->fetch_assoc()['setting_value'] : 3.5;
+// Fetch Banks for the Dropdown from the database
+$banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
+// Data Fallbacks
 $sqft_display = isset($property['built_up_sqft']) && !empty($property['built_up_sqft']) ? number_format($property['built_up_sqft']) : "N/A";
 $income_limit_display = "N/A";
 if (isset($property['applicant_income_limit']) && $property['applicant_income_limit'] > 0) {
@@ -35,6 +33,7 @@ if (isset($property['applicant_income_limit']) && $property['applicant_income_li
 }
 $availableUnits = isset($property['available_units']) ? $property['available_units'] : (isset($property['total_units']) ? $property['total_units'] : 0);
 
+// Image Mapping Logic
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -113,27 +112,45 @@ foreach ($exts as $ext) {
                 <div class="card-body p-4 p-lg-5">
                     <h3 class="text-dark fw-bold mb-4 border-bottom border-2 pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
-                    <input type="hidden" id="interestRate" value="<?php echo $rate; ?>">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold"><i class="fas fa-building-columns text-secondary me-1"></i> Choose Bank</label>
+                        <select id="bankSelect" class="form-select form-select-lg border-secondary">
+                            <?php 
+                            if (isset($banks_result) && $banks_result->num_rows > 0) {
+                                while ($bank = $banks_result->fetch_assoc()) {
+                                    echo '<option data-rate="'.$bank['interest_rate'].'">'.htmlspecialchars($bank['bank_name']).' ('.$bank['interest_rate'].'%)</option>';
+                                }
+                            } else {
+                                echo '<option data-rate="3.5">Default Bank (3.50%)</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label fw-bold">Downpayment (%)</label>
                         <select id="downpayment" class="form-select form-select-lg">
-                            <option value="10">10%</option>
+                            <option value="10">10% (Standard)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
                         </select>
                     </div>
+                    
                     <div class="mb-5">
-                        <label class="form-label fw-bold">Loan Tenure: <span id="tenureLabel" class="text-primary">35</span> Years</label>
-                        <input type="range" id="tenure" class="form-range" value="35" min="5" max="35">
+                        <label class="form-label fw-bold">Loan Tenure: <span id="tenureLabel" class="text-primary fs-5">35</span> Years</label>
+                        <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
                     </div>
+                    
                     <div class="p-4 bg-white border border-secondary border-opacity-25 rounded text-center shadow-sm mb-4">
                         <p class="mb-2 text-muted fw-bold text-uppercase small">Estimated Monthly Installment</p>
                         <h2 class="text-dark fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Interest Rate: <?php echo htmlspecialchars($rate); ?>% (p.a)</small>
+                        <small class="text-muted d-block mt-2">Applied Rate: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
+                    
                     <div class="d-grid mt-auto">
                         <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm w-100" disabled>
-                            <i class="fas fa-ban me-2"></i>Booking Disabled (Staff/Admin View)
+                            <i class="fas fa-ban me-2"></i>Booking Disabled (Staff/Admin)
                         </button>
                     </div>
                 </div>
@@ -152,6 +169,35 @@ foreach ($exts as $ext) {
 </div>
 
 <style>
+    /* Custom Slider Design for High Visibility */
+    .custom-slider::-webkit-slider-thumb {
+        background: #0d6efd !important; /* High contrast blue */
+        border: 2px solid #fff;
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        width: 25px;
+        height: 25px;
+        margin-top: -10px; 
+    }
+
+    .custom-slider::-webkit-slider-runnable-track {
+        background: #ced4da !important; 
+        height: 8px;
+        border-radius: 5px;
+    }
+    
+    .custom-slider::-moz-range-thumb {
+        background: #0d6efd !important;
+        border: 2px solid #fff;
+        width: 25px;
+        height: 25px;
+    }
+    .custom-slider::-moz-range-track {
+        background: #ced4da !important;
+        height: 8px;
+        border-radius: 5px;
+    }
+
+    /* Modal Zoom Styles */
     .zoom-overlay { opacity: 0; transition: opacity 0.3s; }
     .image-zoom-target { transition: opacity 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1 !important; }
@@ -161,21 +207,39 @@ foreach ($exts as $ext) {
 <script>
 function calculateLoan() {
     const price = parseFloat(document.getElementById('propertyPrice').value);
-    const ratePercentage = parseFloat(document.getElementById('interestRate').value);
+    
+    // Fetch rate from the dropdown
+    const bankSelect = document.getElementById('bankSelect');
+    const ratePercentage = parseFloat(bankSelect.options[bankSelect.selectedIndex].getAttribute('data-rate'));
+    
+    // Display the applied rate
+    document.getElementById('displayRate').innerText = ratePercentage.toFixed(2);
+    
     const monthlyRate = (ratePercentage / 100) / 12;
     const downpaymentPerc = parseFloat(document.getElementById('downpayment').value) / 100;
     const tenureYears = parseInt(document.getElementById('tenure').value);
+    
     document.getElementById('tenureLabel').innerText = tenureYears;
     const tenureMonths = tenureYears * 12;
+    
     const loanAmount = price - (price * downpaymentPerc);
     
-    if (loanAmount <= 0) { document.getElementById('monthlyResult').innerText = "RM 0.00"; return; }
+    if (loanAmount <= 0 || isNaN(loanAmount)) { 
+        document.getElementById('monthlyResult').innerText = "RM 0.00"; 
+        return; 
+    }
     
     let monthlyInstallment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
     document.getElementById('monthlyResult').innerText = "RM " + monthlyInstallment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
+
+// Add event listeners to trigger recalculation on changes
+document.getElementById('bankSelect').addEventListener('change', calculateLoan);
 document.getElementById('downpayment').addEventListener('change', calculateLoan);
 document.getElementById('tenure').addEventListener('input', calculateLoan);
+
+// Initial calculation on page load
 window.addEventListener('load', calculateLoan);
 </script>
+
 <?php include_once 'includes/footer.php'; ?>
