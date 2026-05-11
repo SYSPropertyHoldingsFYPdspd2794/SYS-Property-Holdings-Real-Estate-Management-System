@@ -1,11 +1,15 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * MODULE: Customer - Property Catalog (US13, US14, US15, US16)
- * DESCRIPTION: Catalog with dynamic search, state/type filters, and patched image mapping.
+ * FILE: customer/properties.php
+ * DESCRIPTION: Customer exclusive property catalog with search and filters.
  */
 
 include_once '../includes/header.php';
+require_once '../includes/auth_check.php';
+include_once '../includes/header.php';
+/** @var string $root_prefix */
+/** @var mysqli $conn */
 require_once '../includes/auth_check.php';
 protect_customer_page('CUSTOMER', $conn);
 
@@ -14,7 +18,6 @@ $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
 
-// Base query
 $sql = "SELECT * FROM properties WHERE (status = 'ACTIVE' OR status = 'AVAILABLE')";
 $params = [];
 $types = "";
@@ -60,7 +63,7 @@ $result = $stmt->get_result();
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-search me-1"></i> Search by Name</label>
-                        <input type="text" name="search_name" class="form-control form-control-lg" placeholder="example: Elite Estate..." value="<?php echo htmlspecialchars($search_name); ?>">
+                        <input type="text" name="search_name" class="form-control form-control-lg" placeholder="e.g. Elite Estate..." value="<?php echo htmlspecialchars($search_name); ?>">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> Filter by State</label>
@@ -97,18 +100,15 @@ $result = $stmt->get_result();
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 
-                // --- IMAGE MAPPING LOGIC ---
+                // Image Mapping Logic
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 
-                // State Name Translator (DB to File Name)
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
                 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
                 
                 $stateName = ucwords(strtolower($rawState)); 
-                
-                $folder = "";
-                $filePrefix = "";
+                $folder = ""; $filePrefix = "";
 
                 switch($dbType) {
                     case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
@@ -124,7 +124,6 @@ $result = $stmt->get_result();
                 $fileName = $filePrefix . " - " . $stateName;
                 $finalImg = $baseDir . "placeholder.jpg"; 
 
-                // Added 'webp' to support Sarawak image
                 $exts = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
                 foreach ($exts as $ext) {
                     $testPath = $baseDir . $folder . $fileName . "." . $ext;
@@ -139,8 +138,7 @@ $result = $stmt->get_result();
                 ?>
 
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
-                        
+                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden hover-card">
                         <div class="position-relative bg-light" style="height: 250px;">
                             <img src="<?php echo htmlspecialchars($finalImg); ?>" 
                                  class="w-100 h-100" 
@@ -150,7 +148,6 @@ $result = $stmt->get_result();
                                 <?php echo htmlspecialchars($row['property_type']); ?>
                             </span>
                         </div>
-
                         <div class="card-body p-4 d-flex flex-column">
                             <h5 class="card-title fw-bold text-dark mb-1 text-truncate" title="<?php echo htmlspecialchars($row['project_name']); ?>">
                                 <?php echo htmlspecialchars($row['project_name']); ?>
@@ -158,7 +155,6 @@ $result = $stmt->get_result();
                             <p class="text-muted small mb-4">
                                 <i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?>
                             </p>
-                            
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <div>
                                     <small class="text-muted d-block fw-bold" style="font-size: 0.7rem;">PRICE FROM</small>
@@ -167,7 +163,6 @@ $result = $stmt->get_result();
                                 <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-dark rounded-pill px-4 shadow-sm">Details</a>
                             </div>
                         </div>
-
                         <div class="card-footer bg-white border-0 py-3 text-center">
                             <small class="text-muted">
                                 <i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $availableUnits; ?></strong>
@@ -190,4 +185,9 @@ $result = $stmt->get_result();
     </div>
 </div>
 
-<?php include_once $root_prefix . 'includes/footer.php'; ?>
+<style>
+.hover-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hover-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important; }
+</style>
+
+<?php include_once '../includes/footer.php'; ?>
