@@ -131,7 +131,7 @@ $result = $stmt->get_result();
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
                 $badge_class = $is_affordable ? "bg-success" : "bg-primary";
                 
-                // IMAGE MAPPING FIX: Restored full robust switch statement
+                // IMAGE MAPPING LOGIC (RESTORED FULLY)
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -177,7 +177,10 @@ $result = $stmt->get_result();
                             <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
-                                <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['applicant_income_limit']); ?></p>
+                                <p class="text-danger fw-bold small mb-3">
+                                    <i class="fas fa-id-card me-1"></i> 
+                                    Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?>
+                                </p>
                             <?php endif; ?>
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
@@ -193,7 +196,7 @@ $result = $stmt->get_result();
                 <?php
             }
         } else {
-            echo '<div class="col-12 text-center py-5"><i class="fas fa-search-minus fa-3x text-muted mb-3"></i><h4 class="text-muted">No matching properties found.</h4></div>';
+            echo '<div class="col-12 text-center py-5"><h4>No matching properties found.</h4></div>';
         }
         ?>
     </div>

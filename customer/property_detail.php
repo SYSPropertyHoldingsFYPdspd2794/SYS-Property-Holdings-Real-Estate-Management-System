@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
         $del->execute();
     } else {
         $ins = $conn->prepare("INSERT INTO wishlists (customer_id, property_id) VALUES (?, ?)");
-        $ins->bind_param("ii", $account_id, $prop_id);
+        $ins->bind_param("ii", $account_id, $property_id);
         $ins->execute();
     }
     header("Location: property_detail.php?id=" . $property_id);
@@ -44,7 +44,7 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// IMAGE MAPPING ENGINE (ROOTED)
+// IMAGE MAPPING ENGINE (RE-ESTABLISHED)
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -67,7 +67,6 @@ $fileName = $filePrefix . " - " . $stateName;
 
 foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-    // Check local file existence via absolute system path if possible, else rely on web path
     if (file_exists($_SERVER['DOCUMENT_ROOT'] . str_replace('..', '', $testPath)) || file_exists("../" . str_replace('../', '', $testPath))) {
         $finalImg = $testPath;
         break;
@@ -92,7 +91,11 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                             <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                             <form method="POST" class="m-0">
                                 <button type="submit" name="toggle_wishlist" class="btn btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
-                                    <i class="far fa-heart fs-5"></i>
+                                    <?php 
+                                    $w_check = $conn->query("SELECT wishlist_id FROM wishlists WHERE customer_id = $account_id AND property_id = $property_id");
+                                    $is_in_wish = ($w_check->num_rows > 0);
+                                    ?>
+                                    <i class="<?php echo $is_in_wish ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
                                 </button>
                             </form>
                         </div>
@@ -106,7 +109,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
                             <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction</h5>
-                            <p class="mb-0 text-dark">This is a government-subsidized unit. Applicants must have a combined household income <strong>Below RM <?php echo number_format($property['applicant_income_limit']); ?></strong>. Documents must be verified offline.</p>
+                            <p class="mb-0 text-dark">This is a government-subsidized unit. Applicants must have a combined household income <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>. Documents must be verified offline.</p>
                         </div>
                     <?php endif; ?>
 
@@ -207,7 +210,12 @@ function updateCalc() {
     const n = y * 12;
     const loan = p * (1 - d);
     const result = (loan * monthlyRate * Math.pow(1+monthlyRate, n)) / (Math.pow(1+monthlyRate, n) - 1);
-    document.getElementById('monthlyResult').innerText = "RM " + result.toLocaleString('en-US', {minimumFractionDigits: 2});
+    
+    // FIXED: Correct decimal places and format
+    document.getElementById('monthlyResult').innerText = "RM " + result.toLocaleString('en-US', {
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2
+    });
 }
 document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEventListener('input', updateCalc));
 window.onload = updateCalc;
