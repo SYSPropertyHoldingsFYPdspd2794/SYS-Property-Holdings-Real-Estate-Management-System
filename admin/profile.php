@@ -1,27 +1,12 @@
 <?php
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
+include '../includes/functions.php';
 
 protect_admin_page('ADMIN', $conn); 
 
 $account_id = $_SESSION['account_id'];
-$alert_msg = '';
-$alert_type = '';
-
-function table_column_exists($conn, $table, $column)
-{
-    try {
-        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
-        $stmt->bind_param("ss", $table, $column);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-        return ((int)($row['total'] ?? 0)) > 0;
-    } catch (Throwable $e) {
-        return false;
-    }
-}
-
-$admin_has_department = table_column_exists($conn, 'admins', 'department');
+$alert_msg = ''; $alert_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
@@ -29,11 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_pass = $_POST['new_password'] ?? '';
         $confirm_pass = $_POST['confirm_password'] ?? '';
 
-        if (strlen($new_pass) < 8) {
-            $alert_msg = 'New password must be at least 8 characters.';
+        if (!validate_password_strength($new_pass)) {
+            $alert_msg = 'Password does not meet security requirements.';
             $alert_type = 'danger';
         } elseif ($new_pass !== $confirm_pass) {
-            $alert_msg = 'New password and confirmation do not match.';
+            $alert_msg = 'Passwords do not match.';
             $alert_type = 'danger';
         } else {
             $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
@@ -42,60 +27,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = $stmt_check->get_result()->fetch_assoc();
 
             if ($res && password_verify($old_pass, $res['password_hash'])) {
-                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
-                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
-                $update_pass->bind_param("si", $hashed_password, $account_id);
-
-                if ($update_pass->execute()) {
+                $hashed = password_hash($new_pass, PASSWORD_DEFAULT);
+                $upd = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $upd->bind_param("si", $hashed, $account_id);
+                if ($upd->execute()) {
                     $alert_msg = 'Password updated successfully.';
                     $alert_type = 'success';
                 }
             } else {
-                $alert_msg = 'Verification failed: Current password incorrect.';
+                $alert_msg = 'Current password incorrect.';
                 $alert_type = 'danger';
             }
         }
     }
 
     if (isset($_POST['update_profile'])) {
-        $email = trim($_POST['email'] ?? '');
-        $full_name = trim($_POST['full_name'] ?? '');
-        $department = trim($_POST['department'] ?? '');
+        $email = trim($_POST['email']);
+        $full_name = trim($_POST['full_name']);
+        
+        $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
+        $upd_acc->bind_param("si", $email, $account_id);
+        $upd_acc->execute();
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $full_name === '' || ($admin_has_department && $department === '')) {
-            $alert_msg = $admin_has_department ? 'Please enter a valid email, full name, and department.' : 'Please enter a valid email and full name.';
-            $alert_type = 'danger';
-        } else {
-            try {
-                $conn->begin_transaction();
-
-                $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
-                $upd_acc->bind_param("si", $email, $account_id);
-                $upd_acc->execute();
-
-                if ($admin_has_department) {
-                    $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name, department) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), department = VALUES(department)");
-                    $update_stmt->bind_param("iss", $account_id, $full_name, $department);
-                } else {
-                    $update_stmt = $conn->prepare("INSERT INTO admins (admin_id, full_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name)");
-                    $update_stmt->bind_param("is", $account_id, $full_name);
-                }
-                $update_stmt->execute();
-
-                $conn->commit();
-                $alert_msg = 'Profile and email successfully updated.';
-                $alert_type = 'success';
-            } catch (Exception $e) {
-                $conn->rollback();
-                $alert_msg = 'Profile update failed. Please check if the email is already used.';
-                $alert_type = 'danger';
-            }
+        $upd_adm = $conn->prepare("UPDATE admins SET full_name = ? WHERE admin_id = ?");
+        $upd_adm->bind_param("si", $full_name, $account_id);
+        
+        if ($upd_adm->execute()) {
+            $alert_msg = 'Profile updated successfully.';
+            $alert_type = 'success';
         }
     }
 }
 
-$admin_department_select = $admin_has_department ? "ad.department" : "'HQ Administration' AS department";
-$stmt = $conn->prepare("SELECT ad.full_name, $admin_department_select, a.email FROM accounts a LEFT JOIN admins ad ON a.account_id = ad.admin_id WHERE a.account_id = ?");
+$stmt = $conn->prepare("SELECT ad.full_name, a.email FROM accounts a LEFT JOIN admins ad ON a.account_id = ad.admin_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $admin = $stmt->get_result()->fetch_assoc();
@@ -120,13 +84,23 @@ include '../includes/header.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">New Password</label>
-                            <input type="password" name="new_password" class="form-control" required>
+                            <input type="password" name="new_password" class="form-control" required onkeyup="checkPasswordRealtime(this.value, 'adm_')">
+                            
+                            <div class="mt-3 p-3 border rounded bg-light" style="font-size: 0.85rem;">
+                                <ul class="list-unstyled mb-0">
+                                    <li id="adm_length" class="text-danger"><i class="fas fa-times-circle me-2"></i>8+ Characters</li>
+                                    <li id="adm_upper" class="text-danger"><i class="fas fa-times-circle me-2"></i>Uppercase (A-Z)</li>
+                                    <li id="adm_lower" class="text-danger"><i class="fas fa-times-circle me-2"></i>Lowercase (a-z)</li>
+                                    <li id="adm_number" class="text-danger"><i class="fas fa-times-circle me-2"></i>Number (0-9)</li>
+                                    <li id="adm_symbol" class="text-danger"><i class="fas fa-times-circle me-2"></i>Symbol (@#$!)</li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Confirm New Password</label>
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
-                        <button type="submit" name="update_password" class="btn btn-warning w-100 fw-bold mt-2">Update Password</button>
+                        <button type="submit" name="update_password" class="btn btn-warning w-100 fw-bold">Update Password</button>
                     </form>
                 </div>
             </div>
@@ -145,12 +119,6 @@ include '../includes/header.php';
                             <label class="form-label fw-bold">Full Name</label>
                             <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($admin['full_name'] ?? ''); ?>" required>
                         </div>
-                        <?php if ($admin_has_department): ?>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Department</label>
-                                <input type="text" name="department" class="form-control" value="<?php echo htmlspecialchars($admin['department'] ?? ''); ?>" required>
-                            </div>
-                        <?php endif; ?>
                         <button type="submit" name="update_profile" class="btn btn-primary fw-bold px-4">Save Changes</button>
                     </form>
                 </div>

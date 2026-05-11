@@ -1,25 +1,24 @@
 <?php
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
+include '../includes/functions.php';
 
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
-$alert_msg = '';
-$alert_type = '';
+$alert_msg = ''; $alert_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     if (isset($_POST['update_password'])) {
         $old_pass = $_POST['old_password'] ?? '';
         $new_pass = $_POST['new_password'] ?? '';
         $confirm_pass = $_POST['confirm_password'] ?? '';
 
-        if (strlen($new_pass) < 8) {
-            $alert_msg = 'New password must be at least 8 characters.';
+        if (!validate_password_strength($new_pass)) {
+            $alert_msg = 'Password must follow all security rules.';
             $alert_type = 'danger';
         } elseif ($new_pass !== $confirm_pass) {
-            $alert_msg = 'New password and confirmation do not match.';
+            $alert_msg = 'Passwords do not match.';
             $alert_type = 'danger';
         } else {
             $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
@@ -28,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = $stmt_check->get_result()->fetch_assoc();
 
             if ($res && password_verify($old_pass, $res['password_hash'])) {
-                $hashed_password = password_hash($new_pass, PASSWORD_DEFAULT);
-                $update_pass = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
-                $update_pass->bind_param("si", $hashed_password, $account_id);
-                $update_pass->execute();
+                $hashed = password_hash($new_pass, PASSWORD_DEFAULT);
+                $upd = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
+                $upd->bind_param("si", $hashed, $account_id);
+                $upd->execute();
                 $alert_msg = 'Password successfully updated.';
                 $alert_type = 'success';
             } else {
@@ -50,36 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $occupation = trim($_POST['occupation']);
         $income = floatval($_POST['monthly_income']);
 
-        // 1. Update Accounts Table
         $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
         $upd_acc->bind_param("si", $email, $account_id);
         $upd_acc->execute();
 
-        // 2. Update Customers Table
-        $sql = "INSERT INTO customers (customer_id, full_name, phone_number, marital_status, dependents_count, occupation, monthly_income)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE 
-                full_name = VALUES(full_name), 
-                phone_number = VALUES(phone_number), 
-                marital_status = VALUES(marital_status), 
-                dependents_count = VALUES(dependents_count), 
-                occupation = VALUES(occupation), 
-                monthly_income = VALUES(monthly_income)";
-        
-        $update_stmt = $conn->prepare($sql);
-        $update_stmt->bind_param("isssisd", $account_id, $full_name, $phone, $marital, $dependents, $occupation, $income);
+        $stmt_upd = $conn->prepare("UPDATE customers SET full_name = ?, phone_number = ?, marital_status = ?, dependents_count = ?, occupation = ?, monthly_income = ? WHERE customer_id = ?");
+        $stmt_upd->bind_param("sssisdi", $full_name, $phone, $marital, $dependents, $occupation, $income, $account_id);
 
-        if ($update_stmt->execute()) {
+        if ($stmt_upd->execute()) {
             $alert_msg = 'Profile details updated successfully.';
             $alert_type = 'success';
-            
-            // Refresh local session data to show changes immediately
             $_SESSION['user_email'] = $email;
         }
     }
 }
 
-// FETCH DATA AFTER UPDATES: Ensures the $user array has the most recent DB values
 $stmt = $conn->prepare("SELECT c.*, a.email FROM accounts a LEFT JOIN customers c ON a.account_id = c.customer_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
@@ -104,14 +88,23 @@ include '../includes/header.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">New Password</label>
-                            <input type="password" name="new_password" class="form-control" required>
+                            <input type="password" name="new_password" class="form-control" required onkeyup="checkPasswordRealtime(this.value, 'cus_')">
+                            
+                            <div class="mt-3 p-3 border rounded bg-light" style="font-size: 0.85rem;">
+                                <ul class="list-unstyled mb-0">
+                                    <li id="cus_length" class="text-danger"><i class="fas fa-times-circle me-2"></i>8+ Characters</li>
+                                    <li id="cus_upper" class="text-danger"><i class="fas fa-times-circle me-2"></i>Uppercase (A-Z)</li>
+                                    <li id="cus_lower" class="text-danger"><i class="fas fa-times-circle me-2"></i>Lowercase (a-z)</li>
+                                    <li id="cus_number" class="text-danger"><i class="fas fa-times-circle me-2"></i>Number (0-9)</li>
+                                    <li id="cus_symbol" class="text-danger"><i class="fas fa-times-circle me-2"></i>Symbol (@#$!)</li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Confirm New Password</label>
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <button type="submit" name="update_password" class="btn btn-dark w-100 fw-bold">Update Password</button>
-                        <a href="https://wa.link/y3cz3o" class="btn btn-link w-100 mt-2 fw-bold" target="_blank" rel="noopener">Forgot Password?</a>
                     </form>
                 </div>
             </div>
@@ -123,7 +116,7 @@ include '../includes/header.php';
                     <form method="POST">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Email Address</label>
+                                <label class="form-label fw-bold">Email</label>
                                 <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                             </div>
                             <div class="col-md-6">
@@ -133,33 +126,15 @@ include '../includes/header.php';
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Phone Number</label>
+                                <label class="form-label fw-bold">Phone</label>
                                 <input type="text" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
                                 <select name="marital_status" class="form-select" required>
-                                    <!-- FIXED LOGIC: Strict comparison for dropdown selection -->
                                     <option value="SINGLE" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
                                     <option value="MARRIED" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Occupation</label>
-                                <input type="text" name="occupation" class="form-control" value="<?php echo htmlspecialchars($user['occupation'] ?? ''); ?>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Dependents Count</label>
-                                <input type="number" name="dependents_count" class="form-control" value="<?php echo htmlspecialchars($user['dependents_count'] ?? '0'); ?>" required>
-                            </div>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Monthly Income (RM)</label>
-                                <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo htmlspecialchars($user['monthly_income'] ?? '0.00'); ?>" required>
                             </div>
                         </div>
                         <button type="submit" name="save_details" class="btn btn-primary fw-bold px-4">Save Details</button>
