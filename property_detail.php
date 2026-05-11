@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: property_detail.php (ROOT)
- * DESCRIPTION: Admin/Staff View. UI Mirrored from Customer but booking functions disabled.
+ * DESCRIPTION: Admin/Staff View. Mirrored from customer view with Teammate's income limit fixes.
  */
 
 include_once 'includes/header.php';
@@ -11,7 +11,6 @@ protect_staff_admin_page($conn);
 
 $property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// FETCH FULL PROPERTY DATA
 $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ?");
 $stmt->bind_param("i", $property_id);
 $stmt->execute();
@@ -25,7 +24,7 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// IMAGE MAPPING ENGINE (ROOTED PATHS)
+// Robust Image Mapping Logic
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -37,26 +36,27 @@ switch($dbType) {
     case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
     case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
     case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
     default: $folder = "Apartment/"; $filePrefix = "Apartment";
 }
 
-// Notice the difference: NO $root_prefix here because this file is in the root
 $baseDir = "SYS Property Catalog/";
 $finalImg = $baseDir . "placeholder.jpg"; 
 $fileName = $filePrefix . " - " . $stateName;
 
 foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-    if (file_exists($testPath)) {
-        $finalImg = $testPath;
-        break;
-    }
+    if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
 ?>
 
 <div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="properties.php">Catalog</a></li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page"><?php echo htmlspecialchars($property['project_name']); ?></li>
+        </ol>
+    </nav>
+
     <div class="row">
         <div class="col-md-7 mb-4">
             <div class="card shadow-sm border-0 overflow-hidden h-100">
@@ -79,8 +79,8 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
-                            <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction (Verification Required)</h5>
-                            <p class="mb-0 text-dark">Subsidized unit. Staff must verify combining income is <strong>Below RM <?php echo number_format($property['applicant_income_limit']); ?></strong> during offline screening.</p>
+                            <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction</h5>
+                            <p class="mb-0 text-dark">Subsidized unit. Household income must be <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>. Staff must verify this offline.</p>
                         </div>
                     <?php endif; ?>
 
@@ -91,7 +91,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                             <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
                         <div class="col-6">
-                            <small class="d-block text-muted fw-bold mb-1">SYSTEM TOTAL UNITS</small>
+                            <small class="d-block text-muted fw-bold mb-1">TOTAL UNITS</small>
                             <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Select Bank (For Customer Counseling)</label>
+                        <label class="form-label fw-bold">Select Finance Bank</label>
                         <select id="bankSelect" class="form-select border-secondary">
                             <?php while ($bank = $banks_result->fetch_assoc()): ?>
                                 <option data-rate="<?php echo $bank['interest_rate']; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?> (<?php echo $bank['interest_rate']; ?>%)</option>
@@ -118,7 +118,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Simulated Downpayment</label>
+                        <label class="form-label fw-bold">Downpayment</label>
                         <select id="downpayment" class="form-select">
                             <option value="10">10%</option>
                             <option value="20">20%</option>
@@ -126,7 +126,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                         </select>
                     </div>
 
-                    <div class="mb-5">
+                    <div class="mb-5 pb-3">
                         <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary fs-4 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
@@ -136,12 +136,12 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <div class="p-4 bg-white border border-secondary border-opacity-25 rounded text-center shadow-sm mb-4">
                         <p class="mb-1 text-muted fw-bold small">ESTIMATED INSTALLMENT</p>
                         <h2 class="text-dark fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                        <small class="text-muted d-block mt-2">Rate: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
                         <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm" disabled>
-                            <i class="fas fa-lock me-2"></i>Customer Apply Only
+                            <i class="fas fa-lock me-2"></i>Booking Disabled
                         </button>
                     </div>
                 </div>

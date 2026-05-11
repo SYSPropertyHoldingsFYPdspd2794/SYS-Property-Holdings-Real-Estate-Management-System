@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: properties.php (ROOT DIRECTORY)
- * DESCRIPTION: Internal catalog for Staff and Admin with full state filters and robust image logic.
+ * DESCRIPTION: Internal catalog for Staff and Admin. Uses fixed 'income_limit_rm' data.
  */
 
 // 1. Path Fix: This file is in root, so includes are direct
@@ -12,38 +12,39 @@ require_once 'includes/auth_check.php';
 // 2. Security: Strictly for Staff and Admin
 protect_staff_admin_page($conn);
 
-// 3. Filter Logic Initialization
+// 3. Filter Logic
 $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
 
-// 4. SQL Construction
 $sql = "SELECT * FROM properties WHERE (status = 'ACTIVE' OR status = 'AVAILABLE')";
+$params = [];
+$types = "";
 
-if (!empty($search_name)) {
-    $sql .= " AND project_name LIKE '%" . $conn->real_escape_string($search_name) . "%'";
-}
-if (!empty($filter_state)) {
-    $sql .= " AND state = '" . $conn->real_escape_string($filter_state) . "'";
-}
+if (!empty($search_name)) { $sql .= " AND project_name LIKE ?"; $params[] = "%$search_name%"; $types .= "s"; }
+if (!empty($filter_state)) { $sql .= " AND state = ?"; $params[] = $filter_state; $types .= "s"; }
 
-// Logic: If filter is AFFORDABLE, check is_affordable column
 if ($filter_type === 'AFFORDABLE') {
     $sql .= " AND is_affordable = 1";
 } elseif (!empty($filter_type)) {
-    $sql .= " AND property_type = '" . $conn->real_escape_string($filter_type) . "' AND is_affordable = 0";
+    $sql .= " AND property_type = ? AND is_affordable = 0";
+    $params[] = $filter_type;
+    $types .= "s";
 }
 
 $sql .= " ORDER BY is_affordable DESC, property_id DESC";
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+if (!empty($params)) { $stmt->bind_param($types, ...$params); }
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <div class="container my-5">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <h2 class="fw-bold display-5 text-dark">Inventory Catalog</h2>
-            <p class="lead text-secondary text-uppercase small" style="letter-spacing: 2px;">Internal Staff & Administration View</p>
-            <hr class="w-25 mx-auto bg-dark" style="height: 3px; opacity: 1;">
+            <h2 class="fw-bold display-5">Inventory Catalog</h2>
+            <p class="lead text-secondary">Internal view of properties across all states and territories.</p>
+            <hr class="w-25 mx-auto bg-primary" style="height: 3px; opacity: 1;">
         </div>
     </div>
 
@@ -52,12 +53,12 @@ $result = $conn->query($sql);
             <form method="GET" action="properties.php">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-muted small"><i class="fas fa-search me-1"></i> Search Property</label>
-                        <input type="text" name="search_name" class="form-control form-control-lg" placeholder="e.g. Pagoh Jaya..." value="<?php echo htmlspecialchars($search_name); ?>">
+                        <label class="form-label fw-bold text-muted small"><i class="fas fa-search me-1"></i> Project Name</label>
+                        <input type="text" name="search_name" class="form-control" value="<?php echo htmlspecialchars($search_name); ?>">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> Filter State</label>
-                        <select name="filter_state" class="form-select form-select-lg">
+                        <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> State</label>
+                        <select name="filter_state" class="form-select">
                             <option value="">All Regions</option>
                             <optgroup label="States">
                                 <option value="Johor" <?php if($filter_state=='Johor') echo 'selected'; ?>>Johor</option>
@@ -83,7 +84,7 @@ $result = $conn->query($sql);
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-home me-1"></i> Category</label>
-                        <select name="filter_type" class="form-select form-select-lg">
+                        <select name="filter_type" class="form-select">
                             <option value="">All Categories</option>
                             <option value="AFFORDABLE" <?php if($filter_type=='AFFORDABLE') echo 'selected'; ?>>Affordable</option>
                             <option value="TERRACE" <?php if($filter_type=='TERRACE') echo 'selected'; ?>>Terrace</option>
@@ -93,7 +94,7 @@ $result = $conn->query($sql);
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm">Filter</button>
+                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm">Filter</button>
                     </div>
                 </div>
             </form>
@@ -102,18 +103,15 @@ $result = $conn->query($sql);
 
     <div class="row">
         <?php
-        if ($result && $result->num_rows > 0) {
+        if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                
-                $is_affordable = (intval($row['is_affordable']) === 1);
-                $badge_class = $is_affordable ? "bg-success" : "bg-primary";
+                $is_affordable = ($row['is_affordable'] == 1);
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
-
-                // --- ROBUST IMAGE ENGINE (ROOT VERSION) ---
+                $badge_class = $is_affordable ? "bg-success" : "bg-primary";
+                
+                // Image Mapping Logic (Root Path Fix)
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
-                
-                // Normalizing State names to match file directory
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
                 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
                 $stateName = ucwords(strtolower($rawState)); 
@@ -123,91 +121,54 @@ $result = $conn->query($sql);
                     case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
                     case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
                     case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-                    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
                     default: $folder = "Apartment/"; $filePrefix = "Apartment";
                 }
 
-                // Since this file is in ROOT, we don't need $root_prefix for assets
                 $baseDir = "SYS Property Catalog/";
-                $finalImg = $baseDir . "placeholder.jpg"; 
                 $fileName = $filePrefix . " - " . $stateName;
+                $finalImg = $baseDir . "placeholder.jpg"; 
 
-                foreach (['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'] as $ext) {
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-                    if (file_exists($testPath)) {
-                        $finalImg = $testPath;
-                        break;
-                    }
+                    if (file_exists($testPath)) { $finalImg = $testPath; break; }
                 }
-
-                $formattedPrice = number_format($row['price'], 2);
                 ?>
-
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden hover-effect">
-                        <div class="position-relative bg-light" style="height: 230px;">
-                            <img src="<?php echo htmlspecialchars($finalImg); ?>" 
-                                 class="w-100 h-100" 
-                                 alt="Property" 
-                                 style="object-fit: cover; object-position: center;">
-                            <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow">
-                                <?php echo $badge_text; ?>
-                            </span>
+                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden hover-card">
+                        <div class="position-relative" style="height: 220px;">
+                            <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
+                            <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
                         </div>
-
                         <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="card-title fw-bold text-dark mb-1 text-truncate" title="<?php echo htmlspecialchars($row['project_name']); ?>">
-                                <?php echo htmlspecialchars($row['project_name']); ?>
-                            </h5>
-                            <p class="text-muted small mb-3">
-                                <i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?>
-                            </p>
+                            <h5 class="fw-bold text-dark text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
-                                <div class="bg-danger bg-opacity-10 border-start border-danger border-4 p-2 mb-3">
-                                    <small class="text-danger fw-bold d-block"><i class="fas fa-id-card me-1"></i> ELIGIBILITY RESTRICED</small>
-                                    <small class="text-dark">Income Limit: RM <?php echo number_format($row['applicant_income_limit']); ?></small>
-                                </div>
+                                <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></p>
                             <?php endif; ?>
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="text-muted d-block fw-bold" style="font-size: 0.7rem;">LISTING PRICE</small>
-                                    <h4 class="text-success fw-bold mb-0">RM <?php echo $formattedPrice; ?></h4>
-                                </div>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" 
-                                   class="btn btn-outline-dark rounded-pill px-4 shadow-sm fw-bold">
-                                   View Detail
-                                </a>
+                                <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
-
-                        <div class="card-footer bg-white border-0 py-3 text-center border-top">
-                            <small class="text-muted">
-                                <i class="fas fa-door-open me-1"></i> Available Units: 
-                                <strong class="text-dark"><?php echo $row['total_units']; ?></strong>
-                            </small>
+                        <div class="card-footer bg-white border-0 py-3 text-center">
+                            <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>
                 </div>
-
                 <?php
             }
         } else {
-            echo '<div class="col-12 text-center py-5">
-                    <i class="fas fa-search-minus fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted fw-bold">No Records Found</h4>
-                    <p class="text-muted">No properties match your current internal criteria.</p>
-                    <a href="properties.php" class="btn btn-dark mt-2">Reset Inventory View</a>
-                  </div>';
+            echo '<div class="col-12 text-center py-5"><h4>No matching properties found.</h4></div>';
         }
         ?>
     </div>
 </div>
 
 <style>
-    .hover-effect { transition: transform 0.3s ease; }
-    .hover-effect:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.12) !important; }
+.hover-card { transition: transform 0.3s; }
+.hover-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important; }
 </style>
 
 <?php include_once 'includes/footer.php'; ?>
