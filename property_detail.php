@@ -1,20 +1,19 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * FILE: customer/property_detail.php
- * DESCRIPTION: Customer view with booking buttons and interactive image zoom.
+ * FILE: property_detail.php (ROOT DIRECTORY)
+ * DESCRIPTION: Internal details view. Booking functions are disabled for Staff/Admin.
  */
 
-include_once '../includes/header.php';
-require_once '../includes/auth_check.php';
+include_once 'includes/header.php';
+require_once 'includes/auth_check.php';
 include_once '../includes/header.php';
 /** @var string $root_prefix */
 /** @var mysqli $conn */
 require_once '../includes/auth_check.php';
-protect_customer_page('CUSTOMER', $conn);
+protect_staff_admin_page($conn);
 
 $property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-
 $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ?");
 $stmt->bind_param("i", $property_id);
 $stmt->execute();
@@ -22,7 +21,7 @@ $property = $stmt->get_result()->fetch_assoc();
 
 if (!$property) {
     echo "<div class='container my-5 text-center'><h3 class='text-danger'>Property not found.</h3></div>";
-    include_once '../includes/footer.php';
+    include_once 'includes/footer.php';
     exit();
 }
 
@@ -36,16 +35,12 @@ if (isset($property['applicant_income_limit']) && $property['applicant_income_li
 }
 $availableUnits = isset($property['available_units']) ? $property['available_units'] : (isset($property['total_units']) ? $property['total_units'] : 0);
 
-// Image Mapping
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
-
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
-if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
-
 $stateName = ucwords(strtolower($rawState)); 
-$folder = ""; $filePrefix = "";
 
+$folder = ""; $filePrefix = "";
 switch($dbType) {
     case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
     case 'standard': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
@@ -63,10 +58,7 @@ $finalImg = $baseDir . "placeholder.jpg";
 $exts = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
 foreach ($exts as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-    if (file_exists($testPath)) {
-        $finalImg = $testPath;
-        break;
-    }
+    if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
 ?>
 
@@ -82,18 +74,16 @@ foreach ($exts as $ext) {
         <div class="col-md-7 mb-4">
             <div class="card shadow-sm border-0 overflow-hidden h-100">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoomModal">
-                    <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 image-zoom-target" alt="Property Image" style="height: 400px; object-fit: cover;">
+                    <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 image-zoom-target" style="height: 400px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
-                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow">
-                            <i class="fas fa-search-plus me-2"></i>Click to Enlarge
-                        </span>
+                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Enlarge</span>
                     </div>
                 </div>
                 
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="fw-bold mb-0 text-dark"><?php echo htmlspecialchars($property['project_name']); ?></h2>
-                        <span class="badge bg-primary fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($property['property_type']); ?></span>
+                        <span class="badge bg-dark fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($property['property_type']); ?></span>
                     </div>
                     <p class="fs-5 text-muted mb-4"><i class="fas fa-map-marker-alt me-2 text-danger"></i><?php echo htmlspecialchars($property['state']); ?></p>
                     <hr class="my-4">
@@ -108,9 +98,7 @@ foreach ($exts as $ext) {
                         </div>
                         <div class="col-4">
                             <small class="d-block text-muted text-uppercase fw-bold mb-1">INCOME LIMIT</small>
-                            <span class="fs-6 fw-bold <?php echo ($income_limit_display !== 'N/A') ? 'text-danger' : 'text-dark'; ?>">
-                                <?php echo $income_limit_display; ?>
-                            </span>
+                            <span class="fs-6 fw-bold <?php echo ($income_limit_display !== 'N/A') ? 'text-danger' : 'text-dark'; ?>"><?php echo $income_limit_display; ?></span>
                         </div>
                     </div>
                 </div>
@@ -119,17 +107,17 @@ foreach ($exts as $ext) {
 
         <div class="col-md-5 mb-4">
             <div class="card shadow-sm border-0 h-100 bg-light">
-                <div class="card-header bg-dark text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Loan Calculator</h4>
+                <div class="card-header bg-secondary text-white p-4">
+                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Loan Calculator Tool</h4>
                 </div>
                 <div class="card-body p-4 p-lg-5">
-                    <h3 class="text-success fw-bold mb-4 border-bottom border-2 pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
+                    <h3 class="text-dark fw-bold mb-4 border-bottom border-2 pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
                     <input type="hidden" id="interestRate" value="<?php echo $rate; ?>">
                     <div class="mb-4">
                         <label class="form-label fw-bold">Downpayment (%)</label>
                         <select id="downpayment" class="form-select form-select-lg">
-                            <option value="10">10% (Standard)</option>
+                            <option value="10">10%</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
                         </select>
@@ -138,21 +126,15 @@ foreach ($exts as $ext) {
                         <label class="form-label fw-bold">Loan Tenure: <span id="tenureLabel" class="text-primary">35</span> Years</label>
                         <input type="range" id="tenure" class="form-range" value="35" min="5" max="35">
                     </div>
-                    <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
+                    <div class="p-4 bg-white border border-secondary border-opacity-25 rounded text-center shadow-sm mb-4">
                         <p class="mb-2 text-muted fw-bold text-uppercase small">Estimated Monthly Installment</p>
-                        <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
+                        <h2 class="text-dark fw-bold m-0" id="monthlyResult">RM 0.00</h2>
                         <small class="text-muted d-block mt-2">Interest Rate: <?php echo htmlspecialchars($rate); ?>% (p.a)</small>
                     </div>
                     <div class="d-grid mt-auto">
-                        <?php if ($property['property_type'] === 'AFFORDABLE'): ?>
-                            <a href="apply_affordable.php?id=<?php echo $property['property_id']; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow-sm">
-                                Apply for Gov Housing
-                            </a>
-                        <?php else: ?>
-                            <a href="book_appointment.php?id=<?php echo $property['property_id']; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow-sm">
-                                Book Showroom Viewing
-                            </a>
-                        <?php endif; ?>
+                        <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm w-100" disabled>
+                            <i class="fas fa-ban me-2"></i>Booking Disabled (Staff/Admin View)
+                        </button>
                     </div>
                 </div>
             </div>
@@ -196,4 +178,4 @@ document.getElementById('downpayment').addEventListener('change', calculateLoan)
 document.getElementById('tenure').addEventListener('input', calculateLoan);
 window.addEventListener('load', calculateLoan);
 </script>
-<?php include_once '../includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
