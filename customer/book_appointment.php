@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$valid_datetime) {
         $error = "Please select a valid appointment date and time.";
     } elseif ($appointment_dt->format('H:i:s') < '10:00:00' || $appointment_dt->format('H:i:s') > '20:00:00') {
-        $error = "Appointments are available from 10:00 AM to 10:00 PM. Please choose a start time between 10:00 AM and 8:00 PM.";
+        $error = "Appointments are available from 10:00 AM to 8:00 PM. Please choose a time in this range.";
     } else {
         $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
         $count_stmt->bind_param("s", $date);
@@ -117,7 +117,7 @@ include '../includes/header.php';
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Time</label>
                                 <input type="time" name="appointment_time" class="form-control form-control-lg" min="10:00" max="20:00" step="1800" required>
-                                <small class="text-muted d-block mt-2">Appointments run for 2 hours. Latest start time is 8:00 PM.</small>
+                                <small class="text-muted d-block mt-2">Available time: 10:00 AM to 8:00 PM. Appointments must be at least 2 hours apart.</small>
                             </div>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border">

@@ -26,10 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 include '../includes/header.php';
 
-$stmt = $conn->prepare("SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.service_type, a.status, a.staff_remarks, c.full_name, c.phone_number, p.project_name 
+$stmt = $conn->prepare("SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.service_type, a.status, a.staff_remarks, c.full_name, c.phone_number, p.project_name, d.file_path 
                         FROM appointments a 
                         JOIN customers c ON a.customer_id = c.customer_id 
                         JOIN properties p ON a.property_id = p.property_id 
+                        LEFT JOIN documents d ON a.appointment_id = d.related_to_id 
+                            AND d.related_to_type = 'APPOINTMENT' 
+                            AND d.document_type = 'PAYSLIP_SUMMARY' 
+                            AND d.is_purged = FALSE
                         WHERE a.assigned_staff_id = ? 
                         ORDER BY a.appointment_date DESC");
 $stmt->bind_param("i", $account_id);
@@ -58,7 +62,9 @@ $appointment_modals = '';
                         <tr>
                             <th>Date & Time</th>
                             <th>Customer Name</th>
+                            <th>Phone Number</th>
                             <th>Property</th>
+                            <th>Document</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -68,7 +74,17 @@ $appointment_modals = '';
                             <tr>
                                 <td><?php echo htmlspecialchars($row['appointment_date'] . ' ' . $row['appointment_time']); ?></td>
                                 <td><?php echo htmlspecialchars($row['full_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['phone_number']); ?></td>
                                 <td><?php echo htmlspecialchars($row['project_name']); ?></td>
+                                <td>
+                                    <?php if (!empty($row['file_path'])): ?>
+                                        <a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-pdf me-1"></i>View
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-muted small">No file</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php $bg = ($row['status'] === 'ASSIGNED') ? 'primary' : (($row['status'] === 'COMPLETED') ? 'success' : 'danger'); ?>
                                     <span class="badge bg-<?php echo $bg; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
