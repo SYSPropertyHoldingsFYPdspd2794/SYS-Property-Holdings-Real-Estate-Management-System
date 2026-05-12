@@ -10,37 +10,68 @@ $account_id = $_SESSION['account_id'];
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
-    $prop_id = $_POST['property_id'];
-    $service = $_POST['service_type'];
-    $date = $_POST['appointment_date'];
-    $time = $_POST['appointment_time'];
-    
-    $insert_appt = $conn->prepare("INSERT INTO appointments (customer_id, property_id, service_type, appointment_date, appointment_time, status) VALUES (?,?,?,?,?, 'REQUESTED')");
-    $insert_appt->bind_param("iisss", $account_id, $prop_id, $service, $date, $time);
-    
-    if ($insert_appt->execute()) {
-        $appt_id = $conn->insert_id;
-        if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-            $tmp_name = $_FILES['document']['tmp_name'];
-            $name = basename($_FILES['document']['name']);
-            $size = $_FILES['document']['size'];
-            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-            if ($ext === 'pdf' && $size <= 5242880) {
-                if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
-                $file_path = '../uploads/appt_'. $appt_id. '_'. time(). '.pdf';
-                if (move_uploaded_file($tmp_name, $file_path)) {
-                    $doc_type = 'PAYSLIP_SUMMARY';
-                    $rel_type = 'APPOINTMENT';
-                    $doc_stmt = $conn->prepare("INSERT INTO documents (customer_id, related_to_type, related_to_id, document_type, file_path) VALUES (?,?,?,?,?)");
-                    $doc_stmt->bind_param("isiss", $account_id, $rel_type, $appt_id, $doc_type, $file_path);
-                    $doc_stmt->execute();
-                }
+    $prop_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
+    $service = $_POST['service_type'] ?? '';
+    $date = $_POST['appointment_date'] ?? '';
+    $time = $_POST['appointment_time'] ?? '';
+    $time_for_db = strlen($time) === 5 ? $time . ':00' : $time;
+
+    $appointment_dt = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' ' . $time_for_db);
+    $date_errors = DateTime::getLastErrors();
+    $valid_datetime = $appointment_dt && ($date_errors === false || ($date_errors['warning_count'] === 0 && $date_errors['error_count'] === 0));
+
+    if (!$valid_datetime) {
+        $error = "Please select a valid appointment date and time.";
+    } elseif ($appointment_dt->format('H:i:s') < '10:00:00' || $appointment_dt->format('H:i:s') > '20:00:00') {
+        $error = "Appointments are available from 10:00 AM to 10:00 PM. Please choose a start time between 10:00 AM and 8:00 PM.";
+    } else {
+        $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
+        $count_stmt->bind_param("s", $date);
+        $count_stmt->execute();
+        $day_total = (int)$count_stmt->get_result()->fetch_assoc()['total'];
+
+        if ($day_total >= 3) {
+            $error = "This date already has 3 appointments. Please choose another day.";
+        } else {
+            $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 LIMIT 1");
+            $conflict_stmt->bind_param("ss", $date, $time_for_db);
+            $conflict_stmt->execute();
+            $conflict = $conflict_stmt->get_result()->fetch_assoc();
+
+            if ($conflict) {
+                $error = "Another appointment is already scheduled within 2 hours of this time. Please choose a different time.";
             }
         }
-        header("Location: track_status.php");
-        exit();
-    } else {
-        $error = "Failed to book appointment. Please try again.";
+    }
+
+    if ($error === '') {
+        $insert_appt = $conn->prepare("INSERT INTO appointments (customer_id, property_id, service_type, appointment_date, appointment_time, status) VALUES (?,?,?,?,?, 'REQUESTED')");
+        $insert_appt->bind_param("iisss", $account_id, $prop_id, $service, $date, $time_for_db);
+        
+        if ($insert_appt->execute()) {
+            $appt_id = $conn->insert_id;
+            if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
+                $tmp_name = $_FILES['document']['tmp_name'];
+                $name = basename($_FILES['document']['name']);
+                $size = $_FILES['document']['size'];
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                if ($ext === 'pdf' && $size <= 5242880) {
+                    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
+                    $file_path = '../uploads/appt_'. $appt_id. '_'. time(). '.pdf';
+                    if (move_uploaded_file($tmp_name, $file_path)) {
+                        $doc_type = 'PAYSLIP_SUMMARY';
+                        $rel_type = 'APPOINTMENT';
+                        $doc_stmt = $conn->prepare("INSERT INTO documents (customer_id, related_to_type, related_to_id, document_type, file_path) VALUES (?,?,?,?,?)");
+                        $doc_stmt->bind_param("isiss", $account_id, $rel_type, $appt_id, $doc_type, $file_path);
+                        $doc_stmt->execute();
+                    }
+                }
+            }
+            header("Location: track_status.php");
+            exit();
+        } else {
+            $error = "Failed to book appointment. Please try again.";
+        }
     }
 }
 
@@ -85,7 +116,8 @@ include '../includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Time</label>
-                                <input type="time" name="appointment_time" class="form-control form-control-lg" required>
+                                <input type="time" name="appointment_time" class="form-control form-control-lg" min="10:00" max="20:00" step="1800" required>
+                                <small class="text-muted d-block mt-2">Appointments run for 2 hours. Latest start time is 8:00 PM.</small>
                             </div>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border">

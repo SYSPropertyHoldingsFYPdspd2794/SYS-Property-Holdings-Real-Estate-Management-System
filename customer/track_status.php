@@ -23,14 +23,19 @@ include '../includes/header.php';
 <div class="container my-5">
     <h2 class="fw-bold mb-5"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
     
-    <ul class="nav nav-pills mb-5" id="trackerTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active px-4 py-3 fw-bold fs-5 shadow-sm me-3" id="appt-tab" data-bs-toggle="pill" data-bs-target="#appt" type="button" role="tab">Showroom Appointments</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link px-4 py-3 fw-bold fs-5 shadow-sm" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab">Housing Applications</button>
-        </li>
-    </ul>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+        <ul class="nav nav-pills" id="trackerTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active px-4 py-3 fw-bold fs-5 shadow-sm me-3" id="appt-tab" data-bs-toggle="pill" data-bs-target="#appt" type="button" role="tab">Showroom Appointments</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link px-4 py-3 fw-bold fs-5 shadow-sm" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab">Housing Applications</button>
+            </li>
+        </ul>
+        <a href="book_appointment.php" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Add appointment" aria-label="Add appointment">
+            <i class="fas fa-plus"></i>
+        </a>
+    </div>
 
     <div class="tab-content" id="trackerTabsContent">
         <div class="tab-pane fade show active" id="appt" role="tabpanel">
@@ -52,7 +57,7 @@ include '../includes/header.php';
                                         <span class="badge bg-<?php echo $bg;?> fs-6 px-3 py-2"><?php echo htmlspecialchars($row['status']);?></span>
                                     </div>
                                     <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type']));?></p>
-                                    <p class="text-muted fs-5 m-0"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars($row['appointment_date']. ' at '. $row['appointment_time']);?></p>
+                                    <p class="text-muted fs-5 m-0"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('Y-m-d', strtotime($row['appointment_date'])). ' at '. date('H:i', strtotime($row['appointment_time'])));?></p>
                                     <?php if (!empty($row['staff_remarks'])):?>
                                         <div class="mt-3 p-3 bg-light rounded border">
                                             <p class="m-0 small fw-bold">Staff Remarks:</p>
