@@ -105,6 +105,11 @@ include '../includes/header.php';
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <button type="submit" name="update_password" class="btn btn-dark w-100 fw-bold">Update Password</button>
+                        <div class="text-center mt-3">
+                            <a href="https://wa.link/bzspzh" target="_blank" rel="noopener noreferrer" class="small fw-bold text-decoration-none">
+                                Forgot Password?
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
