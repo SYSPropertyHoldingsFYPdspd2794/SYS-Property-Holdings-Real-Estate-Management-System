@@ -56,6 +56,6 @@ function protect_staff_admin_page($conn) {
             header("Location: login.php?error=unauthorized");
         }
         exit();
-    }
+    } 
 }
 ?>

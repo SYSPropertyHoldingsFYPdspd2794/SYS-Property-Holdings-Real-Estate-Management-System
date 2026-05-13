@@ -19,7 +19,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS wishlists (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(customer_id) REFERENCES customers(customer_id) ON DELETE CASCADE, 
     FOREIGN KEY(property_id) REFERENCES properties(property_id) ON DELETE CASCADE
-)");
+)");   
 
 // HANDLE REMOVE ACTION
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove') {
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $del = $conn->prepare("DELETE FROM wishlists WHERE wishlist_id = ? AND customer_id = ?");
     $del->bind_param("ii", $wish_id, $account_id);
     $del->execute();
-    header("Location: wishlist.php");
+    header("Location: wishlist.php"); 
     exit();
 }
 
