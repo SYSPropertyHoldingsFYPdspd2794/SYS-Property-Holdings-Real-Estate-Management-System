@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['save_details'])) {
-        $email = trim($_POST['email']);
-        $full_name = trim($_POST['full_name']);
-        $phone = trim($_POST['phone_number']);
-        $marital = $_POST['marital_status'];
-        $dependents = intval($_POST['dependents_count']);
-        $occupation = trim($_POST['occupation']);
-        $income = floatval($_POST['monthly_income']);
+        $email = trim($_POST['email'] ?? '');
+        $full_name = trim($_POST['full_name'] ?? '');
+        $phone = trim($_POST['phone_number'] ?? '');
+        $marital = $_POST['marital_status'] ?? 'SINGLE';
+        $dependents = max(0, intval($_POST['dependents_count'] ?? 0));
+        $occupation = trim($_POST['occupation'] ?? '');
+        $income = max(0, floatval($_POST['monthly_income'] ?? 0));
 
         $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
         $upd_acc->bind_param("si", $email, $account_id);
@@ -140,6 +140,22 @@ include '../includes/header.php';
                                     <option value="SINGLE" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
                                     <option value="MARRIED" <?php echo (isset($user['marital_status']) && $user['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Occupation</label>
+                                <input type="text" name="occupation" class="form-control" value="<?php echo htmlspecialchars($user['occupation'] ?? ''); ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Dependents</label>
+                                <input type="number" name="dependents_count" class="form-control" min="0" step="1" value="<?php echo htmlspecialchars($user['dependents_count'] ?? 0); ?>" required>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Monthly Income (RM)</label>
+                                <input type="number" name="monthly_income" class="form-control" min="0" step="0.01" value="<?php echo htmlspecialchars($user['monthly_income'] ?? 0); ?>" required>
                             </div>
                         </div>
                         <button type="submit" name="save_details" class="btn btn-primary fw-bold px-4">Save Details</button>
