@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND property_type!= 'AFFORDABLE'");
+$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND is_affordable = 0 ORDER BY state, project_name");
 $preselect = isset($_GET['id'])? intval($_GET['id']) : 0;
 
 include '../includes/header.php';
