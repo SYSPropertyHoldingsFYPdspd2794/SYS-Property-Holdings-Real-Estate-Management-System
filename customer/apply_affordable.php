@@ -16,8 +16,14 @@ $user = $user_stmt->get_result()->fetch_assoc();
 $user_income = (float)($user['monthly_income'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $prop_id = $_POST['property_id'];
-    if (!isset($_FILES['document']) || $_FILES['document']['error']!== UPLOAD_ERR_OK) {
+    $prop_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
+    $prop_check = $conn->prepare("SELECT property_id FROM properties WHERE property_id = ? AND status = 'ACTIVE' AND is_affordable = 1");
+    $prop_check->bind_param("i", $prop_id);
+    $prop_check->execute();
+
+    if ($prop_check->get_result()->num_rows === 0) {
+        $error = "Please select a valid government property.";
+    } elseif (!isset($_FILES['document']) || $_FILES['document']['error']!== UPLOAD_ERR_OK) {
         $error = "Mandatory income declaration document is missing.";
     } else {
         $tmp_name = $_FILES['document']['tmp_name'];
@@ -51,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND property_type = 'AFFORDABLE'");
+$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND is_affordable = 1 ORDER BY state, project_name");
 $preselect = isset($_GET['id'])? intval($_GET['id']) : 0;
 
 include '../includes/header.php';
