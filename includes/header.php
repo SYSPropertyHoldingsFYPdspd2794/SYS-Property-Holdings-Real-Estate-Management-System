@@ -44,6 +44,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 .hero-banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover; color: white; padding: 150px 0; }
 .step-icon { font-size: 3rem; color: #0d6efd; margin-bottom: 1rem; }
 .gov-housing-section { background-color: #f8f9fa; border-left: 5px solid #0d6efd; }
+.password-toggle-btn {
+    min-width: 44px;
+}
+.password-toggle-btn:focus {
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
 </style>
 </head>
 <body>

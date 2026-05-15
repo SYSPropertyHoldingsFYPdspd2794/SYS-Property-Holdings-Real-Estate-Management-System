@@ -56,6 +56,47 @@ function checkPasswordRealtime(password, prefix) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('input[type="password"]').forEach(function (input, index) {
+        if (input.closest('.password-toggle-group')) {
+            return;
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'input-group password-toggle-group';
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-outline-secondary password-toggle-btn';
+        button.setAttribute('aria-label', 'Show password');
+        button.setAttribute('aria-pressed', 'false');
+        button.setAttribute('title', 'Show password');
+
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-eye';
+        icon.setAttribute('aria-hidden', 'true');
+        button.appendChild(icon);
+
+        if (!input.id) {
+            input.id = 'passwordField' + (index + 1);
+        }
+        button.setAttribute('aria-controls', input.id);
+
+        button.addEventListener('click', function () {
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+            button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            button.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+            button.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+        });
+
+        wrapper.appendChild(button);
+    });
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
