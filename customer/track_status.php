@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/track_status.php
- * DESCRIPTION: US29 - Track application and appointment statuses. Kept 100% original layout.
+ * DESCRIPTION: US29 - Track application and appointment statuses. Fixed plus button routing to properties catalog.
  */
 
 session_start();
@@ -45,7 +45,7 @@ include '../includes/header.php';
                 <button class="nav-link px-4 py-3 fw-bold fs-5 shadow-sm rounded-pill" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab"><i class="fas fa-home me-2"></i>Housing Applications</button>
             </li>
         </ul>
-        <a href="book_appointment.php" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Add appointment" aria-label="Add appointment">
+        <a href="properties.php" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Browse Properties Catalog">
             <i class="fas fa-plus"></i>
         </a>
     </div>
