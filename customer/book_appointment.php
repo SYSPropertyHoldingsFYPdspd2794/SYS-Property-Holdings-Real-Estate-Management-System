@@ -1,136 +1,131 @@
 <?php
+/**
+ * PROJECT: SYS Property Holdings
+ * FILE: customer/book_appointment.php
+ * DESCRIPTION: US26 & US28 - Book showroom appointments and securely upload abstract PDF.
+ */
+
 session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role']!== 'CUSTOMER') {
-    header("Location:../login.php");
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
+    header("Location: ../login.php");
     exit();
 }
+
 include '../includes/db_connect.php';
 
 $account_id = $_SESSION['account_id'];
 $error = '';
+$property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
-    $prop_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
+    $prop_id = isset($_POST['property_id']) ? intval($_POST['property_id']) : 0;
     $service = $_POST['service_type'] ?? '';
     $date = $_POST['appointment_date'] ?? '';
     $time = $_POST['appointment_time'] ?? '';
-    $time_for_db = strlen($time) === 5 ? $time . ':00' : $time;
+    $time_for_db = (strlen($time) === 5) ? $time . ':00' : $time;
 
     $appointment_dt = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' ' . $time_for_db);
     $date_errors = DateTime::getLastErrors();
     $valid_datetime = $appointment_dt && ($date_errors === false || ($date_errors['warning_count'] === 0 && $date_errors['error_count'] === 0));
 
-    if (!$valid_datetime) {
-        $error = "Please select a valid appointment date and time.";
+    $today = new DateTime();
+    if (!$valid_datetime || $appointment_dt < $today) {
+        $error = "Please select a valid future appointment date and time.";
     } elseif ($appointment_dt->format('H:i:s') < '10:00:00' || $appointment_dt->format('H:i:s') > '20:00:00') {
-        $error = "Appointments are available from 10:00 AM to 8:00 PM. Please choose a time in this range.";
+        $error = "Appointments must be scheduled between 10:00 AM and 8:00 PM.";
     } else {
-        $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
-        $count_stmt->bind_param("s", $date);
-        $count_stmt->execute();
-        $day_total = (int)$count_stmt->get_result()->fetch_assoc()['total'];
-
-        if ($day_total >= 3) {
-            $error = "This date already has 3 appointments. Please choose another day.";
-        } else {
-            $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 LIMIT 1");
-            $conflict_stmt->bind_param("ss", $date, $time_for_db);
-            $conflict_stmt->execute();
-            $conflict = $conflict_stmt->get_result()->fetch_assoc();
-
-            if ($conflict) {
-                $error = "Another appointment is already scheduled within 2 hours of this time. Please choose a different time.";
-            }
-        }
-    }
-
-    if ($error === '') {
-        $insert_appt = $conn->prepare("INSERT INTO appointments (customer_id, property_id, service_type, appointment_date, appointment_time, status) VALUES (?,?,?,?,?, 'REQUESTED')");
-        $insert_appt->bind_param("iisss", $account_id, $prop_id, $service, $date, $time_for_db);
-        
-        if ($insert_appt->execute()) {
+        $conn->begin_transaction();
+        try {
+            $stmt = $conn->prepare("INSERT INTO appointments (customer_id, property_id, service_type, appointment_date, appointment_time, status) VALUES (?, ?, ?, ?, ?, 'PENDING')");
+            $stmt->bind_param("iisss", $account_id, $prop_id, $service, $date, $time_for_db);
+            $stmt->execute();
             $appt_id = $conn->insert_id;
+
+            // Handle optional PDF document upload securely
             if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-                $tmp_name = $_FILES['document']['tmp_name'];
-                $name = basename($_FILES['document']['name']);
-                $size = $_FILES['document']['size'];
-                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-                if ($ext === 'pdf' && $size <= 5242880) {
-                    if (!is_dir('../uploads')) mkdir('../uploads', 0777, true);
-                    $file_path = '../uploads/appt_'. $appt_id. '_'. time(). '.pdf';
-                    if (move_uploaded_file($tmp_name, $file_path)) {
-                        $doc_type = 'PAYSLIP_SUMMARY';
-                        $rel_type = 'APPOINTMENT';
-                        $doc_stmt = $conn->prepare("INSERT INTO documents (customer_id, related_to_type, related_to_id, document_type, file_path) VALUES (?,?,?,?,?)");
-                        $doc_stmt->bind_param("isiss", $account_id, $rel_type, $appt_id, $doc_type, $file_path);
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $_FILES['document']['tmp_name']);
+                finfo_close($finfo);
+
+                if ($mime === 'application/pdf' && $_FILES['document']['size'] <= 5242880) {
+                    $target_dir = "../storage/docs/";
+                    if(!is_dir($target_dir)) mkdir($target_dir, 0777, true);
+                    
+                    $file_name = "appt_" . $appt_id . "_" . time() . ".pdf";
+                    $target_file = $target_dir . $file_name;
+                    
+                    if (move_uploaded_file($_FILES["document"]["tmp_name"], $target_file)) {
+                        $db_path = "/storage/docs/" . $file_name;
+                        $doc_stmt = $conn->prepare("INSERT INTO documents (customer_id, related_to_type, related_to_id, document_type, file_path, is_purged) VALUES (?, 'APPOINTMENT', ?, 'PAYSLIP_SUMMARY', ?, FALSE)");
+                        $doc_stmt->bind_param("iis", $account_id, $appt_id, $db_path);
                         $doc_stmt->execute();
                     }
+                } else {
+                    throw new Exception("Invalid document format. Only PDF files under 5MB are allowed.");
                 }
             }
-            header("Location: track_status.php");
+            
+            $conn->commit();
+            header("Location: track_status.php?success=appointment_booked");
             exit();
-        } else {
-            $error = "Failed to book appointment. Please try again.";
+            
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error = $e->getMessage() ?: "System error occurred during booking.";
         }
     }
 }
 
-$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status = 'ACTIVE' AND is_affordable = 0 ORDER BY state, project_name");
-$preselect = isset($_GET['id'])? intval($_GET['id']) : 0;
-
 include '../includes/header.php';
 ?>
+
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow border-0">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-dark text-white p-4 rounded-top-4">
+                    <h3 class="fw-bold mb-0"><i class="fas fa-calendar-alt me-2 text-warning"></i>Schedule Viewing</h3>
+                </div>
                 <div class="card-body p-5">
-                    <h2 class="fw-bold mb-4 text-dark"><i class="far fa-calendar-check me-2"></i>Book Showroom Appointment</h2>
-                    <p class="text-muted mb-4">Schedule your physical offline visit to our showrooms for a personalized experience.</p>
-                    <?php if ($error!== ''):?>
-                        <div class="alert alert-danger fw-bold"><?php echo htmlspecialchars($error);?></div>
-                    <?php endif;?>
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Select Property</label>
-                            <select name="property_id" class="form-select form-select-lg" required>
-                                <option value="" disabled <?php echo $preselect === 0? 'selected' : '';?>>Choose a property...</option>
-                                <?php while ($p = $props->fetch_assoc()):?>
-                                    <option value="<?php echo $p['property_id'];?>" <?php echo $preselect === (int)$p['property_id']? 'selected' : '';?>>
-                                        <?php echo htmlspecialchars($p['project_name']. ' ('. $p['state']. ')');?>
-                                    </option>
-                                <?php endwhile;?>
-                            </select>
-                        </div>
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger border-0 shadow-sm"><i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error); ?></div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" action="book_appointment.php" enctype="multipart/form-data">
+                        <input type="hidden" name="property_id" value="<?php echo htmlspecialchars($property_id); ?>">
+                        
                         <div class="mb-4">
                             <label class="form-label fw-bold">Service Type</label>
-                            <select name="service_type" class="form-select form-select-lg" required>
+                            <select name="service_type" class="form-select form-select-lg bg-light" required>
                                 <option value="SHOWROOM_VIEWING">Showroom Viewing</option>
                                 <option value="FINANCIAL_CONSULTATION">Financial Consultation</option>
                             </select>
                         </div>
-                        <div class="row mb-4">
+                        
+                        <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Date</label>
-                                <input type="date" name="appointment_date" class="form-control form-control-lg" required>
+                                <input type="date" name="appointment_date" class="form-control form-control-lg bg-light" required min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Time</label>
-                                <input type="time" name="appointment_time" class="form-control form-control-lg" min="10:00" max="20:00" step="1800" required>
-                                <small class="text-muted d-block mt-2">Available time: 10:00 AM to 8:00 PM. Appointments must be at least 2 hours apart.</small>
+                                <input type="time" name="appointment_time" class="form-control form-control-lg bg-light" min="10:00" max="20:00" step="1800" required>
+                                <small class="text-muted d-block mt-2">Available: 10:00 AM - 8:00 PM</small>
                             </div>
                         </div>
-                        <div class="mb-5 p-4 bg-light rounded border">
-                            <label class="form-label fw-bold"><i class="fas fa-file-upload me-2"></i>Optional Financial Abstract (Payslip Summary)</label>
-                            <p class="small text-muted mb-3">Uploading a document allows our consultants to perform an early financial pre-check before your visit. Max size: 5MB (PDF only).</p>
+                        
+                        <div class="mb-5 p-4 bg-light rounded-4 border border-secondary border-opacity-25">
+                            <label class="form-label fw-bold text-dark"><i class="fas fa-file-upload me-2 text-primary"></i>Optional Financial Abstract</label>
+                            <p class="small text-muted mb-3">Uploading your payslip summary allows our consultants to perform an early financial pre-check. Max size: 5MB (PDF only).</p>
                             <input type="file" name="document" class="form-control" accept="application/pdf">
                         </div>
-                        <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3">Confirm Booking</button>
+                        
+                        <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3 rounded-pill shadow-sm">Confirm Booking Request</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php include '../includes/footer.php';?>
 
+<?php include '../includes/footer.php'; ?>
