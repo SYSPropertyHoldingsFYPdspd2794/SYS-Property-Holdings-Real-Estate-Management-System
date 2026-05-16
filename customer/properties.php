@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Customer property catalog with updated filters and accurate units display.
+ * DESCRIPTION: Customer catalog. Full territory filters, teammate's income_limit_rm fix, and Wishlist.
  */
 
 include_once '../includes/header.php';
@@ -11,7 +11,6 @@ protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 
-// WISHLIST TOGGLE LOGIC
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
     $prop_id = intval($_POST['property_id']);
     $chk = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
@@ -34,7 +33,6 @@ $wishlist_array = [];
 $w_res = $conn->query("SELECT property_id FROM wishlists WHERE customer_id = $account_id");
 while($w = $w_res->fetch_assoc()) { $wishlist_array[] = $w['property_id']; }
 
-// FILTER LOGIC
 $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
@@ -131,20 +129,14 @@ $result = $stmt->get_result();
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
                 $badge_class = $is_affordable ? "bg-success" : "bg-primary";
                 
-                // Image Mapping
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
                 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
                 $stateName = ucwords(strtolower($rawState)); 
                 
-                $folder = ""; $filePrefix = "";
-                switch($dbType) {
-                    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-                    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-                    default: $folder = "Apartment/"; $filePrefix = "Apartment";
-                }
+                $folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
+                $filePrefix = ucfirst($dbType);
 
                 $baseDir = $root_prefix . "SYS Property Catalog/";
                 $fileName = $filePrefix . " - " . $stateName;
@@ -181,7 +173,7 @@ $result = $stmt->get_result();
                                 <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-dark rounded-pill px-4 shadow-sm">Details</a>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-0 py-3 text-center">
+                        <div class="card-footer bg-white border-0 py-3 text-center border-top">
                             <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>

@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: property_detail.php (ROOT DIRECTORY)
- * DESCRIPTION: Admin/Staff View. Includes Dynamic Floor Plans, Layout calculation, Proximity mapping, and teammate's income limits.
+ * DESCRIPTION: Admin and Staff internal workspace. UI mirrored 100% from customer with full-width bottom cards.
  */
 
 include_once 'includes/header.php';
@@ -24,7 +24,7 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// --- 1. PROPERTY IMAGE MAPPING (ROOT PATHS) ---
+// IMAGE PATH
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -43,106 +43,103 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
 
-// --- 2. DYNAMIC FLOOR PLAN GENERATION (ROOT PATHS) ---
-if ($is_afford) {
-    $floorPlanName = "Floor_Plan_Affordable.webp";
-} else {
-    switch ($dbType) {
-        case 'commercial': $floorPlanName = "Floor_Plan_Commercial.webp"; break;
-        case 'terrace': $floorPlanName = "Floor_Plan_Terrace.webp"; break;
-        case 'bungalow': $floorPlanName = "Floor_Plan_Bungalow.webp"; break;
-        default: $floorPlanName = "Floor_Plan_Apartment.webp"; break;
-    }
-}
+// --- DYNAMIC INFRASTRUCTURE RESOLUTION ---
 
+// 1. FLOOR PLAN (STRICTLY .JPG)
+$floorPlanName = $is_afford ? "Affordable_Floor_Plan.jpg" : ucfirst($dbType) . "_Floor_Plan.jpg";
 $finalFloorPlan = $baseDir . $floorPlanName;
 if (!file_exists($finalFloorPlan)) {
-    $finalFloorPlan = $baseDir . "Floor_Plan.webp"; 
+    $finalFloorPlan = $baseDir . "Floor_Plan.jpg"; 
 }
 
-// --- 3. DYNAMIC INTERNAL LAYOUT CALCULATOR ---
-$sqft = intval($property['built_up_sqft']);
-$layoutSpecsHtml = "";
+// 2. INTERNAL LAYOUT (NUMERIC WITH ICONS)
+$layoutHtml = "";
 if ($is_afford) {
-    $layoutSpecsHtml = '
-        <div class="row text-center g-3">
-            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
-            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
-            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Family Hall</h6></div></div>
-            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Standard Kitchen</h6></div></div>
+    $layoutHtml = '
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Living Hall</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Kitchen</h5></div></div>
         </div>';
 } else {
     if ($dbType === 'commercial') {
-        $layoutSpecsHtml = '
-            <div class="row text-center g-3">
-                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-door-open fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">Open Workspace</h6></div></div>
-                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">1 Executive Office</h6></div></div>
-                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Washrooms</h6></div></div>
-                <div class="col-12"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-boxes fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">High-Ceiling Stock Storage Zone</h6></div></div>
+        $layoutHtml = '
+            <div class="row text-center g-4">
+                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-store fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Open Layout Workspaces</h5></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">1 Manager Office</h5></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Restrooms</h5></div></div>
             </div>';
     } else {
+        $sqft = intval($property['built_up_sqft']);
         if ($dbType === 'bungalow') {
-            $layoutSpecsHtml = '
-                <div class="row text-center g-3">
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bathrooms</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Private Pool</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-book-reader fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">1 Study Room</h6></div></div>
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Private Pool</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-car-side fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">3 Car Porches</h5></div></div>
                 </div>';
         } elseif ($dbType === 'apartment') {
-            $layoutSpecsHtml = '
-                <div class="row text-center g-3">
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Clubhouse Gym</h6></div></div>
-                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Public Pool</h6></div></div>
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Gym Facility</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Public Pool</h5></div></div>
                 </div>';
-        } else {
-            if ($sqft >= 1500) {
-                $layoutSpecsHtml = '
-                    <div class="row text-center g-3">
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bathrooms</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-shield-alt fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Gated Area</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-blender fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Extended Kitchen</h6></div></div>
-                    </div>';
-            } else {
-                $layoutSpecsHtml = '
-                    <div class="row text-center g-3">
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bedrooms</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bathrooms</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-car fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Double Porch</h6></div></div>
-                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-sink fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Dry Kitchen</h6></div></div>
-                    </div>';
-            }
+        } else { 
+            $rooms = ($sqft >= 1500) ? "5" : "4";
+            $baths = ($sqft >= 1500) ? "4" : "3";
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-warehouse fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">2 Car Porches</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-door-closed fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Store Room</h5></div></div>
+                </div>';
         }
     }
 }
 
-// --- 4. DYNAMIC PROXIMITY MAPPING ---
-$proximityMap = [
-    'Johor' => 'Situated in a prime high-growth economic corridor. 5 minutes drive to Universiti Teknologi Malaysia (UTM) campus, surrounding retail hypermarkets, and 15 minutes to Johor Bahru City Centre via Skudai Expressway.',
-    'Kuala Lumpur' => 'Premium urban transit-oriented setting. Walking distance to nearest MRT/LRT interchange stations, 10 minutes to Pavilion Bukit Bintang financial district, KLCC tower, and premier international schools.',
-    'Penang' => 'Highly strategic island-mainland logistical bridge. 5 minutes to Penang Bridge entry and Bayan Lepas Free Industrial Zone (FIZ), enveloped by vibrant local heritage culinary precincts and medical centers.',
-    'Selangor' => 'Highly integrated residential township. Direct seamless access to major expressways (ELITE/NKVE), minutes away from top-tier regional universities, central corporate parks, and lifestyle shopping complexes.',
-    'Sarawak' => 'Serene premium neighborhood hub. Placed 10 minutes away from Kuching International Airport, nearby local secondary schools, government administrative offices, and specialized regional healthcare centers.'
-];
-$proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located property ecosystem with swift reach to public transit corridors, surrounding local school systems, district clinics, and retail convenience outlets.';
+// 3. PROXIMITY (WITH PRECISE KM & ICONS)
+$proximityHtml = "";
+switch ($property['state']) {
+    case 'Johor':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Teknologi Malaysia (UTM) <strong class="text-dark">3.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>AEON Mall Tebrau City <strong class="text-dark">5.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Sultanah Aminah Hospital <strong class="text-dark">8.1 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-road text-warning fa-fw me-3"></i> <span>Senai International Airport <strong class="text-dark">18.0 KM</strong></span></div></div>
+            </div>';
+        break;
+    case 'Kuala Lumpur':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-danger fa-fw me-3"></i> <span>KLCC LRT Station <strong class="text-dark">1.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Pavilion Bukit Bintang <strong class="text-dark">2.0 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-success fa-fw me-3"></i> <span>International School of KL <strong class="text-dark">4.3 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-tree text-warning fa-fw me-3"></i> <span>Perdana Botanical Garden <strong class="text-dark">5.0 KM</strong></span></div></div>
+            </div>';
+        break;
+    default:
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Regional Secondary School <strong class="text-dark">1.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>Local Commercial Complex <strong class="text-dark">2.3 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Community Health Center <strong class="text-dark">3.0 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-bus text-warning fa-fw me-3"></i> <span>Central Bus Terminal <strong class="text-dark">4.2 KM</strong></span></div></div>
+            </div>';
+}
 ?>
 
 <div class="container my-5">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="properties.php">Catalog</a></li>
-            <li class="breadcrumb-item active fw-bold" aria-current="page"><?php echo htmlspecialchars($property['project_name']); ?></li>
-        </ol>
-    </nav>
-
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-sm border-0 overflow-hidden mb-4">
+            <div class="card shadow-sm border-0 overflow-hidden h-100">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
-                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
+                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
                         <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Internal View</span>
                     </div>
@@ -161,18 +158,18 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
                             <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction</h5>
-                            <p class="mb-0 text-dark">Subsidized unit. Household income must be <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>. Staff must verify this offline.</p>
+                            <p class="mb-0 text-dark">Subsidized unit. Staff must verify offline that household income is <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>.</p>
                         </div>
                     <?php endif; ?>
 
                     <hr class="my-4">
-                    <div class="row text-center mb-5">
+                    <div class="row text-center mb-4">
                         <div class="col-4 border-end">
                             <small class="d-block text-muted fw-bold mb-1">SQFT</small>
                             <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
                         <div class="col-4 border-end">
-                            <small class="d-block text-muted fw-bold mb-1">TOTAL UNITS</small>
+                            <small class="d-block text-muted fw-bold mb-1">AVAILABLE UNITS</small>
                             <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
                         </div>
                         <div class="col-4">
@@ -180,24 +177,6 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
                             <span class="fs-5 fw-bold text-dark"><?php echo htmlspecialchars($property['property_code']); ?></span>
                         </div>
                     </div>
-
-                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
-                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h5>
-                        <div class="p-2"><?php echo $layoutSpecsHtml; ?></div>
-                    </div>
-
-                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
-                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-map-signs text-primary me-2"></i> Proximity & Neighborhood Amenities</h5>
-                        <p class="text-secondary fs-6 mb-0 lh-base"><?php echo $proximityInfoText; ?></p>
-                    </div>
-
-                    <div class="card bg-light border-0 rounded-4 p-4 reveal-card">
-                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h5>
-                        <div class="text-center bg-white p-3 border rounded-3 mt-2">
-                            <img src="<?php echo $finalFloorPlan; ?>" class="img-fluid rounded" alt="Floor Plan Layout" style="max-height: 400px; object-fit: contain;">
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -205,7 +184,7 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
         <div class="col-md-5 mb-4">
             <div class="card shadow-sm border-0 h-100 bg-light">
                 <div class="card-header bg-secondary text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Internal Calculator</h4>
+                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Internal Calc Tool</h4>
                 </div>
                 <div class="card-body p-4 p-lg-5 d-flex flex-column">
                     <h3 class="text-dark fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
@@ -229,7 +208,7 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
                         </select>
                     </div>
 
-                    <div class="mb-5 pb-3">
+                    <div class="mb-5">
                         <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary fs-4 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
@@ -239,16 +218,41 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
                     <div class="p-4 bg-white border border-secondary border-opacity-25 rounded text-center shadow-sm mb-4">
                         <p class="mb-1 text-muted fw-bold small">ESTIMATED INSTALLMENT</p>
                         <h2 class="text-dark fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Rate: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
                         <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm" disabled>
-                            <i class="fas fa-lock me-2"></i>Booking Disabled
+                            <i class="fas fa-lock me-2"></i>Booking Disabled (Staff View)
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h3>
+                <div class="text-center bg-white p-4 border rounded-3 shadow-sm">
+                    <img src="<?php echo $finalFloorPlan; ?>" class="img-fluid rounded" alt="Architectural Plan" style="max-height: 500px; object-fit: contain;">
+                </div>
+            </div>
+
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h3>
+                <div class="p-2"><?php echo $layoutHtml; ?></div>
+            </div>
+
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-map-signs text-primary me-2"></i> Regional Proximity & Neighborhood</h3>
+                <div class="p-3 bg-white border rounded shadow-sm mt-3">
+                    <?php echo $proximityHtml; ?>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -262,18 +266,18 @@ $proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located p
 </div>
 
 <style>
-    /* CSS FOR FLOAT-UP DRIFT EFFECT */
+    /* ANIMATION: DRIFT UP */
     @keyframes driftUp {
-        0% { opacity: 0; transform: translateY(40px); }
+        0% { opacity: 0; transform: translateY(60px); }
         100% { opacity: 1; transform: translateY(0); }
     }
-    .reveal-card {
-        animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-
+    .reveal-card { animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none;}
+    
+    /* CUSTOM RIGID SLIDER FOR STAFF VIEW */
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
     .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 </style>
