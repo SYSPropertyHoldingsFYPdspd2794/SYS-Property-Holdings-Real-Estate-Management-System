@@ -203,7 +203,7 @@ switch ($property['state']) {
         <div class="col-md-5 mb-4">
             <div class="card shadow-sm border-0 h-100 bg-light">
                 <div class="card-header bg-secondary text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Internal Calc Tool</h4>
+                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Internal Calculator</h4>
                 </div>
                 <div class="card-body p-4 p-lg-5 d-flex flex-column">
                     <h3 class="text-dark fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
@@ -242,7 +242,7 @@ switch ($property['state']) {
 
                     <div class="d-grid mt-auto">
                         <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm" disabled>
-                            <i class="fas fa-lock me-2"></i>Internal Access Only (Booking Disabled)
+                            <i class="fas fa-lock me-2"></i>Internal Access Only
                         </button>
                     </div>
                 </div>
