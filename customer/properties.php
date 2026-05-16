@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Customer catalog. Full territory filters, teammate's income_limit_rm fix, and Wishlist.
+ * DESCRIPTION: Customer property catalog. Perfect baseline layout.
  */
 
 include_once '../includes/header.php';
@@ -11,6 +11,7 @@ protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 
+// WISHLIST LOGIC
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
     $prop_id = intval($_POST['property_id']);
     $chk = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
