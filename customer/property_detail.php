@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/property_detail.php
- * DESCRIPTION: Mirror UI with fully fixed image paths and eligibility alerts.
+ * DESCRIPTION: Complete property detail with structural icons, local floor plans, and scroll drift animation.
  */
 
 include_once '../includes/header.php';
@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
     exit();
 }
 
-// FETCH FULL PROPERTY DATA
 $stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = ?");
 $stmt->bind_param("i", $property_id);
 $stmt->execute();
@@ -41,25 +40,23 @@ if (!$property) {
     include_once '../includes/footer.php'; exit();
 }
 
+$is_wish_stmt = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
+$is_wish_stmt->bind_param("ii", $account_id, $property_id);
+$is_wish_stmt->execute();
+$is_wishlisted = ($is_wish_stmt->get_result()->num_rows > 0);
+
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// IMAGE MAPPING ENGINE (RE-ESTABLISHED)
+// MAIN IMAGE LOGIC
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
 $stateName = ucwords(strtolower($rawState)); 
 
-$folder = ""; $filePrefix = "";
-switch($dbType) {
-    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-    default: $folder = "Apartment/"; $filePrefix = "Apartment";
-}
+$folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
+$filePrefix = ucfirst($dbType);
 
 $baseDir = $root_prefix . "SYS Property Catalog/";
 $finalImg = $baseDir . "placeholder.jpg"; 
@@ -67,17 +64,107 @@ $fileName = $filePrefix . " - " . $stateName;
 
 foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-    if (file_exists($_SERVER['DOCUMENT_ROOT'] . str_replace('..', '', $testPath)) || file_exists("../" . str_replace('../', '', $testPath))) {
-        $finalImg = $testPath;
-        break;
+    if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
+}
+
+// --- DYNAMIC CONTENT DELEGATION (NO EXTRA COLUMNS) ---
+
+// A. Floor Plan Matrix (Strictly fetching from directory architecture)
+if ($is_afford) {
+    $floorPlanName = "Floor_Plan_Affordable.webp";
+} else {
+    switch ($dbType) {
+        case 'commercial': $floorPlanName = "Floor_Plan_Commercial.webp"; break;
+        case 'terrace': $floorPlanName = "Floor_Plan_Terrace.webp"; break;
+        case 'bungalow': $floorPlanName = "Floor_Plan_Bungalow.webp"; break;
+        default: $floorPlanName = "Floor_Plan_Apartment.webp"; break;
     }
 }
+$finalFloorPlan = $baseDir . $floorPlanName;
+
+// B. Internal Layout Algorithm with HTML Icon Tags
+$layoutSpecsHtml = "";
+if ($is_afford) {
+    // Rigid compliance: Government affordable housing is permanently 3 Bedrooms, 2 Bathrooms
+    $layoutSpecsHtml = '
+        <div class="row text-center g-3">
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Family Hall</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Standard Kitchen</h6></div></div>
+        </div>';
+} else {
+    if ($dbType === 'commercial') {
+        $layoutSpecsHtml = '
+            <div class="row text-center g-3">
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-door-open fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">Open Workspace</h6></div></div>
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">1 Executive Office</h6></div></div>
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Washrooms</h6></div></div>
+                <div class="col-12"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-boxes fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">High-Ceiling Stock Storage Zone</h6></div></div>
+            </div>';
+    } else {
+        $sqft = intval($property['built_up_sqft']);
+        if ($dbType === 'bungalow') {
+            $layoutSpecsHtml = '
+                <div class="row text-center g-3">
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bathrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Private Pool</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-book-reader fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">1 Study Room</h6></div></div>
+                </div>';
+        } elseif ($dbType === 'apartment') {
+            // Standard Apartment including public entertainment amenities
+            $layoutSpecsHtml = '
+                <div class="row text-center g-3">
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Clubhouse Gym</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Public Pool</h6></div></div>
+                </div>';
+        } else { // Terrace / Standard housings
+            if ($sqft >= 1500) {
+                $layoutSpecsHtml = '
+                    <div class="row text-center g-3">
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bathrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-shield-alt fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Gated Area</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-blender fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Extended Kitchen</h6></div></div>
+                    </div>';
+            } else {
+                $layoutSpecsHtml = '
+                    <div class="row text-center g-3">
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bedrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bathrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-car fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Double Porch</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-sink fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Dry Kitchen</h6></div></div>
+                    </div>';
+            }
+        }
+    }
+}
+
+// C. Proximity & Neighborhood Matrix Mapping
+$proximityMap = [
+    'Johor' => 'Located inside a high-growth corridor. Within 5 minutes to Universiti Teknologi Malaysia (UTM) campus, AEON Mall, localized public primary/secondary institutes, and connected to the Pasir Gudang & Skudai Expressway.',
+    'Kuala Lumpur' => 'Transit-oriented urban zone. Walking distance to MRT/LRT central interchange networks, 8 minutes to Pavilion Bukit Bintang retail enclave, KLCC area, and premier private international medical hubs.',
+    'Penang' => 'Highly accessible economic bridge. 5 minutes to Penang Bridge entry gate, fast accessibility to Bayan Lepas Free Industrial Zone (FIZ), local municipal schools, and heritage food centers.',
+    'Selangor' => 'Integrated model master township. Immediate connectivity to ELITE & NKVE expressways, close proximity to major educational campuses, community hypermarkets, and integrated commercial squares.',
+    'Sarawak' => 'Serene premium neighborhood hub. Placed 10 minutes away from Kuching International Airport, nearby local secondary schools, government administrative offices, and specialized regional healthcare centers.'
+];
+$proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located property ecosystem with swift reach to public transit corridors, surrounding local school systems, district clinics, and retail convenience outlets.';
 ?>
 
 <div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="properties.php">Catalog</a></li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page"><?php echo htmlspecialchars($property['project_name']); ?></li>
+        </ol>
+    </nav>
+
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-sm border-0 overflow-hidden h-100">
+            <div class="card shadow-sm border-0 overflow-hidden mb-4">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
@@ -90,12 +177,8 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                         <div class="d-flex align-items-center gap-3">
                             <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                             <form method="POST" class="m-0">
-                                <button type="submit" name="toggle_wishlist" class="btn btn-outline-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
-                                    <?php 
-                                    $w_check = $conn->query("SELECT wishlist_id FROM wishlists WHERE customer_id = $account_id AND property_id = $property_id");
-                                    $is_in_wish = ($w_check->num_rows > 0);
-                                    ?>
-                                    <i class="<?php echo $is_in_wish ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
+                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'btn-danger' : 'btn-outline-danger'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
+                                    <i class="<?php echo $is_wishlisted ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
                                 </button>
                             </form>
                         </div>
@@ -114,7 +197,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <?php endif; ?>
 
                     <hr class="my-4">
-                    <div class="row text-center">
+                    <div class="row text-center mb-5">
                         <div class="col-6 border-end">
                             <small class="d-block text-muted fw-bold mb-1">SQFT</small>
                             <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
@@ -124,6 +207,24 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                             <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
                         </div>
                     </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h5>
+                        <div class="p-2"><?php echo $layoutSpecsHtml; ?></div>
+                    </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-map-signs text-primary me-2"></i> Proximity & Neighborhood Amenities</h5>
+                        <p class="text-secondary fs-6 mb-0 lh-base"><?php echo $proximityInfoText; ?></p>
+                    </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h5>
+                        <div class="text-center bg-white p-3 border rounded-3 mt-2">
+                            <img src="<?php echo $finalFloorPlan; ?>" class="img-fluid rounded" alt="Floor Plan Layout" style="max-height: 400px; object-fit: contain;">
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -165,7 +266,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
                         <p class="mb-1 text-muted fw-bold small">MONTHLY REPAYMENT</p>
                         <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Applied Rate: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
@@ -190,10 +291,21 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 </div>
 
 <style>
+    @keyframes driftUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .reveal-card {
+        animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; }
+    
+    /* STRIKING CUSTOM RANGE SLIDER SHAPE */
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
+    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
 </style>
 
 <script>
@@ -210,12 +322,7 @@ function updateCalc() {
     const n = y * 12;
     const loan = p * (1 - d);
     const result = (loan * monthlyRate * Math.pow(1+monthlyRate, n)) / (Math.pow(1+monthlyRate, n) - 1);
-    
-    // FIXED: Correct decimal places and format
-    document.getElementById('monthlyResult').innerText = "RM " + result.toLocaleString('en-US', {
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2
-    });
+    document.getElementById('monthlyResult').innerText = "RM " + result.toLocaleString('en-US', {minimumFractionDigits: 2});
 }
 document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEventListener('input', updateCalc));
 window.onload = updateCalc;

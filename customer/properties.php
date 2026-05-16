@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Catalog with smart filtering, fixed image mapping, and actual total units display.
+ * DESCRIPTION: Customer property catalog with updated filters and accurate units display.
  */
 
 include_once '../includes/header.php';
@@ -131,7 +131,7 @@ $result = $stmt->get_result();
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
                 $badge_class = $is_affordable ? "bg-success" : "bg-primary";
                 
-                // IMAGE MAPPING LOGIC (RESTORED FULLY)
+                // Image Mapping
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -141,22 +141,18 @@ $result = $stmt->get_result();
                 $folder = ""; $filePrefix = "";
                 switch($dbType) {
                     case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-                    case 'standard': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-                    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-                    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
                     case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    default: $folder = ucfirst($dbType) . "/"; $filePrefix = ucfirst($dbType);
+                    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
+                    default: $folder = "Apartment/"; $filePrefix = "Apartment";
                 }
 
                 $baseDir = $root_prefix . "SYS Property Catalog/";
                 $fileName = $filePrefix . " - " . $stateName;
                 $finalImg = $baseDir . "placeholder.jpg"; 
 
-                $exts = ['jpg', 'jpeg', 'png', 'webp'];
-                foreach ($exts as $ext) {
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-                    if (file_exists($testPath)) { $finalImg = $testPath; break; }
+                    if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
                 }
                 ?>
                 <div class="col-lg-4 col-md-6 mb-4">
@@ -177,10 +173,7 @@ $result = $stmt->get_result();
                             <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
-                                <p class="text-danger fw-bold small mb-3">
-                                    <i class="fas fa-id-card me-1"></i> 
-                                    Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?>
-                                </p>
+                                <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></p>
                             <?php endif; ?>
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">

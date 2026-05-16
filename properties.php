@@ -2,17 +2,16 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: properties.php (ROOT DIRECTORY)
- * DESCRIPTION: Internal catalog for Staff and Admin. Uses fixed 'income_limit_rm' data.
+ * DESCRIPTION: Internal catalog for Staff and Admin. 
+ * Mirrored from customer view with teammate's income limit fixes. No wishlist functionality.
  */
 
-// 1. Path Fix: This file is in root, so includes are direct
 include_once 'includes/header.php';
 require_once 'includes/auth_check.php';
 
-// 2. Security: Strictly for Staff and Admin
+// Strictly blocks customers or guests from this URL
 protect_staff_admin_page($conn);
 
-// 3. Filter Logic
 $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
@@ -24,6 +23,7 @@ $types = "";
 if (!empty($search_name)) { $sql .= " AND project_name LIKE ?"; $params[] = "%$search_name%"; $types .= "s"; }
 if (!empty($filter_state)) { $sql .= " AND state = ?"; $params[] = $filter_state; $types .= "s"; }
 
+// SMART AFFORDABLE FILTERING (Aligned with teammate's database fix)
 if ($filter_type === 'AFFORDABLE') {
     $sql .= " AND is_affordable = 1";
 } elseif (!empty($filter_type)) {
@@ -42,8 +42,8 @@ $result = $stmt->get_result();
 <div class="container my-5">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <h2 class="fw-bold display-5">Inventory Catalog</h2>
-            <p class="lead text-secondary">Internal view of properties across all states and territories.</p>
+            <h2 class="fw-bold display-5 text-dark">Inventory Catalog</h2>
+            <p class="lead text-secondary text-uppercase small" style="letter-spacing: 2px;">Internal Staff & Administration Management View</p>
             <hr class="w-25 mx-auto bg-primary" style="height: 3px; opacity: 1;">
         </div>
     </div>
@@ -57,7 +57,7 @@ $result = $stmt->get_result();
                         <input type="text" name="search_name" class="form-control" value="<?php echo htmlspecialchars($search_name); ?>">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> State</label>
+                        <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> State Region</label>
                         <select name="filter_state" class="form-select">
                             <option value="">All Regions</option>
                             <optgroup label="States">
@@ -105,11 +105,11 @@ $result = $stmt->get_result();
         <?php
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                $is_affordable = ($row['is_affordable'] == 1);
+                $is_affordable = (intval($row['is_affordable']) === 1);
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
                 $badge_class = $is_affordable ? "bg-success" : "bg-primary";
                 
-                // Image Mapping Logic (Root Path Fix)
+                // Image Mapping Logic (ROOT DIRECTORY VERSION)
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -149,10 +149,10 @@ $result = $stmt->get_result();
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 shadow-sm">View Details</a>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 shadow-sm fw-bold">View Details</a>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-0 py-3 text-center">
+                        <div class="card-footer bg-white border-0 py-3 text-center border-top">
                             <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>
@@ -160,7 +160,7 @@ $result = $stmt->get_result();
                 <?php
             }
         } else {
-            echo '<div class="col-12 text-center py-5"><h4>No matching properties found.</h4></div>';
+            echo '<div class="col-12 text-center py-5"><h4>No matching properties found inside database inventory.</h4></div>';
         }
         ?>
     </div>

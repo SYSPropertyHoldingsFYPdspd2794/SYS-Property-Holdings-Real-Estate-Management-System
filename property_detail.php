@@ -1,8 +1,8 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * FILE: property_detail.php (ROOT)
- * DESCRIPTION: Admin/Staff View. Mirrored from customer view with Teammate's income limit fixes.
+ * FILE: property_detail.php (ROOT DIRECTORY)
+ * DESCRIPTION: Admin/Staff View. Includes Dynamic Floor Plans, Layout calculation, Proximity mapping, and teammate's income limits.
  */
 
 include_once 'includes/header.php';
@@ -24,20 +24,15 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// Robust Image Mapping Logic
+// --- 1. PROPERTY IMAGE MAPPING (ROOT PATHS) ---
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
 $stateName = ucwords(strtolower($rawState)); 
 
-$folder = ""; $filePrefix = "";
-switch($dbType) {
-    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-    default: $folder = "Apartment/"; $filePrefix = "Apartment";
-}
+$folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
+$filePrefix = ucfirst($dbType);
 
 $baseDir = "SYS Property Catalog/";
 $finalImg = $baseDir . "placeholder.jpg"; 
@@ -47,6 +42,92 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
     if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
+
+// --- 2. DYNAMIC FLOOR PLAN GENERATION (ROOT PATHS) ---
+if ($is_afford) {
+    $floorPlanName = "Floor_Plan_Affordable.webp";
+} else {
+    switch ($dbType) {
+        case 'commercial': $floorPlanName = "Floor_Plan_Commercial.webp"; break;
+        case 'terrace': $floorPlanName = "Floor_Plan_Terrace.webp"; break;
+        case 'bungalow': $floorPlanName = "Floor_Plan_Bungalow.webp"; break;
+        default: $floorPlanName = "Floor_Plan_Apartment.webp"; break;
+    }
+}
+
+$finalFloorPlan = $baseDir . $floorPlanName;
+if (!file_exists($finalFloorPlan)) {
+    $finalFloorPlan = $baseDir . "Floor_Plan.webp"; 
+}
+
+// --- 3. DYNAMIC INTERNAL LAYOUT CALCULATOR ---
+$sqft = intval($property['built_up_sqft']);
+$layoutSpecsHtml = "";
+if ($is_afford) {
+    $layoutSpecsHtml = '
+        <div class="row text-center g-3">
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-success mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Family Hall</h6></div></div>
+            <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Standard Kitchen</h6></div></div>
+        </div>';
+} else {
+    if ($dbType === 'commercial') {
+        $layoutSpecsHtml = '
+            <div class="row text-center g-3">
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-door-open fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">Open Workspace</h6></div></div>
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">1 Executive Office</h6></div></div>
+                <div class="col-6 col-sm-4"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Washrooms</h6></div></div>
+                <div class="col-12"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-boxes fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">High-Ceiling Stock Storage Zone</h6></div></div>
+            </div>';
+    } else {
+        if ($dbType === 'bungalow') {
+            $layoutSpecsHtml = '
+                <div class="row text-center g-3">
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bathrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Private Pool</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-book-reader fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">1 Study Room</h6></div></div>
+                </div>';
+        } elseif ($dbType === 'apartment') {
+            $layoutSpecsHtml = '
+                <div class="row text-center g-3">
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bedrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">2 Bathrooms</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Clubhouse Gym</h6></div></div>
+                    <div class="col-6 col-md-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h6 class="fw-bold m-0">Public Pool</h6></div></div>
+                </div>';
+        } else {
+            if ($sqft >= 1500) {
+                $layoutSpecsHtml = '
+                    <div class="row text-center g-3">
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">5 Bedrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bathrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-shield-alt fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Gated Area</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-blender fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Extended Kitchen</h6></div></div>
+                    </div>';
+            } else {
+                $layoutSpecsHtml = '
+                    <div class="row text-center g-3">
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">4 Bedrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h6 class="fw-bold m-0">3 Bathrooms</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-car fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Double Porch</h6></div></div>
+                        <div class="col-6 col-sm-3"><div class="p-3 bg-white border rounded shadow-sm"><i class="fas fa-sink fa-2x text-muted mb-2"></i><h6 class="fw-bold m-0">Dry Kitchen</h6></div></div>
+                    </div>';
+            }
+        }
+    }
+}
+
+// --- 4. DYNAMIC PROXIMITY MAPPING ---
+$proximityMap = [
+    'Johor' => 'Situated in a prime high-growth economic corridor. 5 minutes drive to Universiti Teknologi Malaysia (UTM) campus, surrounding retail hypermarkets, and 15 minutes to Johor Bahru City Centre via Skudai Expressway.',
+    'Kuala Lumpur' => 'Premium urban transit-oriented setting. Walking distance to nearest MRT/LRT interchange stations, 10 minutes to Pavilion Bukit Bintang financial district, KLCC tower, and premier international schools.',
+    'Penang' => 'Highly strategic island-mainland logistical bridge. 5 minutes to Penang Bridge entry and Bayan Lepas Free Industrial Zone (FIZ), enveloped by vibrant local heritage culinary precincts and medical centers.',
+    'Selangor' => 'Highly integrated residential township. Direct seamless access to major expressways (ELITE/NKVE), minutes away from top-tier regional universities, central corporate parks, and lifestyle shopping complexes.',
+    'Sarawak' => 'Serene premium neighborhood hub. Placed 10 minutes away from Kuching International Airport, nearby local secondary schools, government administrative offices, and specialized regional healthcare centers.'
+];
+$proximityInfoText = $proximityMap[$property['state']] ?? 'Excellently located property ecosystem with swift reach to public transit corridors, surrounding local school systems, district clinics, and retail convenience outlets.';
 ?>
 
 <div class="container my-5">
@@ -59,7 +140,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-sm border-0 overflow-hidden h-100">
+            <div class="card shadow-sm border-0 overflow-hidden mb-4">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
@@ -85,16 +166,38 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <?php endif; ?>
 
                     <hr class="my-4">
-                    <div class="row text-center">
-                        <div class="col-6 border-end">
+                    <div class="row text-center mb-5">
+                        <div class="col-4 border-end">
                             <small class="d-block text-muted fw-bold mb-1">SQFT</small>
                             <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4 border-end">
                             <small class="d-block text-muted fw-bold mb-1">TOTAL UNITS</small>
                             <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
                         </div>
+                        <div class="col-4">
+                            <small class="d-block text-muted fw-bold mb-1">PROPERTY CODE</small>
+                            <span class="fs-5 fw-bold text-dark"><?php echo htmlspecialchars($property['property_code']); ?></span>
+                        </div>
                     </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h5>
+                        <div class="p-2"><?php echo $layoutSpecsHtml; ?></div>
+                    </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 mb-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-map-signs text-primary me-2"></i> Proximity & Neighborhood Amenities</h5>
+                        <p class="text-secondary fs-6 mb-0 lh-base"><?php echo $proximityInfoText; ?></p>
+                    </div>
+
+                    <div class="card bg-light border-0 rounded-4 p-4 reveal-card">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h5>
+                        <div class="text-center bg-white p-3 border rounded-3 mt-2">
+                            <img src="<?php echo $finalFloorPlan; ?>" class="img-fluid rounded" alt="Floor Plan Layout" style="max-height: 400px; object-fit: contain;">
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -159,10 +262,20 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 </div>
 
 <style>
+    /* CSS FOR FLOAT-UP DRIFT EFFECT */
+    @keyframes driftUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .reveal-card {
+        animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; }
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none;}
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 </style>
 
 <script>
