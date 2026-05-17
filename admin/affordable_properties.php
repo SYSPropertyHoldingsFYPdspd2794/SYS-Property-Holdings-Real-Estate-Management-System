@@ -11,64 +11,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $code = $_POST['property_code'];
         $name = $_POST['project_name'];
         $state = $_POST['state'];
-        $type = $_POST['property_type'];
         $price = (float)$_POST['price'];
         $total = (int)$_POST['total_units'];
         $built_up = (int)$_POST['built_up_sqft'];
+        $income_limit = (float)$_POST['income_limit_rm'];
         $image_filename = $_POST['image_filename'];
-        $image_keyword = $_POST['image_search_keyword'];
-        $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, built_up_sqft, image_filename, image_search_keyword, is_affordable, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'ACTIVE')");
-        $stmt->bind_param("ssssdiiss", $code, $name, $state, $type, $price, $total, $built_up, $image_filename, $image_keyword);
+        $image_search_keyword = $_POST['image_search_keyword'];
+        $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, built_up_sqft, income_limit_rm, image_filename, image_search_keyword, is_affordable, status) VALUES (?, ?, ?, 'AFFORDABLE', ?, ?, ?, ?, ?, ?, 1, 'ACTIVE')");
+        $stmt->bind_param("sssdiiiss", $code, $name, $state, $price, $total, $built_up, $income_limit, $image_filename, $image_search_keyword);
         $stmt->execute();
     } elseif ($_POST['action'] === 'edit') {
         $id = (int)$_POST['property_id'];
         $price = (float)$_POST['price'];
         $total = (int)$_POST['total_units'];
-        $stmt = $conn->prepare("UPDATE properties SET price = ?, total_units = ? WHERE property_id = ? AND is_affordable = 0");
-        $stmt->bind_param("dii", $price, $total, $id);
+        $income_limit = (float)$_POST['income_limit_rm'];
+        $stmt = $conn->prepare("UPDATE properties SET price = ?, total_units = ?, income_limit_rm = ? WHERE property_id = ? AND is_affordable = 1");
+        $stmt->bind_param("didi", $price, $total, $income_limit, $id);
         $stmt->execute();
     } elseif ($_POST['action'] === 'archive') {
         $id = (int)$_POST['property_id'];
         $status = $_POST['status'];
-        $stmt = $conn->prepare("UPDATE properties SET status = ? WHERE property_id = ? AND is_affordable = 0");
+        $stmt = $conn->prepare("UPDATE properties SET status = ? WHERE property_id = ? AND is_affordable = 1");
         $stmt->bind_param("si", $status, $id);
         $stmt->execute();
     }
-    header("Location: properties.php");
+    header("Location: affordable_properties.php");
     exit();
 }
 
-$props = $conn->query("SELECT * FROM properties WHERE is_affordable = 0");
+$props = $conn->query("SELECT * FROM properties WHERE is_affordable = 1");
 include '../includes/header.php';
 ?>
 
 <div class="container mt-5">
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body p-4">
-            <h4 class="fw-bold mb-4">Live Multi-Filter Controls</h4>
+            <h4 class="fw-bold mb-4">Affordable House Filter Options</h4>
             <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Project Name</label>
-                    <input type="text" id="filterName" class="form-control" placeholder="Search project...">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Project Search Name</label>
+                    <input type="text" id="filterAffName" class="form-control" placeholder="Search government properties...">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">State Location</label>
-                    <select id="filterState" class="form-select">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Regional State Territory</label>
+                    <select id="filterAffState" class="form-select">
                         <option value="">All States</option>
                         <option value="Johor">Johor</option>
                         <option value="Selangor">Selangor</option>
                         <option value="Penang">Penang</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Property Type Layout</label>
-                    <select id="filterType" class="form-select">
-                        <option value="">All Types</option>
-                        <option value="TERRACE">Terrace</option>
-                        <option value="BUNGALOW">Bungalow</option>
-                        <option value="COMMERCIAL">Commercial</option>
-                        <option value="APARTMENT">Apartment</option>
                     </select>
                 </div>
             </div>
@@ -78,23 +69,23 @@ include '../includes/header.php';
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold mb-0">Standard Property Inventory Masterlist</h4>
+                <h4 class="fw-bold mb-0">Government Subsidized Affordable Properties</h4>
                 <div>
-                    <a href="affordable_properties.php" class="btn btn-info fw-bold me-2">Manage Affordable House</a>
-                    <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addPropModal">Add New Property</button>
+                    <a href="properties.php" class="btn btn-secondary fw-bold me-2">Back Standard Property</a>
+                    <button type="button" class="btn btn-info fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#addAffModal">Add New Affordable House</button>
                 </div>
             </div>
             <div class="table-responsive">
-                <table id="propsTable" class="table table-striped table-hover align-middle">
+                <table id="affTable" class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th>Code</th>
                             <th>Project Name</th>
                             <th>State</th>
-                            <th>Type</th>
-                            <th>Built Up (Sqft)</th>
-                            <th>Price (RM)</th>
-                            <th>Total Units</th>
+                            <th>Built Up</th>
+                            <th>Income Ceiling Cap</th>
+                            <th>Regulated Price</th>
+                            <th>Total Pool Units</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -102,11 +93,11 @@ include '../includes/header.php';
                     <tbody>
                         <?php while ($p = $props->fetch_assoc()): ?>
                             <tr>
-                                <td class="fw-bold"><?php echo htmlspecialchars($p['property_code']); ?></td>
+                                <td class="fw-bold text-success"><?php echo htmlspecialchars($p['property_code']); ?></td>
                                 <td><?php echo htmlspecialchars($p['project_name']); ?></td>
                                 <td><?php echo htmlspecialchars($p['state']); ?></td>
-                                <td><span class="badge bg-secondary"><?php echo $p['property_type']; ?></span></td>
                                 <td><?php echo number_format($p['built_up_sqft']); ?> sqft</td>
+                                <td class="fw-bold text-danger">RM <?php echo number_format($p['income_limit_rm'], 2); ?></td>
                                 <td class="fw-bold text-primary">RM <?php echo number_format($p['price'], 2); ?></td>
                                 <td><?php echo $p['total_units']; ?></td>
                                 <td>
@@ -119,46 +110,50 @@ include '../includes/header.php';
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $p['property_id']; ?>"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#archiveModal<?php echo $p['property_id']; ?>"><i class="fas fa-archive"></i></button>
+                                    <button class="btn btn-sm btn-dark me-1" data-bs-toggle="modal" data-bs-target="#editAffModal<?php echo $p['property_id']; ?>"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#archiveAffModal<?php echo $p['property_id']; ?>"><i class="fas fa-archive"></i></button>
                                 </td>
                             </tr>
 
-                            <div class="modal fade" id="editModal<?php echo $p['property_id']; ?>" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="editAffModal<?php echo $p['property_id']; ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Modify Structural Logistics</h5>
+                                                <h5 class="fw-bold">Modify Government Eligibility Structures</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="action" value="edit">
                                                 <input type="hidden" name="property_id" value="<?php echo $p['property_id']; ?>">
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Adjusted Price (RM)</label>
+                                                    <label class="form-label fw-bold">Regulated House Price (RM)</label>
                                                     <input type="number" step="0.01" name="price" class="form-control" value="<?php echo $p['price']; ?>" required>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Adjusted Total Units</label>
+                                                    <label class="form-label fw-bold">Applicant Maximum Income Eligibility (Had Pendapatan)</label>
+                                                    <input type="number" step="0.01" name="income_limit_rm" class="form-control" value="<?php echo $p['income_limit_rm']; ?>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Total Allocation Units</label>
                                                     <input type="number" name="total_units" class="form-control" value="<?php echo $p['total_units']; ?>" required>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary fw-bold">Commit Changes</button>
+                                                <button type="submit" class="btn btn-info fw-bold text-dark">Save Policies</button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="modal fade" id="archiveModal<?php echo $p['property_id']; ?>" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="archiveAffModal<?php echo $p['property_id']; ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Archive System State Transformation</h5>
+                                                <h5 class="fw-bold">Archive Regulated Housing Unit</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
@@ -189,12 +184,12 @@ include '../includes/header.php';
     </div>
 </div>
 
-<div class="modal fade" id="addPropModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="addAffModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="POST">
                 <div class="modal-header">
-                    <h5 class="fw-bold">Register Free Market Property Unit</h5>
+                    <h5 class="fw-bold">Deploy Regulated Government Scheme Housing</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -202,16 +197,16 @@ include '../includes/header.php';
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Unique Structural Code</label>
-                            <input type="text" name="property_code" class="form-control" placeholder="e.g. J-TR-JB001" required>
+                            <input type="text" name="property_code" class="form-control" placeholder="e.g. J-AF-JB001" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Corporate Project Name</label>
+                            <label class="form-label fw-bold">Government Scheme Project Name</label>
                             <input type="text" name="project_name" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">State Domain Allocation</label>
+                            <label class="form-label fw-bold">State Territory Bound</label>
                             <select name="state" class="form-select" required>
                                 <option value="Johor">Johor</option>
                                 <option value="Selangor">Selangor</option>
@@ -220,28 +215,23 @@ include '../includes/header.php';
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Layout Core Categorization</label>
-                            <select name="property_type" class="form-select" required>
-                                <option value="TERRACE">Terrace</option>
-                                <option value="BUNGALOW">Bungalow</option>
-                                <option value="COMMERCIAL">Commercial</option>
-                                <option value="APARTMENT">Apartment</option>
-                            </select>
+                            <label class="form-label fw-bold">Applicant Maximum Income Cap (Had Pendapatan)</label>
+                            <input type="number" step="0.01" name="income_limit_rm" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Valuation Price Base (RM)</label>
+                            <label class="form-label fw-bold">Regulated Subsidized Price (RM)</label>
                             <input type="number" step="0.01" name="price" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Initial Structural Total Units</label>
+                            <label class="form-label fw-bold">Total Scheme Allocation Units</label>
                             <input type="number" name="total_units" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Floor Space Capacity (Sqft)</label>
+                            <label class="form-label fw-bold">Floor Plan Area Space (Sqft)</label>
                             <input type="number" name="built_up_sqft" class="form-control" required>
                         </div>
                         <div class="col-md-4">
@@ -256,7 +246,7 @@ include '../includes/header.php';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary fw-bold">Deploy Asset Record</button>
+                    <button type="submit" class="btn btn-info fw-bold text-dark">Publish Scheme Asset</button>
                 </div>
             </form>
         </div>
@@ -268,21 +258,17 @@ include '../includes/header.php';
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function() {
-        const table = $('#propsTable').DataTable({
+        const table = $('#affTable').DataTable({
             "order": [[0, "desc"]],
             "dom": "lrtip"
         });
 
-        $('#filterName').on('keyup change', function() {
+        $('#filterAffName').on('keyup change', function() {
             table.column(1).search(this.value).draw();
         });
 
-        $('#filterState').on('change', function() {
+        $('#filterAffState').on('change', function() {
             table.column(2).search(this.value).draw();
-        });
-
-        $('#filterType').on('change', function() {
-            table.column(3).search(this.value).draw();
         });
     });
 </script>
