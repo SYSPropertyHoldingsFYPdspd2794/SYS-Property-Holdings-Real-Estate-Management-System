@@ -27,12 +27,16 @@ while ($row = $res_chart->fetch_assoc()) {
 include '../includes/header.php';
 ?>
 
+<div class="container my-5">
+    <h2 class="fw-bold mb-4">Global Administrator Dashboard</h2> 
+        </div>
+
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card bg-dark text-white shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <h6 class="text-uppercase text-muted mb-2">Standard Inventory</h6>
+                    <h6 class="text-uppercase text-muted mb-2">Total Active Properties</h6>
                     <h2 class="fw-bold"><?php echo $total_prop; ?></h2>
                 </div>
             </div>
