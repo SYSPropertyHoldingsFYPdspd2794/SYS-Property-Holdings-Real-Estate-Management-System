@@ -150,7 +150,6 @@ include '../includes/header.php';
                             <div class="flex-grow-1">
                                 <label class="form-label fw-bold">Profile Avatar</label>
                                 <input type="file" id="staffProfileImage" name="profile_image" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
-                                <div class="small text-muted">Click the avatar icon to upload JPG, PNG, or WebP. Max size: 2MB.</div>
                                 <div id="staffProfileImageName" class="small fw-bold text-primary mt-2"></div>
                             </div>
                         </div>
