@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/adjust_appointment.php
- * DESCRIPTION: US27, US28 & US29 - Granular appointment adjustment panel and application summary layout.
+ * DESCRIPTION: US27, US28 & US29 - Enhanced appointment adjustment with absolute validation logic and root-level modal rendering.
  */
 
 session_start();
@@ -25,36 +25,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
         $new_time = $_POST['reschedule_time'] ?? '';
         $time_db = strlen($new_time) === 5 ? $new_time . ':00' : $new_time;
         
-        $dt = DateTime::createFromFormat('Y-m-d H:i:s', $new_date . ' ' . $time_db);
+        $appointment_dt = DateTime::createFromFormat('Y-m-d H:i:s', $new_date . ' ' . $time_db);
+        $date_errors = DateTime::getLastErrors();
+        $valid_datetime = $appointment_dt && ($date_errors === false || ($date_errors['warning_count'] === 0 && $date_errors['error_count'] === 0));
         $today = new DateTime();
         
-        if (!$dt || $dt < $today) {
-            $error = "Invalid parameters: Please specify a valid future date/time configuration.";
-        } elseif ($time_db < '10:00:00' || $time_db > '20:00:00') {
-            $error = "Outside operations hours: Slots only open between 10:00 AM and 8:00 PM.";
+        // RULE 1: Cannot select a past timestamp configuration
+        if (!$valid_datetime || $appointment_dt < $today) {
+            $error = "Invalid parameters: Please specify a valid future date and time configuration.";
+        } 
+        // RULE 2: Operational boundary check (Strictly 10:00 AM - 8:00 PM)
+        elseif ($time_db < '10:00:00' || $time_db > '20:00:00') {
+            $error = "Outside operation hours: Showroom slots are only open between 10:00 AM and 8:00 PM.";
         } else {
-            // US28: Update execution parameters and revert state back to REQUESTED explicitly
+            // RULE 3: Centralized Capacity Check - Max 3 active slots per single date calendar
+            $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND appointment_id != ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
+            $count_stmt->bind_param("si", $new_date, $id);
+            $count_stmt->execute();
+            $day_total = (int)$count_stmt->get_result()->fetch_assoc()['total'];
+
+            if ($day_total >= 3) {
+                $error = "Capacity limit reached: This target date already contains 3 booked sessions. Please opt for another day.";
+            } else {
+                // RULE 4: Dynamic Buffer Check - Must be strictly spaced at least 2 hours apart
+                $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND appointment_id != ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 LIMIT 1");
+                $conflict_stmt->bind_param("sis", $new_date, $id, $time_db);
+                $conflict_stmt->execute();
+                $conflict = $conflict_stmt->get_result()->fetch_assoc();
+
+                if ($conflict) {
+                    $error = "Scheduling conflict: Another active consultation exists within a 2-hour buffer of your choice.";
+                }
+            }
+        }
+        
+        // Execute state modification only if all business rules pass inspection safely
+        if ($error === '') {
             $up_stmt = $conn->prepare("UPDATE appointments SET appointment_date = ?, appointment_time = ?, status = 'REQUESTED' WHERE appointment_id = ? AND customer_id = ?");
             $up_stmt->bind_param("ssii", $new_date, $time_db, $id, $account_id);
             if ($up_stmt->execute()) {
                 $success = "Appointment successfully rescheduled. Status reverted to REQUESTED.";
             } else {
-                $error = "System error: Failed to modify data matrix records.";
+                $error = "Database failure: Unable to modify appointment records.";
             }
         }
     } elseif (isset($_POST['action_type']) && $_POST['action_type'] === 'cancel') {
-        // US29: Terminate appointment records and flag status parameters to CANCELLED state
         $can_stmt = $conn->prepare("UPDATE appointments SET status = 'CANCELLED' WHERE appointment_id = ? AND customer_id = ?");
         $can_stmt->bind_param("ii", $id, $account_id);
         if ($can_stmt->execute()) {
             $success = "Appointment successfully terminated and flagged as CANCELLED.";
         } else {
-            $error = "System error: Termination routine failed to process.";
+            $error = "Database failure: Termination routine failed to process.";
         }
     }
 }
 
-// DYNAMIC DATA EXTRACTION AND COUPLING MATRIX (US27 Follow-up Real-time Updates)
+// FETCH REAL-TIME UPDATED DATA DATA 
 $data = null;
 if ($type === 'appointment') {
     $stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, p.price, p.property_code FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.appointment_id = ? AND a.customer_id = ?");
@@ -177,11 +203,12 @@ include '../includes/header.php';
     </div>
 </div>
 
-<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+<?php if ($type === 'appointment' && !in_array($data['status'], ['CANCELLED', 'COMPLETED', 'NO_SHOW'])): ?>
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg">
             <div class="modal-header bg-dark text-white p-4">
-                <h5 class="modal-title fw-bold m-0"><i class="fas fa-calendar-alt me-2"></i>Reschedule Selection Matrix</h5>
+                <h5 class="modal-title fw-bold m-0" id="rescheduleModalLabel"><i class="fas fa-calendar-alt me-2"></i>Reschedule Selection Matrix</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" class="m-0">
@@ -194,7 +221,7 @@ include '../includes/header.php';
                     <div class="mb-2">
                         <label class="form-label fw-bold">Select New Execution Time</label>
                         <input type="time" name="reschedule_time" class="form-control form-control-lg bg-light" required min="10:00" max="20:00" step="1800" value="<?php echo htmlspecialchars(substr($data['appointment_time'] ?? '', 0, 5)); ?>">
-                        <small class="text-muted d-block mt-2">Permitted boundary operations hours: 10:00 AM - 8:00 PM.</small>
+                        <small class="text-muted d-block mt-2">Permitted operations framework: 10:00 AM - 8:00 PM. System forces 2-hour conflict resolution buffers.</small>
                     </div>
                 </div>
                 <div class="modal-footer bg-light p-3 border-top rounded-bottom-4">
@@ -205,6 +232,7 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <style>
     @keyframes driftUp {
