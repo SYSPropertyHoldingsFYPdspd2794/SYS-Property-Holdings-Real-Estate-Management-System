@@ -13,9 +13,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
 include '../includes/db_connect.php';
 
 $account_id = $_SESSION['account_id'];
-$success_msg = isset($_GET['success']) ? trim($_GET['success']) : '';
 
-$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? ORDER BY a.appointment_date DESC");
+$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id =? ORDER BY a.appointment_date DESC");
 $appt_stmt->bind_param("i", $account_id);
 $appt_stmt->execute();
 $appointments = $appt_stmt->get_result();
@@ -28,14 +27,8 @@ $applications = $app_stmt->get_result();
 include '../includes/header.php';
 ?>
 <div class="container my-5">
-    <h2 class="fw-bold mb-4"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
+    <h2 class="fw-bold mb-5"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
     
-    <?php if ($success_msg === 'appointment_booked'): ?>
-        <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-check-circle me-2"></i>Your showroom appointment request has been successfully submitted!</div>
-    <?php elseif ($success_msg === 'application_submitted'): ?>
-        <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-check-circle me-2"></i>Your affordable housing application and documents were securely submitted.</div>
-    <?php endif; ?>
-
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
         <ul class="nav nav-pills" id="trackerTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -53,8 +46,8 @@ include '../includes/header.php';
     <div class="tab-content" id="trackerTabsContent">
         <div class="tab-pane fade show active" id="appt" role="tabpanel">
             <div class="row">
-                <?php if ($appointments->num_rows > 0): ?>
-                    <?php while ($row = $appointments->fetch_assoc()): ?>
+                <?php if ($appointments->num_rows > 0):?>
+                    <?php while ($row = $appointments->fetch_assoc()):?>
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0 h-100 rounded-4">
                                 <div class="card-body p-4 d-flex flex-column">
@@ -66,14 +59,20 @@ include '../includes/header.php';
                                             if ($row['status'] === 'ASSIGNED') $bg = 'primary';
                                             if ($row['status'] === 'COMPLETED') $bg = 'success';
                                             if ($row['status'] === 'CANCELLED' || $row['status'] === 'NO_SHOW') $bg = 'danger';
-                                        ?>
-                                        <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($row['status']); ?></span>
+                                       ?>
+                                        <span class="badge bg-<?php echo $bg;?> fs-6 px-3 py-2"><?php echo htmlspecialchars($row['status']);?></span>
                                     </div>
-                                    <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type'])); ?></p>
-                                    <p class="text-muted fs-5 mb-3"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>
-                                    
-                                    <div class="mt-auto pt-2">
-                                        <a href="adjust_appointment.php?type=appointment&id=<?php echo $row['appointment_id']; ?>" class="btn btn-outline-dark btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-sliders-h me-2"></i>Manage Appointment Details</a>
+
+                                    <div class="text-muted fs-6 mb-2">
+                                        <i class="fas fa-map-marker-alt text-danger me-2"></i><?php echo htmlspecialchars($row['state']); ?>
+                                    </div>
+                                    <div class="text-muted fs-6 mb-2">
+                                        <i class="far fa-calendar text-primary me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date']))); ?>
+                                        <span class="mx-2">|</span>
+                                        <i class="far fa-clock text-primary me-2"></i><?php echo htmlspecialchars(date('h:i A', strtotime($row['appointment_time']))); ?>
+                                    </div>
+                                    <div class="text-muted fs-6 mb-3">
+                                        <i class="fas fa-concierge-bell text-primary me-2"></i><?php echo htmlspecialchars(str_replace('_', ' ', $row['service_type'])); ?>
                                     </div>
                                     
                                     <?php if (!empty($row['staff_remarks'])): ?>
@@ -82,6 +81,12 @@ include '../includes/header.php';
                                             <p class="m-0 text-muted small"><?php echo htmlspecialchars($row['staff_remarks']); ?></p>
                                         </div>
                                     <?php endif; ?>
+
+                                    <div class="mt-auto pt-3">
+                                        <a href="adjust_appointment.php?type=appointment&id=<?php echo $row['appointment_id']; ?>" class="btn btn-outline-dark btn-sm w-100 rounded-pill fw-bold py-2">
+                                            <i class="fas fa-sliders-h me-2"></i>Manage Appointment
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -144,4 +149,4 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
-<?php include '../includes/footer.php'; ?>
+<?php include '../includes/footer.php';?>
