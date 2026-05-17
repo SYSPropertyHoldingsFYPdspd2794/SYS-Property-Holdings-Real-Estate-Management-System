@@ -1,8 +1,8 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * FILE: property_detail.php (ROOT)
- * DESCRIPTION: Admin/Staff View. Mirrored from customer view with Teammate's income limit fixes.
+ * FILE: property_detail.php (ROOT DIRECTORY)
+ * DESCRIPTION: Admin and Staff internal workspace. UI mirrored 100% with fixed __DIR__ absolute path fallback.
  */
 
 include_once 'includes/header.php';
@@ -24,20 +24,15 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// Robust Image Mapping Logic
+// IMAGE PATH
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
 $stateName = ucwords(strtolower($rawState)); 
 
-$folder = ""; $filePrefix = "";
-switch($dbType) {
-    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-    default: $folder = "Apartment/"; $filePrefix = "Apartment";
-}
+$folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
+$filePrefix = ucfirst($dbType);
 
 $baseDir = "SYS Property Catalog/";
 $finalImg = $baseDir . "placeholder.jpg"; 
@@ -47,21 +42,130 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     $testPath = $baseDir . $folder . $fileName . "." . $ext;
     if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
+
+// ------------------------------------------------------------------
+// PROPERTIES DESCRIPTION LOGIC (FIXED DYNAMIC DETECTOR)
+// ------------------------------------------------------------------
+
+// 1. FLOOR PLAN PATH (Bulletproof absolute local __DIR__ disk check with smart auto fallback)
+$baseFloorPlanDir = __DIR__ . "/SYS Property Catalog/";
+if ($is_afford || $dbType === 'affordable') {
+    $floorPlanName = "Affordable_Floor_Plan.jpg";
+    if (!file_exists($baseFloorPlanDir . "Affordable_Floor_Plan.jpg")) {
+        $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
+    }
+} else {
+    $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
+}
+$finalFloorPlan = $baseDir . $floorPlanName;
+
+// 2. INTERNAL LAYOUT (Numeric with Icons)
+$layoutHtml = "";
+$sqft = intval($property['built_up_sqft']);
+
+if ($is_afford) {
+    $layoutHtml = '
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Living Hall</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Kitchen</h5></div></div>
+        </div>';
+} else {
+    if ($dbType === 'commercial') {
+        $layoutHtml = '
+            <div class="row text-center g-4">
+                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-store fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Open Layout Workspaces</h5></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">1 Manager Office</h5></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Restrooms</h5></div></div>
+            </div>';
+    } else {
+        if ($dbType === 'bungalow') {
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">6 Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Private Pool</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-car-side fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">3 Car Porches</h5></div></div>
+                </div>';
+        } elseif ($dbType === 'apartment') {
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Gym Facility</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Public Pool</h5></div></div>
+                </div>';
+        } else { 
+            $rooms = ($sqft >= 1800) ? "5" : "4";
+            $baths = ($sqft >= 1800) ? "4" : "3";
+            $layoutHtml = '
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-warehouse fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">2 Car Porches</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-box-open fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Store Room</h5></div></div>
+                </div>';
+        }
+    }
+}
+
+// 3. PROXIMITY (WITH PRECISE KM)
+$proximityHtml = "";
+switch ($property['state']) {
+    case 'Johor':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Teknologi Malaysia (UTM) <strong class="text-dark">3.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>AEON Mall Tebrau City <strong class="text-dark">5.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Sultanah Aminah Hospital <strong class="text-dark">8.1 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Senai International Airport <strong class="text-dark">18.0 KM</strong></span></div></div>
+            </div>';
+        break;
+    case 'Kuala Lumpur':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-danger fa-fw me-3"></i> <span>KLCC LRT Station <strong class="text-dark">1.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Pavilion Bukit Bintang <strong class="text-dark">2.0 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-success fa-fw me-3"></i> <span>International School of KL <strong class="text-dark">4.3 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-tree text-warning fa-fw me-3"></i> <span>Perdana Botanical Garden <strong class="text-dark">5.0 KM</strong></span></div></div>
+            </div>';
+        break;
+    case 'Penang':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-archway text-danger fa-fw me-3"></i> <span>Penang Bridge <strong class="text-dark">4.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-industry text-primary fa-fw me-3"></i> <span>Bayan Lepas FIZ <strong class="text-dark">6.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-success fa-fw me-3"></i> <span>Queensbay Mall <strong class="text-dark">3.8 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-warning fa-fw me-3"></i> <span>Penang General Hospital <strong class="text-dark">7.1 KM</strong></span></div></div>
+            </div>';
+        break;
+    case 'Selangor':
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-danger fa-fw me-3"></i> <span>Sunway Pyramid Mall <strong class="text-dark">4.2 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-primary fa-fw me-3"></i> <span>Monash University <strong class="text-dark">3.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Subang Medical Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Nearest LRT Station <strong class="text-dark">1.8 KM</strong></span></div></div>
+            </div>';
+        break;
+    default:
+        $proximityHtml = '
+            <div class="row g-4 fs-5 text-secondary">
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Regional Secondary School <strong class="text-dark">1.5 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>Local Commercial Complex <strong class="text-dark">2.3 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Community Health Center <strong class="text-dark">3.0 KM</strong></span></div></div>
+                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-bus text-warning fa-fw me-3"></i> <span>Central Bus Terminal <strong class="text-dark">4.2 KM</strong></span></div></div>
+            </div>';
+}
 ?>
 
 <div class="container my-5">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="properties.php">Catalog</a></li>
-            <li class="breadcrumb-item active fw-bold" aria-current="page"><?php echo htmlspecialchars($property['project_name']); ?></li>
-        </ol>
-    </nav>
-
     <div class="row">
         <div class="col-md-7 mb-4">
             <div class="card shadow-sm border-0 overflow-hidden h-100">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
-                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
+                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
                         <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Internal View</span>
                     </div>
@@ -80,19 +184,23 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
                             <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction</h5>
-                            <p class="mb-0 text-dark">Subsidized unit. Household income must be <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>. Staff must verify this offline.</p>
+                            <p class="mb-0 text-dark">Subsidized unit. Household income must be <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>.</p>
                         </div>
                     <?php endif; ?>
 
                     <hr class="my-4">
-                    <div class="row text-center">
-                        <div class="col-6 border-end">
+                    <div class="row text-center mb-4">
+                        <div class="col-4 border-end">
                             <small class="d-block text-muted fw-bold mb-1">SQFT</small>
                             <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
-                        <div class="col-6">
-                            <small class="d-block text-muted fw-bold mb-1">TOTAL UNITS</small>
+                        <div class="col-4 border-end">
+                            <small class="d-block text-muted fw-bold mb-1">AVAILABLE UNITS</small>
                             <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
+                        </div>
+                        <div class="col-4">
+                            <small class="d-block text-muted fw-bold mb-1">PROPERTY CODE</small>
+                            <span class="fs-5 fw-bold text-dark"><?php echo htmlspecialchars($property['property_code']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -126,7 +234,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                         </select>
                     </div>
 
-                    <div class="mb-5 pb-3">
+                    <div class="mb-5">
                         <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary fs-4 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
@@ -141,11 +249,36 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 
                     <div class="d-grid mt-auto">
                         <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm" disabled>
-                            <i class="fas fa-lock me-2"></i>Booking Disabled
+                            <i class="fas fa-lock me-2"></i>Internal Access Only
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h3>
+                <div class="text-center bg-white p-4 border rounded-3 shadow-sm">
+                    <img src="<?php echo htmlspecialchars($finalFloorPlan); ?>" class="img-fluid rounded" alt="Floor Plan" style="max-height: 500px; object-fit: contain;">
+                </div>
+            </div>
+
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h3>
+                <div class="p-2"><?php echo $layoutHtml; ?></div>
+            </div>
+
+            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-map-signs text-primary me-2"></i> Regional Proximity & Neighborhood</h3>
+                <div class="p-3 bg-white border rounded shadow-sm mt-3">
+                    <?php echo $proximityHtml; ?>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -159,10 +292,20 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 </div>
 
 <style>
+    /* ANIMATION: DRIFT UP */
+    @keyframes driftUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .reveal-card { animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; }
+    
+    /* CUSTOM RIGID SLIDER FOR STAFF VIEW */
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 </style>
 
 <script>

@@ -1,4 +1,9 @@
 <?php
+/**
+ * PROJECT: SYS Property Holdings
+ * FILE: customer/dashboard.php
+ * DESCRIPTION: US25 - Centralized Customer Dashboard summary overview.
+ */
 
 session_start();
 
@@ -31,29 +36,28 @@ $stmt3->execute();
 $customer_name = $stmt3->get_result()->fetch_assoc()['full_name'];
 ?>
 <div class="container my-5">
-    <h2 class="fw-bold mb-4">Welcome back, <?php echo htmlspecialchars($customer_name);?></h2>
+    <h2 class="fw-bold mb-4">Welcome back, <?php echo htmlspecialchars($customer_name); ?></h2>
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold"><i class="fas fa-calendar-check text-primary me-2"></i>Active Appointments</h5>
-                    <h2 class="display-4 fw-bold text-dark mt-3"><?php echo $appt_count;?></h2>
+                    <h5><i class="fas fa-calendar-check text-primary me-2"></i>Active Appointments</h5>
+                    <h2 class="display-4 fw-bold text-dark mt-3"><?php echo $appt_count; ?></h2>
                 </div>
             </div>
         </div>
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold"><i class="fas fa-home text-success me-2"></i>Housing Applications</h5>
-                    <h2 class="display-4 fw-bold text-dark mt-3"><?php echo $house_count;?></h2>
+                    <h5><i class="fas fa-home text-success me-2"></i>Housing Applications</h5>
+                    <h2 class="display-4 fw-bold text-dark mt-3"><?php echo $house_count; ?></h2>
                 </div>
             </div>
         </div>
     </div>
     <div class="d-flex gap-3 mt-3">
-        <a href="properties.php" class="btn btn-primary btn-lg px-4 fw-bold shadow-sm">Browse Properties</a>
-        <a href="track_status.php" class="btn btn-outline-dark btn-lg px-4 fw-bold shadow-sm">My Applications</a>
+        <a href="properties.php" class="btn btn-primary">Browse Properties</a>
+        <a href="track_status.php" class="btn btn-outline-dark">My Applications</a>
     </div>
 </div>
-<?php include '../includes/footer.php';?>
-
+<?php include '../includes/footer.php'; ?>

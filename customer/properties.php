@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Catalog with smart filtering, fixed image mapping, and actual total units display.
+ * DESCRIPTION: Customer property catalog. Perfect baseline layout.
  */
 
 include_once '../includes/header.php';
@@ -11,7 +11,7 @@ protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 
-// WISHLIST TOGGLE LOGIC
+// WISHLIST LOGIC
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
     $prop_id = intval($_POST['property_id']);
     $chk = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
@@ -34,7 +34,6 @@ $wishlist_array = [];
 $w_res = $conn->query("SELECT property_id FROM wishlists WHERE customer_id = $account_id");
 while($w = $w_res->fetch_assoc()) { $wishlist_array[] = $w['property_id']; }
 
-// FILTER LOGIC
 $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
@@ -131,32 +130,22 @@ $result = $stmt->get_result();
                 $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
                 $badge_class = $is_affordable ? "bg-success" : "bg-primary";
                 
-                // IMAGE MAPPING LOGIC (RESTORED FULLY)
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
                 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
                 if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
                 $stateName = ucwords(strtolower($rawState)); 
                 
-                $folder = ""; $filePrefix = "";
-                switch($dbType) {
-                    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-                    case 'standard': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-                    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-                    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-                    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    default: $folder = ucfirst($dbType) . "/"; $filePrefix = ucfirst($dbType);
-                }
+                $folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
+                $filePrefix = ucfirst($dbType);
 
                 $baseDir = $root_prefix . "SYS Property Catalog/";
                 $fileName = $filePrefix . " - " . $stateName;
                 $finalImg = $baseDir . "placeholder.jpg"; 
 
-                $exts = ['jpg', 'jpeg', 'png', 'webp'];
-                foreach ($exts as $ext) {
+                foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
                     $testPath = $baseDir . $folder . $fileName . "." . $ext;
-                    if (file_exists($testPath)) { $finalImg = $testPath; break; }
+                    if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
                 }
                 ?>
                 <div class="col-lg-4 col-md-6 mb-4">
@@ -177,10 +166,7 @@ $result = $stmt->get_result();
                             <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
-                                <p class="text-danger fw-bold small mb-3">
-                                    <i class="fas fa-id-card me-1"></i> 
-                                    Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?>
-                                </p>
+                                <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></p>
                             <?php endif; ?>
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
@@ -188,7 +174,7 @@ $result = $stmt->get_result();
                                 <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-dark rounded-pill px-4 shadow-sm">Details</a>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-0 py-3 text-center">
+                        <div class="card-footer bg-white border-0 py-3 text-center border-top">
                             <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>
