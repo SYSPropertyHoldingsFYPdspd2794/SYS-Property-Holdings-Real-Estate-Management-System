@@ -11,6 +11,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
     exit();
 }
 include '../includes/db_connect.php';
+include '../includes/header.php';
+
 
 $account_id = $_SESSION['account_id'];
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
