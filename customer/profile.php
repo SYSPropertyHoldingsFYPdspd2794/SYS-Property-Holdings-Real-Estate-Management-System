@@ -145,17 +145,23 @@ include '../includes/header.php';
                     <h4 class="fw-bold mb-4 border-bottom pb-2">Customer Information</h4>
                     <form method="POST" enctype="multipart/form-data">
                         <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
-                            <?php if ($avatar_src !== ''): ?>
-                                <img src="<?php echo htmlspecialchars($avatar_src); ?>" alt="Profile avatar" class="rounded-circle border shadow-sm object-fit-cover" style="width: 104px; height: 104px;">
-                            <?php else: ?>
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 104px; height: 104px; font-size: 2.4rem;">
-                                    <?php echo htmlspecialchars($avatar_initial); ?>
-                                </div>
-                            <?php endif; ?>
+                            <label for="customerProfileImage" class="avatar-upload-wrap position-relative flex-shrink-0" title="Upload profile avatar">
+                                <?php if ($avatar_src !== ''): ?>
+                                    <img src="<?php echo htmlspecialchars($avatar_src); ?>" alt="Profile avatar" class="profile-avatar rounded-circle border shadow-sm object-fit-cover">
+                                <?php else: ?>
+                                    <span class="profile-avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm">
+                                        <?php echo htmlspecialchars($avatar_initial); ?>
+                                    </span>
+                                <?php endif; ?>
+                                <span class="avatar-upload-icon rounded-circle bg-dark text-white d-flex align-items-center justify-content-center shadow-sm">
+                                    <i class="fas fa-camera"></i>
+                                </span>
+                            </label>
                             <div class="flex-grow-1">
                                 <label class="form-label fw-bold">Profile Avatar</label>
-                                <input type="file" name="profile_image" class="form-control" accept="image/jpeg,image/png,image/webp">
-                                <small class="text-muted d-block mt-2">JPG, PNG, or WebP only. Max size: 2MB.</small>
+                                <input type="file" id="customerProfileImage" name="profile_image" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
+                                <div class="small text-muted">Click the avatar icon to upload JPG, PNG, or WebP. Max size: 2MB.</div>
+                                <div id="customerProfileImageName" class="small fw-bold text-primary mt-2"></div>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -204,4 +210,36 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+<style>
+    .profile-avatar {
+        width: 104px;
+        height: 104px;
+        font-size: 2.4rem;
+    }
+    .avatar-upload-wrap {
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .avatar-upload-wrap:hover .profile-avatar {
+        filter: brightness(0.88);
+    }
+    .avatar-upload-icon {
+        position: absolute;
+        right: 0;
+        bottom: 4px;
+        width: 34px;
+        height: 34px;
+        border: 3px solid #fff;
+        font-size: 0.9rem;
+    }
+</style>
+<script>
+const customerProfileImage = document.getElementById('customerProfileImage');
+const customerProfileImageName = document.getElementById('customerProfileImageName');
+if (customerProfileImage && customerProfileImageName) {
+    customerProfileImage.addEventListener('change', function () {
+        customerProfileImageName.textContent = this.files.length ? this.files[0].name : '';
+    });
+}
+</script>
 <?php include '../includes/footer.php'; ?>
