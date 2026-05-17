@@ -25,21 +25,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
         $new_date = $_POST['reschedule_date'] ?? '';
         $new_time = $_POST['reschedule_time'] ?? '';
         $time_db = strlen($new_time) === 5 ? $new_time . ':00' : $new_time;
+
+        $current_stmt = $conn->prepare("SELECT appointment_date, appointment_time, status FROM appointments WHERE appointment_id = ? AND customer_id = ? LIMIT 1");
+        $current_stmt->bind_param("ii", $id, $account_id);
+        $current_stmt->execute();
+        $current_appt = $current_stmt->get_result()->fetch_assoc();
         
         $appointment_dt = DateTime::createFromFormat('Y-m-d H:i:s', $new_date . ' ' . $time_db);
         $date_errors = DateTime::getLastErrors();
         $valid_datetime = $appointment_dt && ($date_errors === false || ($date_errors['warning_count'] === 0 && $date_errors['error_count'] === 0));
         $today = new DateTime();
+        $current_dt = $current_appt
+            ? DateTime::createFromFormat('Y-m-d H:i:s', $current_appt['appointment_date'] . ' ' . $current_appt['appointment_time'])
+            : null;
         
-        // RULE 1: Cannot select a past timestamp configuration
-        if (!$valid_datetime || $appointment_dt < $today) {
+        // RULE 1: Only future REQUESTED/ASSIGNED appointments can be rescheduled.
+        if (!$current_appt || !in_array($current_appt['status'], ['REQUESTED', 'ASSIGNED'], true) || !$current_dt || $current_dt <= $today) {
+            $error = "This appointment cannot be rescheduled because the appointment time has passed or the status has changed.";
+        }
+        // RULE 2: Cannot select a past timestamp configuration.
+        elseif (!$valid_datetime || $appointment_dt < $today) {
             $error = "Invalid parameters: Please specify a valid future date and time configuration.";
-        } 
-        // RULE 2: Operational boundary check (Strictly 10:00 AM - 8:00 PM)
+        }
+        // RULE 3: New schedule must actually change.
+        elseif ($current_appt['appointment_date'] === $new_date && substr($current_appt['appointment_time'], 0, 5) === substr($time_db, 0, 5)) {
+            $error = "Please choose a different date or time before saving the reschedule request.";
+        }
+        // RULE 4: Operational boundary check (Strictly 10:00 AM - 8:00 PM)
         elseif ($time_db < '10:00:00' || $time_db > '20:00:00') {
             $error = "Outside operation hours: Showroom slots are only open between 10:00 AM and 8:00 PM.";
         } else {
-            // RULE 3: Centralized Capacity Check - Max 3 active slots per single date calendar
+            // RULE 5: Centralized Capacity Check - Max 3 active slots per single date calendar.
             $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND appointment_id != ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
             $count_stmt->bind_param("si", $new_date, $id);
             $count_stmt->execute();
@@ -48,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
             if ($day_total >= 3) {
                 $error = "Capacity limit reached: This target date already contains 3 booked sessions. Please opt for another day.";
             } else {
-                // RULE 4: Dynamic Buffer Check - Must be strictly spaced at least 2 hours apart
+                // RULE 6: Dynamic Buffer Check - Must be strictly spaced at least 2 hours apart.
                 $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND appointment_id != ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 LIMIT 1");
                 $conflict_stmt->bind_param("sis", $new_date, $id, $time_db);
                 $conflict_stmt->execute();
@@ -62,12 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
         
         // Execute state modification only if all business rules pass inspection safely
         if ($error === '') {
-            $up_stmt = $conn->prepare("UPDATE appointments SET appointment_date = ?, appointment_time = ?, status = 'REQUESTED' WHERE appointment_id = ? AND customer_id = ?");
+            $up_stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id = NULL, appointment_date = ?, appointment_time = ?, status = 'REQUESTED', staff_remarks = NULL WHERE appointment_id = ? AND customer_id = ? AND status IN ('REQUESTED', 'ASSIGNED') AND TIMESTAMP(appointment_date, appointment_time) > NOW()");
             $up_stmt->bind_param("ssii", $new_date, $time_db, $id, $account_id);
-            if ($up_stmt->execute()) {
-                $success = "Appointment successfully rescheduled. Status reverted to REQUESTED.";
+            if ($up_stmt->execute() && $up_stmt->affected_rows > 0) {
+                $success = "Appointment successfully rescheduled. Status reverted to REQUESTED and awaits staff assignment.";
             } else {
-                $error = "Database failure: Unable to modify appointment records.";
+                $error = "Unable to reschedule this appointment because the appointment time has passed or the status has changed.";
             }
         }
     } elseif (isset($_POST['action_type']) && $_POST['action_type'] === 'cancel') {
@@ -102,9 +118,11 @@ if (!$data) {
 
 $appointmentDateTime = null;
 $canCancelAppointment = false;
+$canRescheduleAppointment = false;
 if ($type === 'appointment') {
     $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['appointment_date'] . ' ' . $data['appointment_time']);
     $canCancelAppointment = in_array($data['status'], ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime && $appointmentDateTime > new DateTime();
+    $canRescheduleAppointment = $canCancelAppointment;
 }
 
 include '../includes/header.php';
@@ -185,13 +203,15 @@ include '../includes/header.php';
                     </div>
                 </div>
 
-                <?php if ($type === 'appointment' && !in_array($data['status'], ['CANCELLED', 'COMPLETED', 'NO_SHOW'])): ?>
+                <?php if ($type === 'appointment' && ($canRescheduleAppointment || $canCancelAppointment)): ?>
                     <div class="row g-3 mt-4 pt-2 border-top">
-                        <div class="<?php echo $canCancelAppointment ? 'col-6' : 'col-12'; ?>">
-                            <button type="button" class="btn btn-outline-dark btn-lg w-100 fw-bold py-3 fs-6 rounded-pill" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
-                                <i class="fas fa-clock-rotate-left me-2"></i>Reschedule
-                            </button>
-                        </div>
+                        <?php if ($canRescheduleAppointment): ?>
+                            <div class="<?php echo $canCancelAppointment ? 'col-6' : 'col-12'; ?>">
+                                <button type="button" class="btn btn-outline-dark btn-lg w-100 fw-bold py-3 fs-6 rounded-pill" data-bs-toggle="modal" data-bs-target="#rescheduleModal">
+                                    <i class="fas fa-clock-rotate-left me-2"></i>Reschedule
+                                </button>
+                            </div>
+                        <?php endif; ?>
                         <?php if ($canCancelAppointment): ?>
                             <div class="col-6">
                                 <form method="POST" id="cancelAppointmentForm" class="m-0">
@@ -214,7 +234,7 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php if ($type === 'appointment' && !in_array($data['status'], ['CANCELLED', 'COMPLETED', 'NO_SHOW'])): ?>
+<?php if ($type === 'appointment' && $canRescheduleAppointment): ?>
 <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -222,7 +242,7 @@ include '../includes/header.php';
                 <h5 class="modal-title fw-bold m-0" id="rescheduleModalLabel"><i class="fas fa-calendar-alt me-2"></i>Reschedule Selection Matrix</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" class="m-0">
+            <form method="POST" id="rescheduleAppointmentForm" class="m-0">
                 <input type="hidden" name="action_type" value="reschedule">
                 <div class="modal-body p-4">
                     <div class="mb-4">
@@ -254,24 +274,50 @@ include '../includes/header.php';
     .border-dashed { border-style: dashed !important; }
 </style>
 
-<?php if ($type === 'appointment' && $canCancelAppointment): ?>
+<?php if ($type === 'appointment' && ($canRescheduleAppointment || $canCancelAppointment)): ?>
 <script>
-document.getElementById('cancelAppointmentBtn').addEventListener('click', function () {
-    Swal.fire({
-        icon: 'warning',
-        title: 'Cancel Appointment?',
-        text: 'Are you sure you want to cancel this showroom appointment?',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, I want to cancel',
-        cancelButtonText: 'No',
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('cancelAppointmentForm').submit();
-        }
+const rescheduleAppointmentForm = document.getElementById('rescheduleAppointmentForm');
+if (rescheduleAppointmentForm) {
+    rescheduleAppointmentForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            icon: 'question',
+            title: 'Reschedule Appointment?',
+            text: 'Your appointment will return to REQUESTED status and wait for staff assignment again.',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, reschedule',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#212529',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                rescheduleAppointmentForm.submit();
+            }
+        });
     });
-});
+}
+
+const cancelAppointmentBtn = document.getElementById('cancelAppointmentBtn');
+if (cancelAppointmentBtn) {
+    cancelAppointmentBtn.addEventListener('click', function () {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cancel Appointment?',
+            text: 'Are you sure you want to cancel this showroom appointment?',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, I want to cancel',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('cancelAppointmentForm').submit();
+            }
+        });
+    });
+}
 </script>
 <?php endif; ?>
+<?php include '../includes/footer.php'; ?>
