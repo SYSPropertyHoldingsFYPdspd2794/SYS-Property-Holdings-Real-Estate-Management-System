@@ -217,7 +217,8 @@ CREATE TABLE `customers` (
   `marital_status` enum('SINGLE','MARRIED') NOT NULL,
   `dependents_count` int(11) NOT NULL DEFAULT 0,
   `occupation` varchar(150) NOT NULL,
-  `monthly_income` decimal(10,2) NOT NULL
+  `monthly_income` decimal(10,2) NOT NULL,
+  `profile_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -492,7 +493,8 @@ CREATE TABLE `staff` (
   `staff_id` int(11) NOT NULL,
   `full_name` varchar(255) NOT NULL,
   `phone_number` varchar(20) NOT NULL,
-  `assigned_state` varchar(100) NOT NULL
+  `assigned_state` varchar(100) NOT NULL,
+  `profile_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

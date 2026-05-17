@@ -7,6 +7,7 @@ protect_staff_page('STAFF', $conn);
 
 $account_id = $_SESSION['account_id']; 
 $alert_msg = '';
+$profile_image_ready = ensure_profile_image_column($conn, 'staff');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
@@ -40,24 +41,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email']);
         $full_name = trim($_POST['full_name']);
         $phone = trim($_POST['phone_number']);
-        
-        $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
-        $upd_acc->bind_param("si", $email, $account_id);
-        $upd_acc->execute();
+        $upload_error = '';
+        $profile_image = null;
+        $can_update_staff = true;
 
-        $stmt_upd = $conn->prepare("UPDATE staff SET full_name = ?, phone_number = ? WHERE staff_id = ?");
-        $stmt_upd->bind_param("ssi", $full_name, $phone, $account_id);
+        if (!$profile_image_ready) {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Profile image column is not ready. Please check database permissions.</div>';
+            $can_update_staff = false;
+        } else {
+            $profile_image = upload_profile_image($_FILES['profile_image'] ?? null, 'staff', $account_id, $upload_error);
+            if ($profile_image === false) {
+                $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">' . htmlspecialchars($upload_error) . '</div>';
+                $can_update_staff = false;
+            }
+        }
         
-        if ($stmt_upd->execute()) {
-            $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Staff record updated successfully!</div>';
+        if ($can_update_staff) {
+            $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
+            $upd_acc->bind_param("si", $email, $account_id);
+            $upd_acc->execute();
+
+            if ($profile_image !== null) {
+                $stmt_upd = $conn->prepare("UPDATE staff SET full_name = ?, phone_number = ?, profile_image = ? WHERE staff_id = ?");
+                $stmt_upd->bind_param("sssi", $full_name, $phone, $profile_image, $account_id);
+            } else {
+                $stmt_upd = $conn->prepare("UPDATE staff SET full_name = ?, phone_number = ? WHERE staff_id = ?");
+                $stmt_upd->bind_param("ssi", $full_name, $phone, $account_id);
+            }
+        
+            if ($stmt_upd->execute()) {
+                $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">' . ($profile_image !== null ? 'Staff record and avatar updated successfully!' : 'Staff record updated successfully!') . '</div>';
+            }
         }
     }
 }
 
-$stmt = $conn->prepare("SELECT a.email, s.full_name, s.assigned_state, s.phone_number FROM accounts a LEFT JOIN staff s ON a.account_id = s.staff_id WHERE a.account_id = ?");
+$profile_image_select = $profile_image_ready ? 's.profile_image' : 'NULL AS profile_image';
+$stmt = $conn->prepare("SELECT a.email, s.full_name, s.assigned_state, s.phone_number, $profile_image_select FROM accounts a LEFT JOIN staff s ON a.account_id = s.staff_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
+$avatar_src = !empty($user['profile_image']) ? '..' . $user['profile_image'] : '';
+$avatar_initial = strtoupper(substr($user['full_name'] ?? 'S', 0, 1));
 
 include '../includes/header.php';
 ?>
@@ -108,7 +133,21 @@ include '../includes/header.php';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <h4 class="fw-bold mb-4 border-bottom pb-2">Staff Information</h4>
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
+                            <?php if ($avatar_src !== ''): ?>
+                                <img src="<?php echo htmlspecialchars($avatar_src); ?>" alt="Profile avatar" class="rounded-circle border shadow-sm object-fit-cover" style="width: 104px; height: 104px;">
+                            <?php else: ?>
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 104px; height: 104px; font-size: 2.4rem;">
+                                    <?php echo htmlspecialchars($avatar_initial); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="flex-grow-1">
+                                <label class="form-label fw-bold">Profile Avatar</label>
+                                <input type="file" name="profile_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted d-block mt-2">JPG, PNG, or WebP only. Max size: 2MB.</small>
+                            </div>
+                        </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email</label>

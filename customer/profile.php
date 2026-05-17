@@ -7,6 +7,7 @@ protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 $alert_msg = ''; $alert_type = '';
+$profile_image_ready = ensure_profile_image_column($conn, 'customers');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_password'])) {
@@ -48,26 +49,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dependents = max(0, intval($_POST['dependents_count'] ?? 0));
         $occupation = trim($_POST['occupation'] ?? '');
         $income = max(0, floatval($_POST['monthly_income'] ?? 0));
+        $profile_image = null;
+        $can_save_details = true;
 
-        $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
-        $upd_acc->bind_param("si", $email, $account_id);
-        $upd_acc->execute();
+        if (!$profile_image_ready) {
+            $alert_msg = 'Profile image column is not ready. Please check database permissions.';
+            $alert_type = 'danger';
+            $can_save_details = false;
+        } else {
+            $profile_image = upload_profile_image($_FILES['profile_image'] ?? null, 'customer', $account_id, $alert_msg);
+            if ($profile_image === false) {
+                $alert_type = 'danger';
+                $can_save_details = false;
+            }
+        }
 
-        $stmt_upd = $conn->prepare("UPDATE customers SET full_name = ?, phone_number = ?, marital_status = ?, dependents_count = ?, occupation = ?, monthly_income = ? WHERE customer_id = ?");
-        $stmt_upd->bind_param("sssisdi", $full_name, $phone, $marital, $dependents, $occupation, $income, $account_id);
+        if ($can_save_details) {
+            $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
+            $upd_acc->bind_param("si", $email, $account_id);
+            $upd_acc->execute();
 
-        if ($stmt_upd->execute()) {
-            $alert_msg = 'Profile details updated successfully.';
-            $alert_type = 'success';
-            $_SESSION['user_email'] = $email;
+            if ($profile_image !== null) {
+                $stmt_upd = $conn->prepare("UPDATE customers SET full_name = ?, phone_number = ?, marital_status = ?, dependents_count = ?, occupation = ?, monthly_income = ?, profile_image = ? WHERE customer_id = ?");
+                $stmt_upd->bind_param("sssisdsi", $full_name, $phone, $marital, $dependents, $occupation, $income, $profile_image, $account_id);
+            } else {
+                $stmt_upd = $conn->prepare("UPDATE customers SET full_name = ?, phone_number = ?, marital_status = ?, dependents_count = ?, occupation = ?, monthly_income = ? WHERE customer_id = ?");
+                $stmt_upd->bind_param("sssisdi", $full_name, $phone, $marital, $dependents, $occupation, $income, $account_id);
+            }
+
+            if ($stmt_upd->execute()) {
+                $alert_msg = $profile_image !== null ? 'Profile details and avatar updated successfully.' : 'Profile details updated successfully.';
+                $alert_type = 'success';
+                $_SESSION['user_email'] = $email;
+            }
         }
     }
 }
 
-$stmt = $conn->prepare("SELECT c.*, a.email FROM accounts a LEFT JOIN customers c ON a.account_id = c.customer_id WHERE a.account_id = ?");
+$profile_image_select = $profile_image_ready ? 'c.profile_image' : 'NULL AS profile_image';
+$stmt = $conn->prepare("SELECT c.customer_id, c.full_name, c.phone_number, c.marital_status, c.dependents_count, c.occupation, c.monthly_income, $profile_image_select, a.email FROM accounts a LEFT JOIN customers c ON a.account_id = c.customer_id WHERE a.account_id = ?");
 $stmt->bind_param("i", $account_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
+$avatar_src = !empty($user['profile_image']) ? '..' . $user['profile_image'] : '';
+$avatar_initial = strtoupper(substr($user['full_name'] ?? 'C', 0, 1));
 
 include '../includes/header.php';
 ?>
@@ -118,7 +143,21 @@ include '../includes/header.php';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <h4 class="fw-bold mb-4 border-bottom pb-2">Customer Information</h4>
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
+                            <?php if ($avatar_src !== ''): ?>
+                                <img src="<?php echo htmlspecialchars($avatar_src); ?>" alt="Profile avatar" class="rounded-circle border shadow-sm object-fit-cover" style="width: 104px; height: 104px;">
+                            <?php else: ?>
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 104px; height: 104px; font-size: 2.4rem;">
+                                    <?php echo htmlspecialchars($avatar_initial); ?>
+                                </div>
+                            <?php endif; ?>
+                            <div class="flex-grow-1">
+                                <label class="form-label fw-bold">Profile Avatar</label>
+                                <input type="file" name="profile_image" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted d-block mt-2">JPG, PNG, or WebP only. Max size: 2MB.</small>
+                            </div>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email</label>
