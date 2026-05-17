@@ -109,6 +109,7 @@ if ($type === 'appointment') {
 
 include '../includes/header.php';
 ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
@@ -193,9 +194,9 @@ include '../includes/header.php';
                         </div>
                         <?php if ($canCancelAppointment): ?>
                             <div class="col-6">
-                                <form method="POST" onsubmit="return confirm('ARE YOU SURE WANT TO CANCEL?');" class="m-0">
+                                <form method="POST" id="cancelAppointmentForm" class="m-0">
                                     <input type="hidden" name="action_type" value="cancel">
-                                    <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold py-3 fs-6 rounded-pill text-white shadow-sm">
+                                    <button type="button" id="cancelAppointmentBtn" class="btn btn-danger btn-lg w-100 fw-bold py-3 fs-6 rounded-pill text-white shadow-sm">
                                         <i class="fas fa-ban me-2"></i>Cancel Slot
                                     </button>
                                 </form>
@@ -252,3 +253,25 @@ include '../includes/header.php';
     .reveal-card { animation: driftUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .border-dashed { border-style: dashed !important; }
 </style>
+
+<?php if ($type === 'appointment' && $canCancelAppointment): ?>
+<script>
+document.getElementById('cancelAppointmentBtn').addEventListener('click', function () {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Cancel Appointment?',
+        text: 'Are you sure you want to cancel this showroom appointment?',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, I want to cancel',
+        cancelButtonText: 'No',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('cancelAppointmentForm').submit();
+        }
+    });
+});
+</script>
+<?php endif; ?>
