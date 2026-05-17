@@ -1,10 +1,8 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
-    header("Location:../login.php");
-    exit();
-}
-include '../includes/db_connect.php';
+require_once '../includes/db_connect.php';
+require_once '../includes/auth_check.php';
+
+protect_admin_page('ADMIN', $conn);
 
 $account_id = $_SESSION['account_id'];
 $alert = '';
@@ -25,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['execute_real_draw']))
             $log_stmt->bind_param("ii", $account_id, $winner_id);
             $log_stmt->execute();
         }
-        $alert = '<div class=\"alert alert-success fw-bold\">Lucky Draw executed and records synchronized successfully.</div>';
+        $alert = '<div class="alert alert-success fw-bold">Lucky Draw executed and records synchronized successfully.</div>';
     }
 }
 
@@ -69,7 +67,7 @@ include '../includes/header.php';
                             <select name="property_id" class="form-select" required>
                                 <option value="">Select Government Housing...</option>
                                 <?php while ($p = $properties->fetch_assoc()): ?>
-                                    <option value="<?php echo $p['property_id']; ?>" <?php echo $selected_property_id === (int)$p['property_id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($p['property_code'] . ' - ' . $p['project_name']); ?></option>
+                                    <option value="<?php echo $p['property_id']; ?>" <?php echo $selected_property_id === (int)$p['property_id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars(($p['property_code'] ?? '') . ' - ' . $p['project_name']); ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
@@ -169,7 +167,6 @@ include '../includes/header.php';
             let currentWinnersSubmitted = [];
             let currentWinnerIndex = 0;
             let angle = 0;
-            let spinTimeout = null;
 
             function drawWheel() {
                 const numSectors = sectors.length;

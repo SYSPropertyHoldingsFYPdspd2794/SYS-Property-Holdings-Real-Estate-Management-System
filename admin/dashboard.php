@@ -1,6 +1,6 @@
 <?php
-include '../includes/db_connect.php';
-include '../includes/auth_check.php';
+require_once '../includes/db_connect.php';
+require_once '../includes/auth_check.php';
 
 protect_admin_page('ADMIN', $conn);
 
@@ -18,7 +18,7 @@ $total_cust = $res_cust->fetch_assoc()['count'];
 
 $chart_data = [];
 $chart_labels = [];
-$res_chart = $conn->query("SELECT p.state, COUNT(a.appointment_id) as lead_count FROM appointments a JOIN properties p ON a.property_id = p.property_id GROUP p.state");
+$res_chart = $conn->query("SELECT p.state, COUNT(a.appointment_id) as lead_count FROM appointments a JOIN properties p ON a.property_id = p.property_id GROUP BY p.state");
 while ($row = $res_chart->fetch_assoc()) {
     $chart_labels[] = $row['state'];
     $chart_data[] = (int)$row['lead_count'];

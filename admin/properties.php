@@ -1,10 +1,8 @@
 <?php
-session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
-    header("Location:../login.php");
-    exit();
-}
-include '../includes/db_connect.php';
+require_once '../includes/db_connect.php';
+require_once '../includes/auth_check.php';
+
+protect_admin_page('ADMIN', $conn);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
@@ -59,6 +57,7 @@ include '../includes/header.php';
                         <option value="Selangor">Selangor</option>
                         <option value="Penang">Penang</option>
                         <option value="Kuala Lumpur">Kuala Lumpur</option>
+                        <option value="Perak">Perak</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -102,11 +101,11 @@ include '../includes/header.php';
                     <tbody>
                         <?php while ($p = $props->fetch_assoc()): ?>
                             <tr>
-                                <td class="fw-bold"><?php echo htmlspecialchars($p['property_code']); ?></td>
+                                <td class="fw-bold"><?php echo htmlspecialchars($p['property_code'] ?? ''); ?></td>
                                 <td><?php echo htmlspecialchars($p['project_name']); ?></td>
                                 <td><?php echo htmlspecialchars($p['state']); ?></td>
                                 <td><span class="badge bg-secondary"><?php echo $p['property_type']; ?></span></td>
-                                <td><?php echo number_format($p['built_up_sqft']); ?> sqft</td>
+                                <td><?php echo number_format($p['built_up_sqft'] ?? 0); ?> sqft</td>
                                 <td class="fw-bold text-primary">RM <?php echo number_format($p['price'], 2); ?></td>
                                 <td><?php echo $p['total_units']; ?></td>
                                 <td>
@@ -217,6 +216,7 @@ include '../includes/header.php';
                                 <option value="Selangor">Selangor</option>
                                 <option value="Penang">Penang</option>
                                 <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Perak">Perak</option>
                             </select>
                         </div>
                         <div class="col-md-6">

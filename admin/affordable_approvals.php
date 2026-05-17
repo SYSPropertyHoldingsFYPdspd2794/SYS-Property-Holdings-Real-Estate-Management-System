@@ -1,6 +1,6 @@
 <?php
-include '../includes/db_connect.php';
-include '../includes/auth_check.php';
+require_once '../includes/db_connect.php';
+require_once '../includes/auth_check.php';
 
 protect_admin_page('ADMIN', $conn);
 
@@ -35,7 +35,7 @@ include '../includes/header.php';
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo date('Y-m-d H:i', strtotime($row['application_date'])); ?></td>
-                                <td class="fw-bold text-primary"><?php echo htmlspecialchars($row['property_code']); ?></td>
+                                <td class="fw-bold text-primary"><?php echo htmlspecialchars($row['property_code'] ?? ''); ?></td>
                                 <td><?php echo htmlspecialchars($row['project_name']); ?></td>
                                 <td><?php echo htmlspecialchars($row['customer_name']); ?></td>
                                 <td><?php echo $row['dependents_count']; ?></td>
