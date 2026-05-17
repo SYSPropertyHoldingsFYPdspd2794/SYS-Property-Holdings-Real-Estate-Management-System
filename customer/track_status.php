@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/track_status.php
- * DESCRIPTION: US29 - Track application and appointment statuses. Fixed plus button routing to properties catalog.
+ * DESCRIPTION: US29 - Track application and appointment statuses. Linked to adjust_appointment.php.
  */
 
 session_start();
@@ -57,9 +57,9 @@ include '../includes/header.php';
                     <?php while ($row = $appointments->fetch_assoc()): ?>
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0 h-100 rounded-4">
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="fw-bold m-0"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                                        <h4 class="fw-bold m-0 text-truncate" style="max-width: 70%;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                                         <?php
                                             $bg = 'secondary';
                                             if ($row['status'] === 'REQUESTED' || $row['status'] === 'PENDING') $bg = 'warning text-dark';
@@ -70,12 +70,16 @@ include '../includes/header.php';
                                         <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($row['status']); ?></span>
                                     </div>
                                     <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type'])); ?></p>
-                                    <p class="text-muted fs-5 m-0"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>
+                                    <p class="text-muted fs-5 mb-3"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>
+                                    
+                                    <div class="mt-auto pt-2">
+                                        <a href="adjust_appointment.php?type=appointment&id=<?php echo $row['appointment_id']; ?>" class="btn btn-outline-dark btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-sliders-h me-2"></i>Manage Appointment Details</a>
+                                    </div>
                                     
                                     <?php if (!empty($row['staff_remarks'])): ?>
-                                        <div class="mt-4 p-3 bg-light rounded-3 border-start border-warning border-4">
+                                        <div class="mt-3 p-3 bg-light rounded-3 border-start border-warning border-4">
                                             <p class="m-0 small fw-bold text-dark"><i class="fas fa-comment-dots me-2"></i>Staff Remarks:</p>
-                                            <p class="m-0 text-muted"><?php echo htmlspecialchars($row['staff_remarks']); ?></p>
+                                            <p class="m-0 text-muted small"><?php echo htmlspecialchars($row['staff_remarks']); ?></p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -98,9 +102,9 @@ include '../includes/header.php';
                     <?php while ($row = $applications->fetch_assoc()): ?>
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0 border-start border-success border-5 h-100 rounded-4">
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="fw-bold m-0"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                                        <h4 class="fw-bold m-0 text-truncate" style="max-width: 65%;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                                         <?php
                                             $bg = 'secondary';
                                             if ($row['status'] === 'PENDING_REVIEW') $bg = 'warning text-dark';
@@ -110,15 +114,19 @@ include '../includes/header.php';
                                         ?>
                                         <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars(str_replace('_', ' ', $row['status'])); ?></span>
                                     </div>
-                                    <p class="text-muted fs-5 m-0"><i class="far fa-clock text-primary me-2"></i>Applied on: <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></p>
+                                    <p class="text-muted fs-5 mb-3"><i class="far fa-clock text-primary me-2"></i>Applied on: <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></p>
                                     
+                                    <div class="mt-auto pt-2">
+                                        <a href="adjust_appointment.php?type=housing&id=<?php echo $row['application_id']; ?>" class="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-file-alt me-2"></i>View Application Summary</a>
+                                    </div>
+
                                     <?php if ($row['status'] === 'WINNER'): ?>
-                                        <div class="mt-4 p-3 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-50">
-                                            <p class="m-0 fw-bold text-success"><i class="fas fa-trophy me-2 fa-lg"></i>Congratulations! You have been selected in the draw. Please await offline contract instructions.</p>
+                                        <div class="mt-3 p-3 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-50">
+                                            <p class="m-0 small fw-bold text-success"><i class="fas fa-trophy me-2 fa-lg"></i>Congratulations! Selected in ballots. Awaiting verification instructions.</p>
                                         </div>
                                     <?php elseif ($row['status'] === 'REJECTED'): ?>
-                                        <div class="mt-4 p-3 bg-danger bg-opacity-10 rounded-3 border border-danger border-opacity-50">
-                                            <p class="m-0 fw-bold text-danger"><i class="fas fa-times-circle me-2"></i>Application did not meet the regulatory criteria.</p>
+                                        <div class="mt-3 p-3 bg-danger bg-opacity-10 rounded-3 border border-danger border-opacity-50">
+                                            <p class="m-0 small fw-bold text-danger"><i class="fas fa-times-circle me-2"></i>Application did not meet state DDL parameters.</p>
                                         </div>
                                     <?php endif; ?>
                                 </div>

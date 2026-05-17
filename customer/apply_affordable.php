@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/apply_affordable.php
- * DESCRIPTION: US27 & US28 - Submit affordable housing application with strict income checks and secure PDF upload.
+ * DESCRIPTION: US27 & US28 - Affordable application with exact server-side submission timestamping.
  */
 
 session_start();
@@ -24,7 +24,6 @@ $user_income = (float)($user['monthly_income'] ?? 0);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prop_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
     
-    // Fetch property details including the income limit
     $prop_check = $conn->prepare("SELECT property_id, income_limit_rm FROM properties WHERE property_id = ? AND status IN ('ACTIVE', 'AVAILABLE') AND is_affordable = 1");
     $prop_check->bind_param("i", $prop_id);
     $prop_check->execute();
@@ -36,19 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $property_data = $prop_res->fetch_assoc();
         $income_limit = (float)($property_data['income_limit_rm'] ?? 0);
 
-        // US27: Strict Income Eligibility Enforcement
         if ($user_income > $income_limit && $income_limit > 0) {
             $error = "Application Rejected: Your declared monthly income (RM " . number_format($user_income, 2) . ") exceeds the maximum threshold for this subsidized unit.";
         } elseif (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
             $error = "Mandatory income declaration document is missing or corrupted.";
         } else {
-            // US28: Secure PDF Upload Handling
             $tmp_name = $_FILES['document']['tmp_name'];
             $name = basename($_FILES['document']['name']);
             $size = $_FILES['document']['size'];
             $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
             
-            // Validate MIME type more securely
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime = finfo_file($finfo, $tmp_name);
             finfo_close($finfo);
@@ -58,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $conn->begin_transaction();
                 try {
-                    $insert_app = $conn->prepare("INSERT INTO affordable_housing_applications (customer_id, property_id, status) VALUES (?, ?, 'PENDING_REVIEW')");
+                    // FIX US26: Explicitly bind NOW() timestamp to capture the exact current submission period
+                    $insert_app = $conn->prepare("INSERT INTO affordable_housing_applications (customer_id, property_id, status, application_date) VALUES (?, ?, 'PENDING_REVIEW', NOW())");
                     $insert_app->bind_param("ii", $account_id, $prop_id);
                     $insert_app->execute();
                     $app_id = $conn->insert_id;
@@ -100,7 +97,7 @@ include '../includes/header.php';
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow border-0 border-top border-primary border-5">
+            <div class="card shadow border-0 border-top border-primary border-5 rounded-3">
                 <div class="card-body p-5">
                     <h2 class="fw-bold mb-3 text-primary"><i class="fas fa-home me-2"></i>Affordable Housing Application</h2>
                     <p class="text-muted mb-4">Complete your submission for government-subsidized housing. Please ensure your income data aligns with state policies.</p>
@@ -131,7 +128,7 @@ include '../includes/header.php';
                             <p class="small text-muted mb-3">This upload is mandatory for eligibility verification. Max size: 5MB (PDF only).</p>
                             <input type="file" name="document" class="form-control form-control-lg" accept="application/pdf" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow">Submit Application</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow rounded-pill">Submit Secure Application</button>
                     </form>
                 </div>
             </div>
