@@ -40,13 +40,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($day_total >= 3) {
             $error = "Capacity reached: This date already has 3 scheduled appointments. Please choose another day.";
         } else {
-            $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 LIMIT 1");
+            // Updated query to sort by time so we get the accurate target slot details
+            $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 ORDER BY appointment_time ASC LIMIT 1");
             $conflict_stmt->bind_param("ss", $date, $time_for_db);
             $conflict_stmt->execute();
             $conflict = $conflict_stmt->get_result()->fetch_assoc();
 
             if ($conflict) {
-                $error = "Scheduling conflict: Another appointment is already active within 2 hours of this time. Please select a different slot.";
+                // Dynamically computes and sets the next safe open time block 2 hours out
+                $conflicting_time = $conflict['appointment_time'];
+                $suggested_time = date('h:i A', strtotime($conflicting_time . ' +2 hours'));
+                
+                $error = "Scheduling conflict: Another appointment is already active within 2 hours of this time. To avoid a clash, the next available time slot you can book is from " . $suggested_time . " onwards.";
             }
         }
     }
@@ -146,7 +151,7 @@ include '../includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Time</label>
-                                <input type="time" name="appointment_time" class="form-control form-control-lg bg-light" min="08:00" max="20:00" step="1800" required>
+                                <input type="time" name="appointment_time" class="form-control form-control-lg bg-light" min="08:00" max="20:00" required>
                                 <small class="text-muted d-block mt-2">Available time: 8:00 AM to 8:00 PM. Appointments must be at least 2 hours apart.</small>
                             </div>
                         </div>
