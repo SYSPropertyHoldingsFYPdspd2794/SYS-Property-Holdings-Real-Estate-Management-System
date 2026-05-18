@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： sql102.infinityfree.com
--- 生成日期： 2026-05-18 10:46:34
+-- 生成日期： 2026-05-18 10:51:33
 -- 服务器版本： 11.4.10-MariaDB
 -- PHP 版本： 7.2.22
 
@@ -21,6 +21,303 @@ SET time_zone = "+00:00";
 --
 -- 数据库： `if0_41857411_sys_property_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `accounts`
+--
+
+CREATE TABLE `accounts` (
+  `account_id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` enum('CUSTOMER','STAFF','ADMIN') NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `accounts`
+--
+
+INSERT INTO `accounts` (`account_id`, `email`, `password_hash`, `role`, `created_at`) VALUES
+(1, 'admin.ahmad@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ADMIN', '2026-05-07 15:09:47'),
+(2, 'admin.david@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ADMIN', '2026-05-07 15:09:47'),
+(3, 'staff.siti@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(4, 'staff.chong@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(5, 'staff.muthu@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(6, 'staff.nurul@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(7, 'staff.wong@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(8, 'staff.aisyah@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(9, 'staff.tan@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(10, 'staff.prakash@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(11, 'staff.fatima@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(12, 'lcw@gmail.com', '$2y$10$f3gtHluJ.waiaf6Zo0rRsu7SQ8hLTcaaiRG7aK8llCYYkQKRHDESG', 'STAFF', '2026-05-07 15:09:47'),
+(13, 'staff.sivakumar@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(14, 'staff.aminah@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(15, 'staff.goh@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(16, 'staff.ravi@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(17, 'staff.ali@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(18, 'staff.chan@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(19, 'staff.kavita@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(20, 'staff.zulkifli@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(21, 'staff.swee@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(22, 'staff.sangeetha@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(23, 'staff.omar@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(24, 'staff.daren@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(25, 'staff.saadiah@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(26, 'staff.tze@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(27, 'staff.safiq@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(28, 'staff.teo@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(29, 'staff.arif@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(30, 'staff.ong@sysproperty.com.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'STAFF', '2026-05-07 15:09:47'),
+(33, 'amiruddin@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(34, 'weijian@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(35, 'suresh@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(36, 'hidayah@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(37, 'siewmin@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(38, 'karthik@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(39, 'mohdfaiz@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(40, 'rachel@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(41, 'ahmadzaki@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(43, 'gohchee@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(44, 'priya@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(45, 'hafizuddin@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'CUSTOMER', '2026-05-07 15:09:47'),
+(46, 'tests@gmail.com', '$2y$10$fqbqVqwVDRNksgyypsdVKOsv/Li.RVZtJ5HxFtJmlKV0tK1eSnswK', 'STAFF', '2026-05-07 15:09:47'),
+(47, 'testc@gmail.com', '$2y$10$rd2lqI0/QFm8n.FTXmPnbepM21DaiAQk75rUEcN.YtSq/xopGEQua', 'CUSTOMER', '2026-05-07 15:09:47'),
+(49, 'test@gmail.com', '$2y$10$M6d4K9p/J31X2bEAKDehBejc/BLFFMTbP/HeUsKn8m/dsm.ZxXmS2', 'ADMIN', '2026-05-07 19:07:41'),
+(50, 'khairunnisakamal22@gmail.com', '$2y$10$IgSBVi/W9YMNDckrByQeA.tZr.q19beQKhZCAkT6EoZFRcgqHT.cG', 'CUSTOMER', '2026-05-07 20:35:35'),
+(51, 'win0621@gmail.com', '$2y$10$Dfwqgrg0NPMiUHllag.mLODHajSR/WsYlopmDRO650jp/dwL52Iky', 'CUSTOMER', '2026-05-08 06:37:59'),
+(54, 'jason@gmail.com', '$2y$10$zGIYX1ldK.zmHgFpp4OsGuH7Cf3x8B5NYR3YQtuZ77AfAeNJO6PG.', 'ADMIN', '2026-05-08 14:43:37'),
+(56, 'staff123@gmail.com', '$2y$10$aVNNeU1DWjfVJpBq398/vO4KJtts55TDTClJduvJ0k6cmjFEnU/Um', 'CUSTOMER', '2026-05-11 00:20:57'),
+(57, '1234@gmail.com', '$2y$10$N.HyOUUN1AINVsad6WfmuuiPcEnadsNyK11DTL3XlB1qRkH/nwjeu', 'CUSTOMER', '2026-05-11 20:18:38'),
+(59, 'kahjun@gmail.com', '$2y$10$Hb/rvth4Un0P1Qd06kDyAe73PrBj7XIcADwBNumhADMp/KXuhCBLi', 'CUSTOMER', '2026-05-14 18:58:42'),
+(60, 'jasonkl@gmail.com', '$2y$10$5xLjpWiAw.lQ9DymZsAvQe/iHFDMXIFELdSyEYERqpW4MDeoMoBIG', 'STAFF', '2026-05-18 07:48:34');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `admins`
+--
+
+CREATE TABLE `admins` (
+  `admin_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `admins`
+--
+
+INSERT INTO `admins` (`admin_id`, `full_name`) VALUES
+(1, 'Ahmad Razali'),
+(2, 'David Lee'),
+(54, 'JASON');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `affordable_housing_applications`
+--
+
+CREATE TABLE `affordable_housing_applications` (
+  `application_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `status` enum('PENDING_REVIEW','APPROVED_FOR_DRAW','REJECTED','WINNER') NOT NULL DEFAULT 'PENDING_REVIEW',
+  `reviewed_by_staff_id` int(11) DEFAULT NULL,
+  `application_date` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `affordable_housing_applications`
+--
+
+INSERT INTO `affordable_housing_applications` (`application_id`, `customer_id`, `property_id`, `status`, `reviewed_by_staff_id`, `application_date`) VALUES
+(1, 38, 5, 'PENDING_REVIEW', NULL, '2026-05-01 08:30:00'),
+(2, 39, 7, 'PENDING_REVIEW', NULL, '2026-05-02 09:15:00'),
+(3, 40, 8, 'APPROVED_FOR_DRAW', 3, '2026-05-03 10:45:00'),
+(4, 41, 20, 'APPROVED_FOR_DRAW', 5, '2026-05-04 11:20:00'),
+(6, 51, 57, 'APPROVED_FOR_DRAW', 46, '2026-05-16 12:00:58');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `appointments`
+--
+
+CREATE TABLE `appointments` (
+  `appointment_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `assigned_staff_id` int(11) DEFAULT NULL,
+  `service_type` enum('SHOWROOM_VIEWING','FINANCIAL_CONSULTATION') NOT NULL,
+  `appointment_date` date NOT NULL,
+  `appointment_time` time NOT NULL,
+  `status` enum('REQUESTED','ASSIGNED','COMPLETED','NO_SHOW','CANCELLED') NOT NULL DEFAULT 'REQUESTED',
+  `staff_remarks` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `appointments`
+--
+
+INSERT INTO `appointments` (`appointment_id`, `customer_id`, `property_id`, `assigned_staff_id`, `service_type`, `appointment_date`, `appointment_time`, `status`, `staff_remarks`) VALUES
+(1, 33, 1, 3, 'SHOWROOM_VIEWING', '2026-05-15', '10:00:00', 'ASSIGNED', NULL),
+(2, 34, 2, 4, 'FINANCIAL_CONSULTATION', '2026-05-16', '11:30:00', 'ASSIGNED', NULL),
+(3, 35, 10, 3, 'SHOWROOM_VIEWING', '2026-05-17', '14:00:00', 'ASSIGNED', NULL),
+(4, 36, 13, 5, 'SHOWROOM_VIEWING', '2026-05-18', '15:30:00', 'ASSIGNED', NULL),
+(5, 37, 25, 7, 'FINANCIAL_CONSULTATION', '2026-05-19', '09:00:00', 'ASSIGNED', NULL),
+(6, 51, 59, 46, 'SHOWROOM_VIEWING', '2026-05-11', '16:00:00', 'COMPLETED', ''),
+(7, 47, 180, 46, 'SHOWROOM_VIEWING', '2026-05-11', '15:26:00', 'COMPLETED', 'customer ni bagus'),
+(8, 47, 179, 46, 'SHOWROOM_VIEWING', '2026-05-11', '17:47:00', 'COMPLETED', ''),
+(9, 47, 178, 46, 'SHOWROOM_VIEWING', '2026-05-11', '17:48:00', 'ASSIGNED', NULL),
+(10, 51, 52, 46, 'FINANCIAL_CONSULTATION', '2026-05-13', '13:00:00', 'ASSIGNED', NULL),
+(11, 51, 52, NULL, 'SHOWROOM_VIEWING', '2026-05-18', '11:30:00', 'CANCELLED', NULL),
+(12, 51, 51, NULL, 'SHOWROOM_VIEWING', '2026-05-23', '16:30:00', 'REQUESTED', NULL),
+(13, 47, 171, NULL, 'SHOWROOM_VIEWING', '2026-05-19', '12:00:00', 'CANCELLED', NULL),
+(14, 47, 50, 46, 'SHOWROOM_VIEWING', '2026-05-19', '12:00:00', 'CANCELLED', NULL),
+(15, 47, 49, 46, 'SHOWROOM_VIEWING', '2026-05-19', '17:00:00', 'ASSIGNED', NULL),
+(16, 51, 173, NULL, 'SHOWROOM_VIEWING', '2026-05-22', '15:00:00', 'REQUESTED', NULL),
+(17, 51, 170, NULL, 'SHOWROOM_VIEWING', '2026-05-25', '17:00:00', 'CANCELLED', NULL),
+(18, 51, 171, NULL, 'SHOWROOM_VIEWING', '2026-05-24', '17:00:00', 'REQUESTED', NULL),
+(19, 47, 170, NULL, 'SHOWROOM_VIEWING', '2026-05-19', '15:00:00', 'REQUESTED', NULL),
+(20, 51, 55, NULL, 'SHOWROOM_VIEWING', '2026-05-31', '14:30:00', 'CANCELLED', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `audit_logs`
+--
+
+CREATE TABLE `audit_logs` (
+  `log_id` int(11) NOT NULL,
+  `account_id` int(11) DEFAULT NULL,
+  `action_type` enum('DOCUMENT_PURGED','LUCKY_DRAW_EXECUTED','LEAD_ASSIGNED','STATUS_UPDATED') NOT NULL,
+  `entity_type` varchar(50) NOT NULL,
+  `entity_id` int(11) NOT NULL,
+  `timestamp` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `audit_logs`
+--
+
+INSERT INTO `audit_logs` (`log_id`, `account_id`, `action_type`, `entity_type`, `entity_id`, `timestamp`) VALUES
+(1, 54, 'LEAD_ASSIGNED', 'appointment_id', 6, '2026-05-10 23:14:59'),
+(2, 54, 'LEAD_ASSIGNED', 'appointment_id', 7, '2026-05-10 23:26:21'),
+(3, 54, 'LEAD_ASSIGNED', 'appointment_id', 8, '2026-05-11 18:29:09'),
+(4, 54, 'LEAD_ASSIGNED', 'appointment_id', 10, '2026-05-11 19:15:50'),
+(5, 54, 'LEAD_ASSIGNED', 'appointment_id', 9, '2026-05-17 01:52:11'),
+(6, 54, 'LEAD_ASSIGNED', 'appointment_id', 12, '2026-05-17 01:58:14'),
+(7, 54, 'LEAD_ASSIGNED', 'appointment_id', 14, '2026-05-17 02:04:21'),
+(8, 54, 'LEAD_ASSIGNED', 'appointment_id', 15, '2026-05-17 02:09:25');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `banks`
+--
+
+CREATE TABLE `banks` (
+  `bank_id` int(11) NOT NULL,
+  `bank_name` varchar(100) NOT NULL,
+  `interest_rate` decimal(4,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `banks`
+--
+
+INSERT INTO `banks` (`bank_id`, `bank_name`, `interest_rate`) VALUES
+(1, 'Maybank', '3.35'),
+(2, 'CIMB Bank', '3.40'),
+(3, 'Public Bank', '3.38'),
+(4, 'RHB Bank', '3.45'),
+(5, 'Hong Leong Bank', '3.39'),
+(6, 'AmBank', '3.50'),
+(7, 'UOB Bank', '3.42'),
+(8, 'Affin Bank', '3.75');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `customers`
+--
+
+CREATE TABLE `customers` (
+  `customer_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `marital_status` enum('SINGLE','MARRIED') NOT NULL,
+  `dependents_count` int(11) NOT NULL DEFAULT 0,
+  `occupation` varchar(150) NOT NULL,
+  `monthly_income` decimal(10,2) NOT NULL,
+  `profile_image` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `customers`
+--
+
+INSERT INTO `customers` (`customer_id`, `full_name`, `phone_number`, `marital_status`, `dependents_count`, `occupation`, `monthly_income`, `profile_image`) VALUES
+(33, 'Amiruddin Bin Bakar', '011-1234567', 'SINGLE', 0, 'Teacher', '3500.00', NULL),
+(34, 'Lim Wei Jian', '012-1234567', 'MARRIED', 2, 'Engineer', '8500.00', NULL),
+(35, 'Suresh a/l Ramasamy', '013-1234567', 'SINGLE', 0, 'Clerk', '2500.00', NULL),
+(36, 'Nurul Hidayah', '014-1234567', 'MARRIED', 3, 'Business Owner', '6000.00', NULL),
+(37, 'Tan Siew Min', '015-1234567', 'SINGLE', 1, 'Nurse', '4000.00', NULL),
+(38, 'Karthik a/l Murugan', '016-1234567', 'MARRIED', 1, 'Technician', '3200.00', NULL),
+(39, 'Mohd Faiz', '016-7654321', 'SINGLE', 0, 'Designer', '4500.00', NULL),
+(40, 'Rachel Wong', '017-1234567', 'MARRIED', 4, 'Manager', '9500.00', NULL),
+(41, 'Ahmad Zaki', '017-7654321', 'SINGLE', 0, 'Executive', '5000.00', NULL),
+(43, 'Goh Chee Keong', '018-7654321', 'SINGLE', 0, 'Chef', '3000.00', NULL),
+(44, 'Priya a/p Subramaniam', '019-1234567', 'MARRIED', 1, 'IT Specialist', '6800.00', NULL),
+(45, 'Hafizuddin', '019-7654321', 'SINGLE', 0, 'Sales', '3800.00', NULL),
+(46, 'Chong Mei Ling', '011-9876543', 'MARRIED', 2, 'Doctor', '12000.00', NULL),
+(47, 'testcus', '012-9876543', 'SINGLE', 0, 'Student', '11000.00', '/storage/profile_images/customer_47_a35ecf63084a391f.jpg'),
+(49, 'test', '1111', 'SINGLE', 0, 'Student', '0.00', NULL),
+(50, 'KHAIRUNNISA KAMAL', '017283783893', 'SINGLE', 1, 'teacher', '4500.00', NULL),
+(51, 'WIN', '017', 'SINGLE', 0, 'Student', '5000.00', NULL),
+(54, '12', '12', '', 0, 'student', '0.00', NULL),
+(57, '1234', '1234', 'SINGLE', 0, 'student', '0.00', NULL),
+(59, 'kahjun', '999', 'SINGLE', 0, 'student', '5.00', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `documents`
+--
+
+CREATE TABLE `documents` (
+  `document_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `related_to_type` enum('APPLICATION','APPOINTMENT') NOT NULL,
+  `related_to_id` int(11) NOT NULL,
+  `document_type` enum('PAYSLIP_SUMMARY','EPF_STATEMENT_SUMMARY','INCOME_DECLARATION') NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `uploaded_at` datetime DEFAULT current_timestamp(),
+  `is_purged` tinyint(1) NOT NULL DEFAULT 0,
+  `purged_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `documents`
+--
+
+INSERT INTO `documents` (`document_id`, `customer_id`, `related_to_type`, `related_to_id`, `document_type`, `file_path`, `uploaded_at`, `is_purged`, `purged_at`) VALUES
+(1, 38, 'APPLICATION', 1, 'INCOME_DECLARATION', '/uploads/app_1_1715000000.pdf', '2026-05-07 15:09:47', 0, NULL),
+(2, 39, 'APPLICATION', 2, 'EPF_STATEMENT_SUMMARY', '/uploads/app_2_1715000001.pdf', '2026-05-07 15:09:47', 0, NULL),
+(3, 40, 'APPLICATION', 3, 'INCOME_DECLARATION', '/uploads/app_3_1715000002.pdf', '2026-05-07 15:09:47', 0, NULL),
+(4, 41, 'APPLICATION', 4, 'EPF_STATEMENT_SUMMARY', '/uploads/app_4_1715000003.pdf', '2026-05-07 15:09:47', 0, NULL),
+(6, 33, 'APPOINTMENT', 1, 'PAYSLIP_SUMMARY', '/uploads/appt_1_1715000005.pdf', '2026-05-07 15:09:47', 0, NULL),
+(7, 34, 'APPOINTMENT', 2, 'PAYSLIP_SUMMARY', '/uploads/appt_2_1715000006.pdf', '2026-05-07 15:09:47', 0, NULL),
+(8, 35, 'APPOINTMENT', 3, 'PAYSLIP_SUMMARY', '/uploads/appt_3_1715000007.pdf', '2026-05-07 15:09:47', 0, NULL),
+(9, 47, 'APPOINTMENT', 7, 'PAYSLIP_SUMMARY', '../uploads/appt_7_1778480724.pdf', '2026-05-10 23:25:23', 0, NULL),
+(10, 51, 'APPLICATION', 6, 'EPF_STATEMENT_SUMMARY', '/storage/docs/app_6_1778958058.pdf', '2026-05-16 12:00:58', 0, NULL),
+(11, 51, 'APPOINTMENT', 16, 'PAYSLIP_SUMMARY', '/storage/docs/appt_16_1779084239.pdf', '2026-05-17 23:03:59', 0, NULL),
+(12, 51, 'APPOINTMENT', 18, 'PAYSLIP_SUMMARY', '/storage/docs/appt_18_1779084779.pdf', '2026-05-17 23:12:58', 0, NULL),
+(13, 47, 'APPOINTMENT', 19, 'PAYSLIP_SUMMARY', '/storage/docs/appt_19_1779087060.pdf', '2026-05-17 23:51:00', 0, NULL),
+(14, 51, 'APPOINTMENT', 20, 'PAYSLIP_SUMMARY', '/storage/docs/appt_20_1779113506.pdf', '2026-05-18 07:11:46', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -230,9 +527,175 @@ INSERT INTO `properties` (`property_id`, `property_code`, `project_name`, `state
 (179, 'W-CM-MK002', 'Mont Kiara Business Boulevard', 'Kuala Lumpur', 'COMMERCIAL', '2205000.00', 15, 3000, NULL, 'ACTIVE', 'W-CM-MK002.jpg', 'modern shop office mont kiara kuala lumpur', 0),
 (180, 'W-CM-CH003', 'Pusat Komersial Cheras KL', 'Kuala Lumpur', 'COMMERCIAL', '1575000.00', 20, 2600, NULL, 'ACTIVE', 'W-CM-CH003.jpg', 'retail commercial space cheras kuala lumpur', 0);
 
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `staff`
+--
+
+CREATE TABLE `staff` (
+  `staff_id` int(11) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `assigned_state` varchar(100) NOT NULL,
+  `profile_image` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `staff`
+--
+
+INSERT INTO `staff` (`staff_id`, `full_name`, `phone_number`, `assigned_state`, `profile_image`) VALUES
+(3, 'Siti Nurhaliza', '011-10001111', 'Perak', NULL),
+(4, 'Chong Wei', '011-10002222', 'Perak', NULL),
+(5, 'Muthu Kumar', '012-20001111', 'Selangor', NULL),
+(6, 'Nurul Huda', '012-20002222', 'Selangor', NULL),
+(7, 'Wong Ken', '013-30001111', 'Pahang', NULL),
+(8, 'Aisyah Binti Othman', '013-30002222', 'Pahang', NULL),
+(9, 'Tan Mei Ling', '014-40001111', 'Kelantan', NULL),
+(10, 'Prakash Rao', '014-40002222', 'Kelantan', NULL),
+(11, 'Nur Fatima', '015-50001111', 'Johor', NULL),
+(12, 'Lee Chong Wei', '015-50002222', 'Johor', NULL),
+(13, 'Sivakumar', '016-60001111', 'Kedah', NULL),
+(14, 'Aminah Jusoh', '016-60002222', 'Kedah', NULL),
+(15, 'Goh Jin Wei', '017-70001111', 'Labuan', NULL),
+(16, 'Ravi Chandran', '017-70002222', 'Labuan', NULL),
+(17, 'Fatimah Ali', '018-80001111', 'Melaka', NULL),
+(18, 'Chan Peng Soon', '018-80002222', 'Melaka', NULL),
+(19, 'Kavita Kaur', '019-90001111', 'Negeri Sembilan', NULL),
+(20, 'Zulkifli Majid', '019-90002222', 'Negeri Sembilan', NULL),
+(21, 'Lim Swee', '011-20001111', 'Penang', NULL),
+(22, 'Sangeetha', '011-20002222', 'Penang', NULL),
+(23, 'Awangku Omar', '012-30001111', 'Sarawak', NULL),
+(24, 'Liew Daren', '012-30002222', 'Sarawak', NULL),
+(25, 'Halimaton Saadiah', '013-40001111', 'Perlis', NULL),
+(26, 'Ng Tze Yong', '013-40002222', 'Perlis', NULL),
+(27, 'Safiq Rahim', '014-50001111', 'Sabah', NULL),
+(28, 'Teo Ee Yi', '014-50002222', 'Sabah', NULL),
+(29, 'Arif Aiman', '015-60001111', 'Terengganu', NULL),
+(30, 'Ong Yew Sin', '015-60002222', 'Terengganu', NULL),
+(46, 'teststaff', '011-9876543', 'Johor', '/storage/profile_images/staff_46_b054e90bea8384de.jpg'),
+(51, 'WIN', '012', 'NA', NULL),
+(56, 'staff123', 'staff123', 'Johor', NULL),
+(60, 'KL-Jason', '012', 'Kuala Lumpur', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `system_settings`
+--
+
+CREATE TABLE `system_settings` (
+  `setting_key` varchar(50) NOT NULL,
+  `setting_value` varchar(255) NOT NULL,
+  `description` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `system_settings`
+--
+
+INSERT INTO `system_settings` (`setting_key`, `setting_value`, `description`) VALUES
+('BASE_INTEREST_RATE', '3.85', 'Global interest rate parameter utilized for frontend dynamic loan calculator.'),
+('DATA_RETENTION_DAYS', '7', 'PDPA compliance setting defining data retention window before sensitive files are purged.');
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `wishlists`
+--
+
+CREATE TABLE `wishlists` (
+  `wishlist_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `property_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- 转存表中的数据 `wishlists`
+--
+
+INSERT INTO `wishlists` (`wishlist_id`, `customer_id`, `property_id`, `created_at`) VALUES
+(1, 33, 1, '2026-05-07 15:09:47'),
+(2, 33, 2, '2026-05-07 15:09:47'),
+(3, 34, 3, '2026-05-07 15:09:47'),
+(4, 34, 4, '2026-05-07 15:09:47'),
+(5, 35, 5, '2026-05-07 15:09:47'),
+(6, 35, 6, '2026-05-07 15:09:47'),
+(7, 36, 7, '2026-05-07 15:09:47'),
+(8, 36, 8, '2026-05-07 15:09:47'),
+(9, 37, 9, '2026-05-07 15:09:47'),
+(10, 37, 10, '2026-05-07 15:09:47'),
+(11, 38, 11, '2026-05-07 15:09:47'),
+(12, 38, 12, '2026-05-07 15:09:47'),
+(13, 39, 13, '2026-05-07 15:09:47'),
+(14, 39, 14, '2026-05-07 15:09:47'),
+(15, 40, 15, '2026-05-07 15:09:47'),
+(16, 40, 16, '2026-05-07 15:09:47'),
+(17, 41, 17, '2026-05-07 15:09:47'),
+(18, 41, 18, '2026-05-07 15:09:47');
+
 --
 -- 转储表的索引
 --
+
+--
+-- 表的索引 `accounts`
+--
+ALTER TABLE `accounts`
+  ADD PRIMARY KEY (`account_id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- 表的索引 `admins`
+--
+ALTER TABLE `admins`
+  ADD PRIMARY KEY (`admin_id`);
+
+--
+-- 表的索引 `affordable_housing_applications`
+--
+ALTER TABLE `affordable_housing_applications`
+  ADD PRIMARY KEY (`application_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `property_id` (`property_id`),
+  ADD KEY `reviewed_by_staff_id` (`reviewed_by_staff_id`);
+
+--
+-- 表的索引 `appointments`
+--
+ALTER TABLE `appointments`
+  ADD PRIMARY KEY (`appointment_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `property_id` (`property_id`),
+  ADD KEY `assigned_staff_id` (`assigned_staff_id`);
+
+--
+-- 表的索引 `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `account_id` (`account_id`);
+
+--
+-- 表的索引 `banks`
+--
+ALTER TABLE `banks`
+  ADD PRIMARY KEY (`bank_id`);
+
+--
+-- 表的索引 `customers`
+--
+ALTER TABLE `customers`
+  ADD PRIMARY KEY (`customer_id`);
+
+--
+-- 表的索引 `documents`
+--
+ALTER TABLE `documents`
+  ADD PRIMARY KEY (`document_id`),
+  ADD KEY `customer_id` (`customer_id`);
 
 --
 -- 表的索引 `properties`
@@ -242,14 +705,133 @@ ALTER TABLE `properties`
   ADD UNIQUE KEY `property_code` (`property_code`);
 
 --
+-- 表的索引 `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`staff_id`);
+
+--
+-- 表的索引 `system_settings`
+--
+ALTER TABLE `system_settings`
+  ADD PRIMARY KEY (`setting_key`);
+
+--
+-- 表的索引 `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD PRIMARY KEY (`wishlist_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `property_id` (`property_id`);
+
+--
 -- 在导出的表使用AUTO_INCREMENT
 --
+
+--
+-- 使用表AUTO_INCREMENT `accounts`
+--
+ALTER TABLE `accounts`
+  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+
+--
+-- 使用表AUTO_INCREMENT `affordable_housing_applications`
+--
+ALTER TABLE `affordable_housing_applications`
+  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- 使用表AUTO_INCREMENT `appointments`
+--
+ALTER TABLE `appointments`
+  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- 使用表AUTO_INCREMENT `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- 使用表AUTO_INCREMENT `banks`
+--
+ALTER TABLE `banks`
+  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- 使用表AUTO_INCREMENT `documents`
+--
+ALTER TABLE `documents`
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- 使用表AUTO_INCREMENT `properties`
 --
 ALTER TABLE `properties`
   MODIFY `property_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=181;
+
+--
+-- 使用表AUTO_INCREMENT `wishlists`
+--
+ALTER TABLE `wishlists`
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- 限制导出的表
+--
+
+--
+-- 限制表 `admins`
+--
+ALTER TABLE `admins`
+  ADD CONSTRAINT `admins_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE;
+
+--
+-- 限制表 `affordable_housing_applications`
+--
+ALTER TABLE `affordable_housing_applications`
+  ADD CONSTRAINT `affordable_housing_applications_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `affordable_housing_applications_ibfk_2` FOREIGN KEY (`property_id`) REFERENCES `properties` (`property_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `affordable_housing_applications_ibfk_3` FOREIGN KEY (`reviewed_by_staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE SET NULL;
+
+--
+-- 限制表 `appointments`
+--
+ALTER TABLE `appointments`
+  ADD CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`property_id`) REFERENCES `properties` (`property_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `appointments_ibfk_3` FOREIGN KEY (`assigned_staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE SET NULL;
+
+--
+-- 限制表 `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`) ON DELETE SET NULL;
+
+--
+-- 限制表 `customers`
+--
+ALTER TABLE `customers`
+  ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE;
+
+--
+-- 限制表 `documents`
+--
+ALTER TABLE `documents`
+  ADD CONSTRAINT `documents_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE;
+
+--
+-- 限制表 `staff`
+--
+ALTER TABLE `staff`
+  ADD CONSTRAINT `staff_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE;
+
+--
+-- 限制表 `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD CONSTRAINT `wishlists_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlists_ibfk_2` FOREIGN KEY (`property_id`) REFERENCES `properties` (`property_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
