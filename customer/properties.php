@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Customer property catalog. Perfect baseline layout.
+ * DESCRIPTION: Customer property catalog. Fixed Federal Territories value mapping to match database.
  */
 
 include_once '../includes/header.php';
@@ -97,9 +97,9 @@ $result = $stmt->get_result();
                                 <option value="Terengganu" <?php if($filter_state=='Terengganu') echo 'selected'; ?>>Terengganu</option>
                             </optgroup>
                             <optgroup label="Federal Territories">
-                                <option value="WP Kuala Lumpur" <?php if($filter_state=='WP Kuala Lumpur') echo 'selected'; ?>>WP Kuala Lumpur</option>
-                                <option value="WP Labuan" <?php if($filter_state=='WP Labuan') echo 'selected'; ?>>WP Labuan</option>
-                                <option value="WP Putrajaya" <?php if($filter_state=='WP Putrajaya') echo 'selected'; ?>>WP Putrajaya</option>
+                                <option value="Kuala Lumpur" <?php if($filter_state=='Kuala Lumpur') echo 'selected'; ?>>WP Kuala Lumpur</option>
+                                <option value="Labuan" <?php if($filter_state=='Labuan') echo 'selected'; ?>>WP Labuan</option>
+                                <option value="Putrajaya" <?php if($filter_state=='Putrajaya') echo 'selected'; ?>>WP Putrajaya</option>
                             </optgroup>
                         </select>
                     </div>
