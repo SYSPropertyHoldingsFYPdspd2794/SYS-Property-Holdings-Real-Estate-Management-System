@@ -71,19 +71,14 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 // PROPERTIES DESCRIPTION LOGIC (FIXED DYNAMIC DETECTOR)
 // ------------------------------------------------------------------
 
-// 1. FLOOR PLAN PATH (Bulletproof absolute local __DIR__ disk check with smart auto fallback)
-$baseFloorPlanDir = __DIR__ . "/../SYS Property Catalog/";
+// 1. FLOOR PLAN PATH (Strictly couples Affordable housing to Affordable_Floor_Plan.jpg without disk checks)
 if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
-    // If you don't have Affordable_Floor_Plan.jpg, it dynamically falls back to its structural type plan
-    if (!file_exists($baseFloorPlanDir . "Affordable_Floor_Plan.jpg")) {
-        $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
-    }
 } else {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
 
-// FIX APPLIED HERE: Smart Environment Detection (Handles both local testing and server deployment flawlessly)
+// Smart Environment Detection (Handles both local testing and server deployment flawlessly)
 if ($_SERVER['HTTP_HOST'] === 'localhost:3000' || $_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
     $finalFloorPlan = $baseDir . $floorPlanName; 
 } else {
@@ -348,7 +343,7 @@ switch ($property['state']) {
     .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
 </style>
 
-<script>
+<script { sandbox: 'allow-scripts' }>
 function updateCalc() {
     const p = parseFloat(document.getElementById('propertyPrice').value);
     const bank = document.getElementById('bankSelect');

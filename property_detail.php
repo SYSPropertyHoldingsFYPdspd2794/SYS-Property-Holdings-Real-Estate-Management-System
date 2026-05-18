@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: property_detail.php (ROOT DIRECTORY)
- * DESCRIPTION: Admin and Staff internal workspace. UI mirrored 100% with fixed __DIR__ absolute path fallback.
+ * DESCRIPTION: Admin and Staff internal workspace. UI mirrored 100% with absolute forced JPG floor plan loading.
  */
 
 include_once 'includes/header.php';
@@ -47,13 +47,9 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 // PROPERTIES DESCRIPTION LOGIC (FIXED DYNAMIC DETECTOR)
 // ------------------------------------------------------------------
 
-// 1. FLOOR PLAN PATH (Bulletproof absolute local __DIR__ disk check with smart auto fallback)
-$baseFloorPlanDir = __DIR__ . "/SYS Property Catalog/";
+// 1. FLOOR PLAN PATH (Strictly couples Affordable housing to Affordable_Floor_Plan.jpg without disk checks)
 if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
-    if (!file_exists($baseFloorPlanDir . "Affordable_Floor_Plan.jpg")) {
-        $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
-    }
 } else {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
@@ -308,7 +304,7 @@ switch ($property['state']) {
     .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
 </style>
 
-<script>
+<script { sandbox: 'allow-scripts' }>
 function updateCalc() {
     const p = parseFloat(document.getElementById('propertyPrice').value);
     const bank = document.getElementById('bankSelect');
