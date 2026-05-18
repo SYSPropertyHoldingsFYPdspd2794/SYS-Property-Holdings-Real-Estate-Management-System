@@ -11,6 +11,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
     exit();
 }
 include '../includes/db_connect.php';
+include_once '../includes/functions.php';
 
 
 $account_id = $_SESSION['account_id'];
@@ -18,6 +19,133 @@ $type = isset($_GET['type']) ? trim($_GET['type']) : '';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $error = '';
 $success = '';
+
+function delete_customer_document_file($file_path) {
+    $path = str_replace('\\', '/', trim((string)$file_path));
+    $path = preg_replace('#^\./+#', '', $path);
+    $path = preg_replace('#^/+#', '', $path);
+    while (strpos($path, '../') === 0) {
+        $path = substr($path, 3);
+    }
+
+    if ($path === '' || (strpos($path, 'storage/docs/') !== 0 && strpos($path, 'uploads/') !== 0)) {
+        return;
+    }
+
+    $project_root = realpath(__DIR__ . '/..');
+    $full_path = realpath($project_root . '/' . $path);
+    if ($project_root && $full_path && strpos($full_path, $project_root) === 0 && is_file($full_path)) {
+        unlink($full_path);
+    }
+}
+
+function customer_owns_record($conn, $type, $id, $account_id) {
+    if ($type === 'appointment') {
+        $stmt = $conn->prepare("SELECT appointment_id FROM appointments WHERE appointment_id = ? AND customer_id = ? LIMIT 1");
+    } elseif ($type === 'housing') {
+        $stmt = $conn->prepare("SELECT application_id FROM affordable_housing_applications WHERE application_id = ? AND customer_id = ? LIMIT 1");
+    } else {
+        return false;
+    }
+
+    $stmt->bind_param("ii", $id, $account_id);
+    $stmt->execute();
+    return $stmt->get_result()->num_rows > 0;
+}
+
+function document_meta_for_type($type) {
+    if ($type === 'appointment') {
+        return ['APPOINTMENT', 'PAYSLIP_SUMMARY', 'appt'];
+    }
+
+    if ($type === 'housing') {
+        return ['APPLICATION', 'EPF_STATEMENT_SUMMARY', 'app'];
+    }
+
+    return [null, null, null];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action_type'] ?? '', ['resend_document', 'delete_document'], true)) {
+    [$related_type, $document_type, $file_prefix] = document_meta_for_type($type);
+
+    if (!$related_type || !customer_owns_record($conn, $type, $id, $account_id)) {
+        $error = "Document action is not available for this record.";
+    } elseif ($_POST['action_type'] === 'delete_document') {
+        $doc_stmt = $conn->prepare("SELECT document_id, file_path FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ? AND is_purged = FALSE");
+        $doc_stmt->bind_param("isi", $account_id, $related_type, $id);
+        $doc_stmt->execute();
+        $docs = $doc_stmt->get_result();
+
+        while ($doc = $docs->fetch_assoc()) {
+            delete_customer_document_file($doc['file_path']);
+        }
+
+        $delete_stmt = $conn->prepare("DELETE FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ?");
+        $delete_stmt->bind_param("isi", $account_id, $related_type, $id);
+        if ($delete_stmt->execute() && $delete_stmt->affected_rows > 0) {
+            $success = "Document deleted successfully.";
+        } else {
+            $error = "No active document was found to delete.";
+        }
+    } elseif (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+        $error = "Please choose a PDF document to resend.";
+    } else {
+        $tmp_name = $_FILES['document']['tmp_name'];
+        $name = basename($_FILES['document']['name']);
+        $size = $_FILES['document']['size'];
+        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $tmp_name);
+        finfo_close($finfo);
+
+        if ($ext !== 'pdf' || $mime !== 'application/pdf' || $size > 5242880) {
+            $error = "Invalid document. Please upload a PDF file under 5MB.";
+        } else {
+            $upload_dir = '../storage/docs/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            $file_name = $file_prefix . "_" . $id . "_" . time() . ".pdf";
+            $target_file = $upload_dir . $file_name;
+            $db_path = "storage/docs/" . $file_name;
+
+            $conn->begin_transaction();
+            try {
+                $old_stmt = $conn->prepare("SELECT file_path FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ? AND is_purged = FALSE");
+                $old_stmt->bind_param("isi", $account_id, $related_type, $id);
+                $old_stmt->execute();
+                $old_docs = $old_stmt->get_result();
+
+                if (!move_uploaded_file($tmp_name, $target_file)) {
+                    throw new Exception("Unable to save uploaded document.");
+                }
+
+                while ($old_doc = $old_docs->fetch_assoc()) {
+                    delete_customer_document_file($old_doc['file_path']);
+                }
+
+                $delete_old = $conn->prepare("DELETE FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ?");
+                $delete_old->bind_param("isi", $account_id, $related_type, $id);
+                $delete_old->execute();
+
+                $insert_doc = $conn->prepare("INSERT INTO documents (customer_id, related_to_type, related_to_id, document_type, file_path, is_purged) VALUES (?, ?, ?, ?, ?, FALSE)");
+                $insert_doc->bind_param("isiss", $account_id, $related_type, $id, $document_type, $db_path);
+                $insert_doc->execute();
+
+                $conn->commit();
+                $success = "Document resent successfully.";
+            } catch (Throwable $e) {
+                $conn->rollback();
+                if (file_exists($target_file)) {
+                    unlink($target_file);
+                }
+                $error = "Unable to resend document. Please try again.";
+            }
+        }
+    }
+}
 
 // ACTION HANDLERS FOR SHOWROOM APPOINTMENTS (US28 & US29)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
@@ -125,6 +253,15 @@ if ($type === 'appointment') {
     $canRescheduleAppointment = $canCancelAppointment;
 }
 
+[$current_related_type] = document_meta_for_type($type);
+$current_document = null;
+if ($current_related_type) {
+    $doc_stmt = $conn->prepare("SELECT document_id, document_type, file_path, uploaded_at FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ? AND is_purged = FALSE ORDER BY uploaded_at DESC, document_id DESC LIMIT 1");
+    $doc_stmt->bind_param("isi", $account_id, $current_related_type, $id);
+    $doc_stmt->execute();
+    $current_document = $doc_stmt->get_result()->fetch_assoc();
+}
+
 include '../includes/header.php';
 ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -200,6 +337,45 @@ include '../includes/header.php';
                             if (in_array($data['status'], ['CANCELLED', 'REJECTED', 'NO_SHOW'])) $badge = 'danger';
                         ?>
                         <span class="badge bg-<?php echo $badge; ?> fs-6 px-3 py-2"><?php echo htmlspecialchars(str_replace('_', ' ', $data['status'])); ?></span>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded border">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                            <div>
+                                <span class="text-muted fw-bold d-block"><i class="fas fa-file-pdf me-2"></i>Customer Document</span>
+                                <?php if ($current_document): ?>
+                                    <small class="text-muted">Uploaded <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($current_document['uploaded_at']))); ?></small>
+                                <?php else: ?>
+                                    <small class="text-muted">No document currently attached.</small>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ($current_document): ?>
+                                <a href="<?php echo htmlspecialchars(document_public_url($current_document['file_path'], '../')); ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3">
+                                    <i class="fas fa-eye me-2"></i>View
+                                </a>
+                            <?php endif; ?>
+                        </div>
+
+                        <form method="POST" enctype="multipart/form-data" id="resendDocumentForm" class="mb-3">
+                            <input type="hidden" name="action_type" value="resend_document">
+                            <label class="form-label fw-bold"><?php echo $current_document ? 'Resend / Replace Document' : 'Send Document'; ?></label>
+                            <div class="input-group">
+                                <input type="file" name="document" class="form-control" accept="application/pdf" required>
+                                <button type="submit" class="btn btn-dark fw-bold">
+                                    <i class="fas fa-paper-plane me-2"></i><?php echo $current_document ? 'Resend' : 'Upload'; ?>
+                                </button>
+                            </div>
+                            <small class="text-muted d-block mt-2">PDF only, max 5MB.</small>
+                        </form>
+
+                        <?php if ($current_document): ?>
+                            <form method="POST" id="deleteDocumentForm" class="m-0">
+                                <input type="hidden" name="action_type" value="delete_document">
+                                <button type="button" id="deleteDocumentBtn" class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-4">
+                                    <i class="fas fa-trash-alt me-2"></i>Delete Document
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -320,4 +496,49 @@ if (cancelAppointmentBtn) {
 }
 </script>
 <?php endif; ?>
+<script>
+const documentHasCurrent = <?php echo $current_document ? 'true' : 'false'; ?>;
+const resendDocumentForm = document.getElementById('resendDocumentForm');
+if (resendDocumentForm) {
+    resendDocumentForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            icon: 'question',
+            title: 'Resend Document?',
+            text: documentHasCurrent ? 'This will replace your current submitted document.' : 'This document will be submitted for this record.',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, resend',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#212529',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                resendDocumentForm.submit();
+            }
+        });
+    });
+}
+
+const deleteDocumentBtn = document.getElementById('deleteDocumentBtn');
+if (deleteDocumentBtn) {
+    deleteDocumentBtn.addEventListener('click', function () {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Delete Document?',
+            text: 'Are you sure you want to delete this document?',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteDocumentForm').submit();
+            }
+        });
+    });
+}
+</script>
 <?php include '../includes/footer.php'; ?>
