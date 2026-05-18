@@ -82,7 +82,13 @@ if ($is_afford || $dbType === 'affordable') {
 } else {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
-$finalFloorPlan = $baseDir . $floorPlanName;
+
+// FIX APPLIED HERE: Smart Environment Detection (Handles both local testing and server deployment flawlessly)
+if ($_SERVER['HTTP_HOST'] === 'localhost:3000' || $_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
+    $finalFloorPlan = $baseDir . $floorPlanName; 
+} else {
+    $finalFloorPlan = "../" . $baseDir . $floorPlanName; 
+}
 
 // 2. INTERNAL LAYOUT (Numeric Specification Matrix)
 $layoutHtml = "";
