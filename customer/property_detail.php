@@ -78,7 +78,7 @@ if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
 
-// Smart Environment Detection (Handles both local testing and server deployment flawlessly)
+// FIX APPLIED HERE: Smart Environment Detection (Handles both local testing and InfinityFree server deployment)
 if ($_SERVER['HTTP_HOST'] === 'localhost:3000' || $_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
     $finalFloorPlan = $baseDir . $floorPlanName; 
 } else {
