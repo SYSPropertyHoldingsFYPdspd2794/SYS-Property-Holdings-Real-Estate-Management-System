@@ -1,6 +1,7 @@
 <?php
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
+include_once '../includes/functions.php';
 
 // Secure the page
 protect_staff_page('STAFF', $conn);
@@ -78,7 +79,7 @@ $appointment_modals = '';
                                 <td><?php echo htmlspecialchars($row['project_name']); ?></td>
                                 <td>
                                     <?php if (!empty($row['file_path'])): ?>
-                                        <a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="<?php echo htmlspecialchars(document_public_url($row['file_path'], '../')); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-file-pdf me-1"></i>View
                                         </a>
                                     <?php else: ?>

@@ -86,4 +86,26 @@ function upload_profile_image($file, $role_prefix, $account_id, &$error_message)
 
     return '/storage/profile_images/' . $file_name;
 }
+
+function document_public_url($file_path, $root_prefix = '') {
+    $path = trim((string)$file_path);
+    if ($path === '') {
+        return '';
+    }
+
+    if (preg_match('#^https?://#i', $path)) {
+        return $path;
+    }
+
+    $path = str_replace('\\', '/', $path);
+    $path = preg_replace('#^\./+#', '', $path);
+    $path = preg_replace('#^/+#', '', $path);
+
+    while (strpos($path, '../') === 0) {
+        $path = substr($path, 3);
+    }
+
+    $prefix = trim((string)$root_prefix);
+    return $prefix === '' ? $path : rtrim($prefix, '/') . '/' . $path;
+}
 ?>

@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     $file_name = "app_" . $app_id . "_" . time() . ".pdf";
                     $target_file = $upload_dir . $file_name;
-                    $db_path = "/storage/docs/" . $file_name;
+                    $db_path = "storage/docs/" . $file_name;
                     
                     if (move_uploaded_file($tmp_name, $target_file)) {
                         $doc_type = 'EPF_STATEMENT_SUMMARY';

@@ -2,6 +2,7 @@
 // 1. Include dependencies
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
+include_once '../includes/functions.php';
 
 // 2. Validate session and restrict DB connection
 // This fixed the "Call to undefined function" error
@@ -84,7 +85,7 @@ $result = $stmt_apps->get_result();
                                     <td class="fw-bold text-success"><?php echo number_format($row['monthly_income'], 2); ?></td>
                                     <td><?php echo htmlspecialchars($row['project_name']); ?></td>
                                     <td>
-                                        <a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="<?php echo htmlspecialchars(document_public_url($row['file_path'], '../')); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-file-pdf"></i> View
                                         </a>
                                     </td>
