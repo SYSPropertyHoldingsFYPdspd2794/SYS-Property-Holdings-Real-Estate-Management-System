@@ -65,6 +65,7 @@ $appointment_modals = '';
                             <th>Customer Name</th>
                             <th>Phone Number</th>
                             <th>Property</th>
+                            <th>Service</th>
                             <th>Document</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -77,6 +78,9 @@ $appointment_modals = '';
                                 <td><?php echo htmlspecialchars($row['full_name']); ?></td>
                                 <td><?php echo htmlspecialchars($row['phone_number']); ?></td>
                                 <td><?php echo htmlspecialchars($row['project_name']); ?></td>
+                                <td>
+                                    <?php echo htmlspecialchars(str_replace('_', ' ', $row['service_type'])); ?>
+                                </td>
                                 <td>
                                     <?php if (!empty($row['file_path'])): ?>
                                         <a href="<?php echo htmlspecialchars(document_public_url($row['file_path'], '../')); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
