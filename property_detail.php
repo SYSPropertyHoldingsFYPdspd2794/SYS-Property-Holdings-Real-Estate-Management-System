@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: property_detail.php (ROOT DIRECTORY)
- * DESCRIPTION: Admin and Staff internal workspace. UI mirrored 100% with absolute forced JPG floor plan loading.
+ * DESCRIPTION: Admin and Staff internal workspace. Upgraded Internal Layout and 16-Region Proximity coverage.
  */
 
 include_once 'includes/header.php';
@@ -24,7 +24,7 @@ if (!$property) {
 $is_afford = (intval($property['is_affordable']) === 1);
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// IMAGE PATH
+// IMAGE PATH RESOLUTION
 $dbType = strtolower(trim($property['property_type']));
 $rawState = trim($property['state']);
 if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
@@ -43,11 +43,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
     if (file_exists($testPath)) { $finalImg = $testPath; break; }
 }
 
-// ------------------------------------------------------------------
-// PROPERTIES DESCRIPTION LOGIC (FIXED DYNAMIC DETECTOR)
-// ------------------------------------------------------------------
-
-// 1. FLOOR PLAN PATH (Strictly couples Affordable housing to Affordable_Floor_Plan.jpg without disk checks)
+// 1. FLOOR PLAN PATH RESOLUTION
 if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
     
@@ -67,107 +63,174 @@ if ($is_afford || $dbType === 'affordable') {
 } else {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
+
 $finalFloorPlan = $baseDir . $floorPlanName;
 
-// 2. INTERNAL LAYOUT (Numeric with Icons)
+// ==================================================================
+// SECTION 1: DETAILED INTERNAL LAYOUT SPECIFICATION
+// ==================================================================
 $layoutHtml = "";
 $sqft = intval($property['built_up_sqft']);
 
 if ($is_afford) {
     $layoutHtml = '
         <div class="row text-center g-4">
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Living Hall</h5></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Kitchen</h5></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5><p class="text-muted small mt-2 mb-0">Optimal family spacing</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5><p class="text-muted small mt-2 mb-0">Standard sanitary fittings</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Living Hall</h5><p class="text-muted small mt-2 mb-0">Open concept design</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Kitchen</h5><p class="text-muted small mt-2 mb-0">Ventilated cooking area</p></div></div>
         </div>';
 } else {
     if ($dbType === 'commercial') {
         $layoutHtml = '
             <div class="row text-center g-4">
-                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-store fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Open Layout Workspaces</h5></div></div>
-                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">1 Manager Office</h5></div></div>
-                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Restrooms</h5></div></div>
+                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-store fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Open Workspaces</h5><p class="text-muted small mt-2 mb-0">Flexible partition ready</p></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">1 Manager Office</h5><p class="text-muted small mt-2 mb-0">Private executive suite</p></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Restrooms</h5><p class="text-muted small mt-2 mb-0">Client & staff designated</p></div></div>
             </div>';
     } else {
         if ($dbType === 'bungalow') {
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">6 Bedrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bathrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Private Pool</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-car-side fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">3 Car Porches</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">6 Bedrooms</h5><p class="text-muted small mt-2 mb-0">Premium suite sizing</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bathrooms</h5><p class="text-muted small mt-2 mb-0">Luxury en-suite setups</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Private Pool</h5><p class="text-muted small mt-2 mb-0">Resort-style recreation</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-car-side fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">3 Car Porches</h5><p class="text-muted small mt-2 mb-0">Expansive driveway</p></div></div>
                 </div>';
         } elseif ($dbType === 'apartment') {
+            $rooms = ($sqft >= 1200) ? "4" : "3";
+            $baths = ($sqft >= 1200) ? "3" : "2";
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Gym Facility</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-water fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Public Pool</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5><p class="text-muted small mt-2 mb-0">High-rise scenic views</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5><p class="text-muted small mt-2 mb-0">Modern ventilation</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Gym Facility</h5><p class="text-muted small mt-2 mb-0">Resident exclusive access</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-water fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Public Pool</h5><p class="text-muted small mt-2 mb-0">Maintained infinity pool</p></div></div>
                 </div>';
         } else { 
             $rooms = ($sqft >= 1800) ? "5" : "4";
             $baths = ($sqft >= 1800) ? "4" : "3";
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-warehouse fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">2 Car Porches</h5></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm"><i class="fas fa-box-open fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Store Room</h5></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5><p class="text-muted small mt-2 mb-0">Multi-generational layout</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5><p class="text-muted small mt-2 mb-0">Functional water heating</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-warehouse fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">2 Car Porches</h5><p class="text-muted small mt-2 mb-0">Covered parking space</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-box-open fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Store Room</h5><p class="text-muted small mt-2 mb-0">Built-in storage solution</p></div></div>
                 </div>';
         }
     }
 }
 
-// 3. PROXIMITY (WITH PRECISE KM)
-$proximityHtml = "";
-switch ($property['state']) {
-    case 'Johor':
-        $proximityHtml = '
-            <div class="row g-4 fs-5 text-secondary">
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Teknologi Malaysia (UTM) <strong class="text-dark">3.2 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>AEON Mall Tebrau City <strong class="text-dark">5.5 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Sultanah Aminah Hospital <strong class="text-dark">8.1 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Senai International Airport <strong class="text-dark">18.0 KM</strong></span></div></div>
-            </div>';
-        break;
-    case 'Kuala Lumpur':
-        $proximityHtml = '
-            <div class="row g-4 fs-5 text-secondary">
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-danger fa-fw me-3"></i> <span>KLCC LRT Station <strong class="text-dark">1.2 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Pavilion Bukit Bintang <strong class="text-dark">2.0 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-success fa-fw me-3"></i> <span>International School of KL <strong class="text-dark">4.3 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-tree text-warning fa-fw me-3"></i> <span>Perdana Botanical Garden <strong class="text-dark">5.0 KM</strong></span></div></div>
-            </div>';
-        break;
-    case 'Penang':
-        $proximityHtml = '
-            <div class="row g-4 fs-5 text-secondary">
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-archway text-danger fa-fw me-3"></i> <span>Penang Bridge <strong class="text-dark">4.5 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-industry text-primary fa-fw me-3"></i> <span>Bayan Lepas FIZ <strong class="text-dark">6.2 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-success fa-fw me-3"></i> <span>Queensbay Mall <strong class="text-dark">3.8 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-warning fa-fw me-3"></i> <span>Penang General Hospital <strong class="text-dark">7.1 KM</strong></span></div></div>
-            </div>';
-        break;
-    case 'Selangor':
-        $proximityHtml = '
-            <div class="row g-4 fs-5 text-secondary">
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-danger fa-fw me-3"></i> <span>Sunway Pyramid Mall <strong class="text-dark">4.2 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-primary fa-fw me-3"></i> <span>Monash University <strong class="text-dark">3.5 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Subang Medical Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Nearest LRT Station <strong class="text-dark">1.8 KM</strong></span></div></div>
-            </div>';
-        break;
-    default:
-        $proximityHtml = '
-            <div class="row g-4 fs-5 text-secondary">
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Regional Secondary School <strong class="text-dark">1.5 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>Local Commercial Complex <strong class="text-dark">2.3 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Community Health Center <strong class="text-dark">3.0 KM</strong></span></div></div>
-                <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-bus text-warning fa-fw me-3"></i> <span>Central Bus Terminal <strong class="text-dark">4.2 KM</strong></span></div></div>
-            </div>';
+// ==================================================================
+// SECTION 2: 16 REGIONS PROXIMITY & NEIGHBORHOOD MAPPING
+// ==================================================================
+$proximityHtml = '<div class="row g-4 fs-5 text-secondary">';
+$stateCheck = strtoupper(trim($property['state']));
+
+if ($stateCheck === 'JOHOR') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Teknologi Malaysia (UTM) <strong class="text-dark">3.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>AEON Mall Tebrau City <strong class="text-dark">5.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Sultanah Aminah Hospital <strong class="text-dark">8.1 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Senai International Airport <strong class="text-dark">18.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'KEDAH') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Aman Central Mall <strong class="text-dark">3.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Sultanah Bahiyah <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Sultan Abdul Halim Airport <strong class="text-dark">12.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Utara Malaysia (UUM) <strong class="text-dark">15.5 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'KELANTAN') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Aeon Mall Kota Bharu <strong class="text-dark">4.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Hospital Raja Perempuan Zainab II <strong class="text-dark">3.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-danger fa-fw me-3"></i> <span>Siti Khadijah Market <strong class="text-dark">2.1 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Ismail Petra Airport <strong class="text-dark">9.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'MELAKA' || $stateCheck === 'MALACCA') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-map-signs text-danger fa-fw me-3"></i> <span>Jonker Street Heritage Area <strong class="text-dark">2.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Melaka General Hospital <strong class="text-dark">4.1 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Dataran Pahlawan Megamall <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-warning fa-fw me-3"></i> <span>Multimedia University (MMU) <strong class="text-dark">6.5 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'NEGERI SEMBILAN') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Palm Mall Seremban <strong class="text-dark">3.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Tuanku Ja\'afar <strong class="text-dark">4.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>UiTM Seremban Campus <strong class="text-dark">7.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store-alt text-warning fa-fw me-3"></i> <span>Seremban Gateway <strong class="text-dark">2.8 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'PAHANG') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>East Coast Mall <strong class="text-dark">4.1 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Hospital Tengku Ampuan Afzan <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-umbrella-beach text-warning fa-fw me-3"></i> <span>Teluk Cempedak Beach <strong class="text-dark">5.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Pahang <strong class="text-dark">18.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'PERAK') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Ipoh Parade Shopping Centre <strong class="text-dark">2.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Raja Permaisuri Bainun <strong class="text-dark">3.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Azlan Shah Airport <strong class="text-dark">6.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Teknologi PETRONAS <strong class="text-dark">14.5 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'PERLIS') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>C-Mart Arau Hypermarket <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Hospital Tuanku Fauziah <strong class="text-dark">5.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Perlis (UniMAP) <strong class="text-dark">8.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-warning fa-fw me-3"></i> <span>Arau KTM Railway Station <strong class="text-dark">3.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'PENANG' || $stateCheck === 'PULAU PINANG') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-archway text-danger fa-fw me-3"></i> <span>Penang Bridge <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-industry text-primary fa-fw me-3"></i> <span>Bayan Lepas Free Industrial Zone <strong class="text-dark">6.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-success fa-fw me-3"></i> <span>Queensbay Mall <strong class="text-dark">3.8 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-warning fa-fw me-3"></i> <span>Penang General Hospital <strong class="text-dark">7.1 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'SABAH') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Imago Shopping Mall <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Queen Elizabeth Hospital <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Kota Kinabalu International Airport <strong class="text-dark">7.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Malaysia Sabah (UMS) <strong class="text-dark">12.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'SARAWAK') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>The Spring Shopping Mall <strong class="text-dark">3.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Sarawak General Hospital <strong class="text-dark">4.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Kuching International Airport <strong class="text-dark">8.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Sarawak <strong class="text-dark">15.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'SELANGOR') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-danger fa-fw me-3"></i> <span>Sunway Pyramid Mall <strong class="text-dark">4.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-primary fa-fw me-3"></i> <span>Monash University Malaysia <strong class="text-dark">3.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Subang Jaya Medical Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Nearest LRT/MRT Station <strong class="text-dark">1.8 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'TERENGGANU') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>KTCC Mall <strong class="text-dark">2.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Hospital Sultanah Nur Zahirah <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Sultan Zainal Abidin <strong class="text-dark">9.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Mahmud Airport <strong class="text-dark">11.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'KUALA LUMPUR' || $stateCheck === 'WP KUALA LUMPUR') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-danger fa-fw me-3"></i> <span>KLCC LRT Station <strong class="text-dark">1.2 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Pavilion Bukit Bintang <strong class="text-dark">2.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-success fa-fw me-3"></i> <span>International School of KL (ISKL) <strong class="text-dark">4.3 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-tree text-warning fa-fw me-3"></i> <span>Perdana Botanical Garden <strong class="text-dark">5.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'LABUAN' || $stateCheck === 'WP LABUAN') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-building text-primary fa-fw me-3"></i> <span>Financial Park Labuan <strong class="text-dark">1.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Labuan Nucleus Hospital <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Labuan International School <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Labuan Airport <strong class="text-dark">5.0 KM</strong></span></div></div>';
+} elseif ($stateCheck === 'PUTRAJAYA' || $stateCheck === 'WP PUTRAJAYA') {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>IOI City Mall <strong class="text-dark">6.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Putrajaya <strong class="text-dark">4.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store-alt text-danger fa-fw me-3"></i> <span>Alamanda Shopping Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Putrajaya Sentral Station <strong class="text-dark">3.5 KM</strong></span></div></div>';
+} else {
+    $proximityHtml .= '
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Regional Secondary School <strong class="text-dark">1.5 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>Local Commercial Complex <strong class="text-dark">2.3 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Community Health Center <strong class="text-dark">3.0 KM</strong></span></div></div>
+        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-bus text-warning fa-fw me-3"></i> <span>Central Transit Hub <strong class="text-dark">4.2 KM</strong></span></div></div>';
 }
+$proximityHtml .= '</div>';
 ?>
 
 <div class="container my-5">
@@ -177,13 +240,20 @@ switch ($property['state']) {
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
-                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Internal View</span>
+                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Click to Enlarge</span>
                     </div>
                 </div>
 
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
+                        <div class="d-flex align-items-center gap-3">
+                            <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
+                            <form method="POST" class="m-0">
+                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'btn-danger' : 'btn-outline-danger'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
+                                    <i class="<?php echo $is_wishlisted ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
+                                </button>
+                            </form>
+                        </div>
                         <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
                             <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
                         </span>
@@ -194,7 +264,7 @@ switch ($property['state']) {
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
                             <h5 class="fw-bold text-danger mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Eligibility Restriction</h5>
-                            <p class="mb-0 text-dark">Subsidized unit. Household income must be <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>.</p>
+                            <p class="mb-0 text-dark">This is a government-subsidized unit. Applicants must have a combined household income <strong>Below RM <?php echo number_format($property['income_limit_rm'] ?? 0); ?></strong>. Documents must be verified offline.</p>
                         </div>
                     <?php endif; ?>
 
@@ -219,16 +289,16 @@ switch ($property['state']) {
 
         <div class="col-md-5 mb-4">
             <div class="card shadow-sm border-0 h-100 bg-light">
-                <div class="card-header bg-secondary text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2"></i>Internal Calculator</h4>
+                <div class="card-header bg-dark text-white p-4">
+                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Payment Estimator</h4>
                 </div>
                 <div class="card-body p-4 p-lg-5 d-flex flex-column">
-                    <h3 class="text-dark fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
+                    <h3 class="text-success fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Select Finance Bank</label>
-                        <select id="bankSelect" class="form-select border-secondary">
+                        <select id="bankSelect" class="form-select border-primary">
                             <?php while ($bank = $banks_result->fetch_assoc()): ?>
                                 <option data-rate="<?php echo $bank['interest_rate']; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?> (<?php echo $bank['interest_rate']; ?>%)</option>
                             <?php endwhile; ?>
@@ -236,9 +306,9 @@ switch ($property['state']) {
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Downpayment</label>
+                        <label class="form-label fw-bold">Downpayment (10% - 30%)</label>
                         <select id="downpayment" class="form-select">
-                            <option value="10">10%</option>
+                            <option value="10">10% (Minimum)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
                         </select>
@@ -251,16 +321,18 @@ switch ($property['state']) {
                         </div>
                     </div>
 
-                    <div class="p-4 bg-white border border-secondary border-opacity-25 rounded text-center shadow-sm mb-4">
-                        <p class="mb-1 text-muted fw-bold small">ESTIMATED INSTALLMENT</p>
-                        <h2 class="text-dark fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Rate: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                    <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
+                        <p class="mb-1 text-muted fw-bold small">MONTHLY REPAYMENT</p>
+                        <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
+                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
-                        <button class="btn btn-secondary btn-lg fw-bold py-3 shadow-sm" disabled>
-                            <i class="fas fa-lock me-2"></i>Internal Access Only
-                        </button>
+                        <?php if ($is_afford): ?>
+                            <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
+                        <?php else: ?>
+                            <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -302,20 +374,16 @@ switch ($property['state']) {
 </div>
 
 <style>
-    /* ANIMATION: DRIFT UP */
     @keyframes driftUp {
-        0% { opacity: 0; transform: translateY(40px); }
+        0% { opacity: 0; transform: translateY(60px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .reveal-card { animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-    
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    
-    /* CUSTOM RIGID SLIDER FOR STAFF VIEW */
     .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
-    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #6c757d; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
+    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
 </style>
 
 <script { sandbox: 'allow-scripts' }>
@@ -338,4 +406,4 @@ document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEvent
 window.onload = updateCalc;
 </script>
 
-<?php include_once 'includes/footer.php'; ?>
+<?php include_once '../includes/footer.php'; ?>
