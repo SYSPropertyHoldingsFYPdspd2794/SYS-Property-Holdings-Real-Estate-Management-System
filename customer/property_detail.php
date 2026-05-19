@@ -74,6 +74,20 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
 // 1. FLOOR PLAN PATH (Strictly couples Affordable housing to Affordable_Floor_Plan.jpg without disk checks)
 if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
+    
+    // Linux Web Hosting Strict Case-Sensitivity Scan Guard
+    $checkDir = "../SYS Property Catalog/";
+    if (!file_exists($checkDir . "Affordable_Floor_Plan.jpg")) {
+        if (file_exists($checkDir . "affordable_floor_plan.jpg")) {
+            $floorPlanName = "affordable_floor_plan.jpg";
+        } elseif (file_exists($checkDir . "Affordable_Floor_plan.jpg")) {
+            $floorPlanName = "Affordable_Floor_plan.jpg";
+        } elseif (file_exists($checkDir . "Affordable_Floor_Plan.JPG")) {
+            $floorPlanName = "Affordable_Floor_Plan.JPG";
+        } elseif (file_exists($checkDir . "affordable_floor_plan.JPG")) {
+            $floorPlanName = "affordable_floor_plan.JPG";
+        }
+    }
 } else {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
