@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/book_appointment.php
- * DESCRIPTION: Book showroom appointments with capacity and time conflict validation.
+ * DESCRIPTION: Book showroom appointments with capacity, hour/half-hour alignment, and time conflict validation.
  */
 
 session_start();
@@ -31,6 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Please select a valid future appointment date and time.";
     } elseif ($appointment_dt->format('H:i:s') < '08:00:00' || $appointment_dt->format('H:i:s') > '20:00:00') {
         $error = "Appointments are available from 8:00 AM to 8:00 PM. Please choose a time in this range.";
+    } 
+    // ENHANCEMENT: Server-side validation to enforce strictly sharp hour or half-hour selection matrices
+    elseif ($appointment_dt->format('i') !== '00' && $appointment_dt->format('i') !== '30') {
+        $error = "Invalid slot alignment: Appointments must be scheduled strictly on the hour or half-hour mark (e.g., 10:00 or 10:30).";
     } else {
         $count_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW')");
         $count_stmt->bind_param("s", $date);
@@ -40,14 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($day_total >= 3) {
             $error = "Capacity reached: This date already has 3 scheduled appointments. Please choose another day.";
         } else {
-            // Updated query to sort by time so we get the accurate target slot details
             $conflict_stmt = $conn->prepare("SELECT appointment_time FROM appointments WHERE appointment_date = ? AND status NOT IN ('CANCELLED', 'NO_SHOW') AND ABS(TIME_TO_SEC(TIMEDIFF(appointment_time, ?))) < 7200 ORDER BY appointment_time ASC LIMIT 1");
             $conflict_stmt->bind_param("ss", $date, $time_for_db);
             $conflict_stmt->execute();
             $conflict = $conflict_stmt->get_result()->fetch_assoc();
 
             if ($conflict) {
-                // Dynamically computes and sets the next safe open time block 2 hours out
                 $conflicting_time = $conflict['appointment_time'];
                 $suggested_time = date('h:i A', strtotime($conflicting_time . ' +2 hours'));
                 
@@ -151,8 +153,8 @@ include '../includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Preferred Time</label>
-                                <input type="time" name="appointment_time" class="form-control form-control-lg bg-light" min="08:00" max="20:00" required>
-                                <small class="text-muted d-block mt-2">Available time: 8:00 AM to 8:00 PM. Appointments must be at least 2 hours apart.</small>
+                                <input type="time" name="appointment_time" class="form-control form-control-lg bg-light" min="08:00" max="20:00" step="1800" required>
+                                <small class="text-muted d-block mt-2">Available time: 8:00 AM to 8:00 PM. Appointments must be structured in hour or half-hour slots and at least 2 hours apart.</small>
                             </div>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded-4 border border-secondary border-opacity-25">
