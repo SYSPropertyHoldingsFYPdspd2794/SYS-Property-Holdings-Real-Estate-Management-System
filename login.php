@@ -71,9 +71,14 @@ include 'includes/header.php';
                             <label class="form-label fw-bold">Email Address</label>
                             <input type="email" name="email" class="form-control" required>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-2">
                             <label class="form-label fw-bold">Password</label>
                             <input type="password" name="password" class="form-control" required>
+                        </div>
+                        <div class="text-end mb-4">
+                            <a href="https://wa.link/bzspzh" target="_blank" rel="noopener noreferrer" class="small fw-bold text-decoration-none">
+                                Forgot Password?
+                            </a>
                         </div>
                         <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-primary btn-lg">Login</button>
