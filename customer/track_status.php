@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/track_status.php
- * DESCRIPTION: US29 - Track application and appointment statuses with context-aware plus button filtering.
+ * DESCRIPTION: US29 - Track application and appointment statuses with context-aware filtering, flat layout cards, and multi-stage workflow timelines.
  */
 
 session_start();
@@ -29,12 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action_type'] ?? '') === '
     $conn->begin_transaction();
     try {
         $delete_docs_stmt = $conn->prepare("DELETE d FROM documents d
-                                            JOIN appointments a ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = a.appointment_id
-                                            WHERE a.customer_id = ? AND a.appointment_id = ?
+                                            JOIN appointments a ON d.related_to_type = 'APPOINTMENT' && d.related_to_id = a.appointment_id
+                                            WHERE a.customer_id = ? && a.appointment_id = ?
                                             AND (a.status = 'CANCELLED' OR a.status = 'NO_SHOW')");
 
         $delete_appt_stmt = $conn->prepare("DELETE FROM appointments 
-                                            WHERE customer_id = ? AND appointment_id = ? 
+                                            WHERE customer_id = ? && appointment_id = ? 
                                             AND (status = 'CANCELLED' OR status = 'NO_SHOW')");
 
         $deleted_count = 0;
@@ -182,11 +182,15 @@ include '../includes/header.php';
                 <div class="row">
                     <?php if ($applications->num_rows > 0): ?>
                         <?php while ($row = $applications->fetch_assoc()): ?>
-                            <div class="col-md-6 mb-4">
-                                <div class="card shadow-sm border-0 border-start border-success border-5 h-100 rounded-4">
-                                    <div class="card-body p-4 d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h4 class="fw-bold m-0 text-truncate" style="max-width: 65%;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                            <div class="col-12 mb-4">
+                                <div class="card shadow-sm border-0 border-start border-success border-5 rounded-4">
+                                    <div class="card-body p-4 p-md-5">
+                                        
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                                            <div>
+                                                <h3 class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($row['project_name']); ?></h3>
+                                                <p class="text-muted fs-5 m-0"><i class="fas fa-map-marker-alt text-danger me-2"></i><?php echo htmlspecialchars($row['state']); ?></p>
+                                            </div>
                                             <?php
                                                 $bg = 'secondary';
                                                 if ($row['status'] === 'PENDING_REVIEW') $bg = 'warning text-dark';
@@ -194,21 +198,76 @@ include '../includes/header.php';
                                                 if ($row['status'] === 'WINNER') $bg = 'success';
                                                 if ($row['status'] === 'REJECTED') $bg = 'danger';
                                             ?>
-                                            <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars(str_replace('_', ' ', $row['status'])); ?></span>
-                                        </div>
-                                        <p class="text-muted fs-5 mb-3"><i class="far fa-clock text-primary me-2"></i>Applied on: <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></p>
-                                        
-                                        <div class="mt-auto pt-2">
-                                            <a href="adjust_appointment.php?type=housing&id=<?php echo $row['application_id']; ?>" class="btn btn-outline-success btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-file-alt me-2"></i>View Application Summary</a>
+                                            <span class="badge bg-<?php echo $bg; ?> fs-5 px-4 py-2.5 shadow-sm rounded-pill text-uppercase"><?php echo htmlspecialchars(str_replace('_', ' ', $row['status'])); ?></span>
                                         </div>
 
-                                        <?php if ($row['status'] === 'WINNER'): ?>
-                                            <div class="mt-3 p-3 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-50">
-                                                <p class="m-0 small fw-bold text-success"><i class="fas fa-trophy me-2 fa-lg"></i>Congratulations! Selected in ballots. Awaiting verification instructions.</p>
+                                        <div class="py-4 my-2 border-top border-bottom border-light">
+                                            <h6 class="text-uppercase tracking-wider fw-bold text-secondary small mb-4"><i class="fas fa-tasks me-2"></i>Application Pipeline Progress Matrix</h6>
+                                            <div class="timeline-container d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center position-relative gap-4 gap-md-2">
+                                                <div class="timeline-line d-none d-md-block"></div>
+                                                
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <div class="step-icon bg-success text-white shadow"><i class="fas fa-file-import"></i></div>
+                                                    <div class="fw-bold text-dark mt-2 small">1. Documents Submitted</div>
+                                                    <div class="text-muted font-monospace tiny-time"><?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></div>
+                                                </div>
+
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <?php if ($row['status'] !== 'PENDING_REVIEW'): ?>
+                                                        <div class="step-icon bg-success text-white shadow"><i class="fas fa-user-check"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">2. Regional Verification</div>
+                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-check me-1"></i>Verified Complete</div>
+                                                    <?php else: ?>
+                                                        <div class="step-icon bg-warning text-dark shadow"><i class="fas fa-spinner fa-spin"></i></div>
+                                                        <div class="fw-bold text-muted mt-2 small">2. Regional Verification</div>
+                                                        <div class="text-warning font-monospace tiny-time fw-bold">Awaiting Review...</div>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <?php if ($row['status'] === 'WINNER'): ?>
+                                                        <div class="step-icon bg-success text-white shadow"><i class="fas fa-trophy"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-star me-1"></i>Selected in Draw!</div>
+                                                    <?php elseif ($row['status'] === 'REJECTED'): ?>
+                                                        <div class="step-icon bg-danger text-white shadow"><i class="fas fa-times"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-danger font-monospace tiny-time fw-bold">Disqualified</div>
+                                                    <?php elseif ($row['status'] === 'APPROVED_FOR_DRAW'): ?>
+                                                        <div class="step-icon bg-info text-dark shadow"><i class="fas fa-ticket-alt"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-info font-monospace tiny-time fw-bold">Awaiting Draw Runs</div>
+                                                    <?php else: ?>
+                                                        <div class="step-icon bg-light text-muted border"><i class="fas fa-hourglass-start"></i></div>
+                                                        <div class="fw-bold text-muted mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-muted font-monospace tiny-time">Pending Stage 2</div>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
-                                        <?php elseif ($row['status'] === 'REJECTED'): ?>
-                                            <div class="mt-3 p-3 bg-danger bg-opacity-10 rounded-3 border border-danger border-opacity-50">
-                                                <p class="m-0 small fw-bold text-danger"><i class="fas fa-times-circle me-2"></i>Application did not meet state DDL parameters.</p>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3">
+                                            <p class="text-muted m-0 small"><i class="far fa-clock text-primary me-2"></i>Submission Registered: <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></p>
+                                            <div>
+                                                <a href="adjust_appointment.php?type=housing&id=<?php echo $row['application_id']; ?>" class="btn btn-outline-success rounded-pill fw-bold px-4 py-2"><i class="fas fa-file-invoice me-2"></i>View Application Summary / Uploads</a>
+                                            </div>
+                                        </div>
+
+                                        <?php if ($row['status'] === 'REJECTED'): ?>
+                                            <div class="alert alert-danger border-0 shadow-sm p-4 mt-4 mb-0 rounded-3" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="fas fa-times-circle text-danger fa-lg me-3 mt-1"></i>
+                                                    <div>
+                                                        <h6 class="fw-bold text-danger mb-1">Application Request Disqualified</h6>
+                                                        <p class="mb-0 text-dark font-monospace fw-bold small">Sorry you’re dont match the application requirement. You still can try other Affodable House Application</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <?php if ($row['status'] === 'WINNER'): ?>
+                                            <div class="mt-4 p-4 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-50 mb-0">
+                                                <p class="m-0 fw-bold text-success"><i class="fas fa-trophy me-2 fa-lg animate-bounce"></i>Congratulations! Your application has been successfully drawn in the state ballot allocation pool. Our housing officers will contact you shortly for contract signing parameters.</p>
                                             </div>
                                         <?php endif; ?>
                                     </div>
@@ -228,8 +287,19 @@ include '../includes/header.php';
     </form>
 </div>
 
+<style>
+    .timeline-container { position: relative; width: 100%; }
+    .timeline-line { position: absolute; top: 20px; left: 5%; width: 90%; height: 4px; background-color: #e9ecef; z-index: 1; }
+    .step-icon { width: 45px; height: 45px; border-radius: 50%; background-color: #fff; border: 3px solid #e9ecef; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 16px; transition: all 0.3s ease; }
+    .tiny-time { font-size: 11px; margin-top: 2px; display: block; }
+    @media (max-width: 767.98px) {
+        .step-icon { margin: 0; display: inline-flex; }
+        .timeline-step { padding-left: 60px; text-align: left !important; width: 100%; }
+        .timeline-step .step-icon { position: absolute; left: 0; top: 0; }
+    }
+</style>
+
 <script { sandbox: 'allow-scripts' }>
-// ENHANCEMENT: Listen to Bootstrap pill tab switches to toggle the context-aware plus button target
 document.addEventListener('DOMContentLoaded', function () {
     const plusBtn = document.getElementById('dynamicPlusBtn');
     const apptTab = document.getElementById('appt-tab');
@@ -243,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (housingTab) {
             housingTab.addEventListener('shown.bs.tab', function () {
-                // Instantly injects the filter parameter when user switches to Housing summary panel
                 plusBtn.setAttribute('href', 'properties.php?filter_type=AFFORDABLE');
             });
         }

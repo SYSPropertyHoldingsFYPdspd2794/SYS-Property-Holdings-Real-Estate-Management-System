@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/property_detail.php
- * DESCRIPTION: Customer view. Upgraded Internal Layout and 16-Region Proximity coverage.
+ * DESCRIPTION: Customer view. Upgraded Internal Layout, 16-Region Proximity coverage, and SOLD OUT security block bounds.
  */
 
 include_once '../includes/header.php';
@@ -46,6 +46,7 @@ $is_wish_stmt->execute();
 $is_wishlisted = ($is_wish_stmt->get_result()->num_rows > 0);
 
 $is_afford = (intval($property['is_affordable']) === 1);
+$is_sold_out = (trim($property['status']) === 'SOLD_OUT');
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
 // CATALOG MAIN IMAGE RESOLUTION
@@ -282,9 +283,13 @@ $proximityHtml .= '</div>';
                                 </button>
                             </form>
                         </div>
-                        <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
-                            <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
-                        </span>
+                        <?php if ($is_sold_out): ?>
+                            <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm text-white">SOLD OUT</span>
+                        <?php else: ?>
+                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
+                                <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
 
                     <p class="fs-5 text-muted mb-4"><i class="fas fa-map-marker-alt text-danger me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
@@ -304,7 +309,7 @@ $proximityHtml .= '</div>';
                         </div>
                         <div class="col-4 border-end">
                             <small class="d-block text-muted fw-bold mb-1">AVAILABLE UNITS</small>
-                            <span class="fs-4 fw-bold text-success"><?php echo $property['total_units']; ?></span>
+                            <span class="fs-4 fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-success'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
                         </div>
                         <div class="col-4">
                             <small class="d-block text-muted fw-bold mb-1">PROPERTY CODE</small>
@@ -356,10 +361,16 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="d-grid mt-auto">
-                        <?php if ($is_afford): ?>
-                            <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
+                        <?php if ($is_sold_out): ?>
+                            <button type="button" class="btn btn-danger btn-lg fw-bold py-3 shadow" disabled>
+                                <i class="fas fa-lock me-2"></i>SOLD OUT
+                            </button>
                         <?php else: ?>
-                            <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
+                            <?php if ($is_afford): ?>
+                                <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
+                            <?php else: ?>
+                                <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </div>
