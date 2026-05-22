@@ -4,7 +4,7 @@ if (!isset($root_prefix)) {
     $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
 }
 ?>
-<footer class="bg-dark text-light py-5 mt-5 border-top border-secondary border-opacity-25" style="background-color: #111418 !important;">
+<footer class="luxury-footer text-light py-5 mt-5 border-top border-secondary border-opacity-25">
     <div class="container py-3">
         <div class="row g-4">
             <div class="col-lg-4 mb-4 mb-lg-0">
