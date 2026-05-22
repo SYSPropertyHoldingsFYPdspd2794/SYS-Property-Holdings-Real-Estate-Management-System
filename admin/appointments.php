@@ -46,7 +46,7 @@ include '../includes/header.php';
                         $assign_modals = '';
                         while ($row = $res->fetch_assoc()): 
                             $state = $row['state'];
-                            $staff_res = $conn->prepare("SELECT staff_id, full_name FROM staff WHERE assigned_state = ?");
+                            $staff_res = $conn->prepare("SELECT staff_id, full_name, assigned_state FROM staff ORDER BY CASE WHEN assigned_state = ? THEN 0 ELSE 1 END, assigned_state, full_name");
                             $staff_res->bind_param("s", $state);
                             $staff_res->execute();
                             $staff_list = $staff_res->get_result();
@@ -83,7 +83,12 @@ include '../includes/header.php';
                                                         <select name="assigned_staff_id" class="form-select" required>
                                                             <option value="">Select Staff...</option>
                                                             <?php foreach ($staff_members as $s): ?>
-                                                                <option value="<?php echo $s['staff_id']; ?>"><?php echo htmlspecialchars($s['full_name']); ?></option>
+                                                                <?php
+                                                                    $staff_state = $s['assigned_state'] ?: 'Unassigned';
+                                                                    $is_recommended = $s['assigned_state'] === $state;
+                                                                    $staff_label = $staff_state . ' - ' . $s['full_name'] . ($is_recommended ? ' (Recommended)' : '');
+                                                                ?>
+                                                                <option value="<?php echo $s['staff_id']; ?>"><?php echo htmlspecialchars($staff_label); ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
                                                     </div>
