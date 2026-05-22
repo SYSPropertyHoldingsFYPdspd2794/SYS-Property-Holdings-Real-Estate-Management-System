@@ -36,7 +36,7 @@ include '../includes/header.php';
         <div class="col-md-3">
             <div class="card bg-dark text-white shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <h6 class="text-uppercase text-muted mb-2">Total Active Properties</h6>
+                    <h6 class="text-uppercase text-light mb-2">Total Active Properties</h6>
                     <h2 class="fw-bold"><?php echo $total_prop; ?></h2>
                 </div>
             </div>
@@ -44,7 +44,7 @@ include '../includes/header.php';
         <div class="col-md-3">
             <div class="card bg-primary text-white shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <h6 class="text-uppercase text-white-50 mb-2">Pending Leads</h6>
+                    <h6 class="text-uppercase text-white mb-2">Pending Leads</h6>
                     <h2 class="fw-bold"><?php echo $total_leads; ?></h2>
                 </div>
             </div>
@@ -52,15 +52,15 @@ include '../includes/header.php';
         <div class="col-md-3">
             <div class="card bg-success text-white shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <h6 class="text-uppercase text-white-50 mb-2">Housing Applications</h6>
+                    <h6 class="text-uppercase text-white mb-2">Housing Applications</h6>
                     <h2 class="fw-bold"><?php echo $total_app; ?></h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white shadow-sm border-0">
+            <div class="card bg-info text-dark shadow-sm border-0">
                 <div class="card-body p-4 text-center">
-                    <h6 class="text-uppercase text-white-50 mb-2">Total Customers</h6>
+                    <h6 class="text-uppercase text-dark mb-2">Total Customers</h6>
                     <h2 class="fw-bold"><?php echo $total_cust; ?></h2>
                 </div>
             </div>

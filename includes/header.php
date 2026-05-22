@@ -108,6 +108,14 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--luxury-gold) !important;
     border-color: var(--luxury-gold) !important;
 }
+.bg-info.text-white,
+.badge.bg-info.text-white,
+.btn-info.text-white,
+.bg-warning.text-white,
+.badge.bg-warning.text-white,
+.btn-warning.text-white {
+    color: #11151b !important;
+}
 footer.luxury-footer {
     background: #07080d !important;
     color: var(--luxury-muted) !important;
