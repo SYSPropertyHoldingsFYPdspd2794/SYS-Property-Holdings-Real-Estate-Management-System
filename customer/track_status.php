@@ -29,282 +29,296 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action_type'] ?? '') === '
     $conn->begin_transaction();
     try {
         $delete_docs_stmt = $conn->prepare("DELETE d FROM documents d
-                                            JOIN appointments a ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = a.appointment_id
-                                            WHERE a.customer_id = ? AND a.appointment_id = ?
-                                            AND (a.status = 'CANCELLED' OR a.appointment_date < CURDATE())");
-        
-        $delete_appt_stmt = $conn->prepare("DELETE FROM appointments 
-                                            WHERE customer_id = ? AND appointment_id = ? 
-                                            AND (status = 'CANCELLED' OR appointment_date < CURDATE())");
+                                            JOIN appointments a ON d.related_to_type = 'APPOINTMENT' && d.related_to_id = a.appointment_id
+                                            WHERE a.customer_id = ? && a.appointment_id = ?
+                                            AND (a.status = 'CANCELLED' OR a.status = 'NO_SHOW')");
 
-        foreach ($selected_ids as $id) {
-            $delete_docs_stmt->bind_param("ii", $account_id, $id);
+        $delete_appt_stmt = $conn->prepare("DELETE FROM appointments 
+                                            WHERE customer_id = ? && appointment_id = ? 
+                                            AND (status = 'CANCELLED' OR status = 'NO_SHOW')");
+
+        $deleted_count = 0;
+        foreach ($selected_ids as $appt_id) {
+            $delete_docs_stmt->bind_param("ii", $account_id, $appt_id);
             $delete_docs_stmt->execute();
 
-            $delete_appt_stmt->bind_param("ii", $account_id, $id);
+            $delete_appt_stmt->bind_param("ii", $account_id, $appt_id);
             $delete_appt_stmt->execute();
+            if ($delete_appt_stmt->affected_rows > 0) {
+                $deleted_count++;
+            }
         }
 
-        $conn->commit();
-        header("Location: track_status.php?delete_msg=success");
-        exit();
+        if ($deleted_count > 0) {
+            $conn->commit();
+            header("Location: track_status.php?delete_msg=success&count=" . $deleted_count);
+            exit();
+        } else {
+            $conn->rollback();
+            header("Location: track_status.php?delete_msg=not_eligible");
+            exit();
+        }
     } catch (Exception $e) {
         $conn->rollback();
-        header("Location: track_status.php?delete_msg=error");
-        exit();
+        $delete_error = "System error occurred while deleting appointments.";
     }
 }
 
 if (isset($_GET['delete_msg'])) {
     if ($_GET['delete_msg'] === 'success') {
-        $delete_message = "Selected historical records purged successfully.";
-    } elseif ($_GET['delete_msg'] === 'error') {
-        $delete_error = "Database integrity exception during batch purge.";
+        $count = intval($_GET['count'] ?? 1);
+        $delete_message = "Successfully cleared " . $count . " archived appointment record(s) from your history tracking.";
+    } elseif ($_GET['delete_msg'] === 'none') {
+        $delete_error = "No appointment selections detected. Please select entries via checkboxes.";
+    } elseif ($_GET['delete_msg'] === 'not_eligible') {
+        $delete_error = "Selected records cannot be cleared. Only CANCELLED or EXPIRED records can be deleted.";
     }
 }
 
-// FETCH HOUSING APPLICATIONS
-$apps_query = "SELECT aha.application_id, aha.status, aha.application_date, p.project_name, p.property_code, p.state, p.price, p.image_filename 
-               FROM affordable_housing_applications aha
-               JOIN properties p ON aha.property_id = p.property_id
-               WHERE aha.customer_id = ?
-               ORDER BY aha.application_date DESC";
-$apps_stmt = $conn->prepare($apps_query);
-$apps_stmt->bind_param("i", $account_id);
-$apps_stmt->execute();
-$apps_result = $apps_stmt->get_result();
+$success_msg = isset($_GET['success']) ? trim($_GET['success']) : '';
 
-// FETCH APPOINTMENTS
-$appts_query = "SELECT a.appointment_id, a.service_type, a.appointment_date, a.appointment_time, a.status, a.staff_remarks, p.project_name, p.property_code
-                FROM appointments a
-                JOIN properties p ON a.property_id = p.property_id
-                WHERE a.customer_id = ?
-                ORDER BY a.appointment_date DESC, a.appointment_time DESC";
-$appts_stmt = $conn->prepare($appts_query);
-$appts_stmt->bind_param("i", $account_id);
-$appts_stmt->execute();
-$appts_result = $appts_stmt->get_result();
+$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? ORDER BY a.appointment_date DESC");
+$appt_stmt->bind_param("i", $account_id);
+$appt_stmt->execute();
+$appointments = $appt_stmt->get_result();
+
+$app_stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price FROM affordable_housing_applications ah JOIN properties p ON ah.property_id = p.property_id WHERE ah.customer_id = ? ORDER BY ah.application_date DESC");
+$app_stmt->bind_param("i", $account_id);
+$app_stmt->execute();
+$applications = $app_stmt->get_result();
 
 include '../includes/header.php';
 ?>
+<div class="container my-5">
+    <h2 class="fw-bold mb-5"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
+    
+    <?php if ($success_msg === 'appointment_booked'): ?>
+        <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-check-circle me-2"></i>Your showroom appointment request has been successfully submitted!</div>
+    <?php elseif ($success_msg === 'application_submitted'): ?>
+        <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-check-circle me-2"></i>Your affordable housing application and documents were securely submitted.</div>
+    <?php endif; ?>
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">Asset Pipeline Tracking</h2>
-            <p class="text-muted small mb-0">Real-time status updates for housing registrations and showroom appointments.</p>
-        </div>
-        <a href="properties.php" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm">
-            <i class="fas fa-plus me-1"></i> New Registration
+    <?php if ($delete_message !== ''): ?>
+        <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-trash-alt me-2"></i><?php echo htmlspecialchars($delete_message); ?></div>
+    <?php endif; ?>
+    <?php if ($delete_error !== ''): ?>
+        <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($delete_error); ?></div>
+    <?php endif; ?>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+        <ul class="nav nav-pills" id="trackerTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active px-4 py-3 fw-bold fs-5 shadow-sm me-3 rounded-pill" id="appt-tab" data-bs-toggle="pill" data-bs-target="#appt" type="button" role="tab"><i class="far fa-calendar-alt me-2"></i>Showroom Appointments</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link px-4 py-3 fw-bold fs-5 shadow-sm rounded-pill" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab"><i class="fas fa-home me-2"></i>Housing Applications</button>
+            </li>
+        </ul>
+        <a href="properties.php" id="dynamicPlusBtn" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Browse Properties Catalog">
+            <i class="fas fa-plus"></i>
         </a>
     </div>
 
-    <?php if ($delete_message): ?>
-        <div class="alert alert-success fw-bold small shadow-sm"><?php echo htmlspecialchars($delete_message); ?></div>
-    <?php endif; ?>
-    <?php if ($delete_error): ?>
-        <div class="alert alert-danger fw-bold small shadow-sm"><?php echo htmlspecialchars($delete_error); ?></div>
-    <?php endif; ?>
-
-    <ul class="nav nav-pills mb-4 bg-light p-1 rounded-3 d-inline-flex" id="pipelineTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold px-4 rounded-3" id="housing-tab" data-bs-toggle="tab" data-bs-target="#housing" type="button" role="tab" aria-controls="housing" aria-selected="true">
-                <i class="fas fa-home me-2"></i>Housing Applications (<?php echo $apps_result->num_rows; ?>)
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold px-4 rounded-3" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false">
-                <i class="fas fa-calendar-check me-2"></i>Showroom Appointments (<?php echo $appts_result->num_rows; ?>)
-            </button>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="pipelineTabsContent">
-        
-        <div class="tab-pane fade show active" id="housing" role="tablist" aria-labelledby="housing-tab">
-            <?php if ($apps_result->num_rows === 0): ?>
-                <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
-                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                    <h5 class="fw-bold text-secondary">No Active Schemes Registered</h5>
-                    <p class="text-muted small">Explore our database to register for affordable housing options.</p>
-                </div>
-            <?php else: ?>
-                <div class="row g-4">
-                    <?php while ($app = $apps_result->fetch_assoc()): ?>
-                        <div class="col-12">
-                            <div class="card border shadow-sm rounded-4 overflow-hidden bg-white">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-md-2 bg-light text-center py-4 border-end">
-                                        <?php 
-                                        $img_url = "../storage/properties/" . (!empty($app['image_filename']) ? $app['image_filename'] : 'default.jpg');
-                                        if (!file_exists($img_url)) $img_url = "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=600&auto=format&fit=crop";
-                                        ?>
-                                        <img src="<?php echo $img_url; ?>" class="img-fluid rounded-3 shadow-sm mx-auto" style="width: 100px; height: 100px; object-fit: cover;" alt="Scheme Asset">
-                                    </div>
-                                    <div class="col-md-6 p-4">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <span class="badge bg-secondary px-2 py-1 rounded small me-2"><?php echo htmlspecialchars($app['property_code']); ?></span>
-                                            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i><?php echo htmlspecialchars($app['state']); ?></small>
-                                        </div>
-                                        <h5 class="fw-bold text-dark mb-2"><?php echo htmlspecialchars($app['project_name']); ?></h5>
-                                        <div class="text-success fw-bold mb-3">RM <?php echo number_format($app['price'], 2); ?></div>
-                                        
-                                        <div class="position-relative mt-4 pt-2">
-                                            <div class="progress" style="height: 4px;">
-                                                <?php 
-                                                $pct = 25;
-                                                if ($app['status'] === 'APPROVED_FOR_DRAW') $pct = 60;
-                                                if ($app['status'] === 'WINNER') $pct = 100;
-                                                if ($app['status'] === 'REJECTED') $pct = 100;
-                                                ?>
-                                                <div class="progress-bar <?php echo $app['status'] === 'REJECTED' ? 'bg-danger' : 'bg-dark'; ?>" role="progressbar" style="width: <?php echo $pct; ?>%;"></div>
-                                            </div>
-                                            <div class="d-flex justify-content-between position-absolute top-0 w-100" style="margin-top: -6px;">
-                                                <div class="text-center">
-                                                    <span class="d-block bg-dark text-white rounded-circle shadow-sm" style="width:16px; height:16px; margin:0 auto;"></span>
-                                                    <small class="d-block text-muted tiny mt-1 fw-bold">Submitted</small>
-                                                </div>
-                                                <div class="text-center">
-                                                    <span class="d-block <?php echo ($pct >= 60 && $app['status'] !== 'REJECTED') ? 'bg-dark' : 'bg-secondary'; ?> text-white rounded-circle shadow-sm" style="width:16px; height:16px; margin:0 auto;"></span>
-                                                    <small class="d-block text-muted tiny mt-1 <?php echo ($pct >= 60) ? 'fw-bold text-dark' : ''; ?>">Review Status</small>
-                                                </div>
-                                                <div class="text-center">
-                                                    <span class="d-block <?php echo ($pct === 100) ? ($app['status'] === 'REJECTED' ? 'bg-danger' : 'bg-success') : 'bg-secondary'; ?> text-white rounded-circle shadow-sm" style="width:16px; height:16px; margin:0 auto;"></span>
-                                                    <small class="d-block text-muted tiny mt-1 <?php echo ($pct === 100) ? 'fw-bold text-dark' : ''; ?>">Resolution</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 p-4 border-start text-center bg-light-subtle h-100">
-                                        <div class="mb-3">
-                                            <span class="small text-muted d-block mb-1">Current Matrix State</span>
-                                            <?php if ($app['status'] === 'PENDING_REVIEW'): ?>
-                                                <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill"><i class="fas fa-hourglass-half me-1"></i> PENDING REVIEW</span>
-                                            <?php elseif ($app['status'] === 'APPROVED_FOR_DRAW'): ?>
-                                                <span class="badge bg-info text-dark fw-bold px-3 py-2 rounded-pill"><i class="fas fa-ticket-alt me-1"></i> APPROVED FOR DRAW</span>
-                                            <?php elseif ($app['status'] === 'WINNER'): ?>
-                                                <span class="badge bg-success fw-bold px-3 py-2 rounded-pill"><i class="fas fa-trophy me-1"></i> CONGRATULATIONS: WINNER</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger fw-bold px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i> APPLICATION REJECTED</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="small text-muted mb-3"><i class="fas fa-clock me-1"></i> Logged: <?php echo date('Y-m-d', strtotime($app['application_date'])); ?></div>
-                                        
-                                        <a href="adjust_appointment.php?type=application&id=<?php echo $app['application_id']; ?>" class="btn btn-sm btn-outline-dark fw-bold rounded-pill px-4">
-                                            <i class="fas fa-sliders-h me-1"></i> Manage Application
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
-            <form id="deleteAppointmentsForm" method="POST">
-                <input type="hidden" name="action_type" value="delete_appointments">
-                
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small text-muted">To drop an expired or cancelled schedule, select the card option framework.</span>
-                    <button type="button" id="deleteSelectedAppointmentsBtn" class="btn btn-sm btn-outline-danger fw-bold px-3 rounded-pill" disabled>
-                        <i class="fas fa-trash-alt me-1"></i> Purge Selected History
+    <form id="deleteAppointmentsForm" method="POST" action="track_status.php">
+        <input type="hidden" name="action_type" value="delete_appointments">
+        <div class="tab-content" id="trackerTabsContent">
+            
+            <div class="tab-pane fade show active" id="appt" role="tabpanel">
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" id="deleteSelectedAppointmentsBtn" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm" disabled>
+                        <i class="fas fa-trash-alt me-1"></i>Delete Selected
                     </button>
                 </div>
-
-                <?php if ($appts_result->num_rows === 0): ?>
-                    <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
-                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                        <h5 class="fw-bold text-secondary">No Showroom Visits Scheduled</h5>
-                        <p class="text-muted small">You haven't requested any site allocations or direct corporate consults.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="row g-3">
-                        <?php while ($appt = $appts_result->fetch_assoc()): ?>
-                            <?php 
-                            $is_historical = ($appt['status'] === 'CANCELLED' || strtotime($appt['appointment_date']) < strtotime(date('Y-m-d')));
-                            ?>
-                            <div class="col-md-6">
-                                <div class="card border shadow-sm rounded-4 bg-white position-relative hover-card h-100">
-                                    <div class="card-body p-4">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div>
-                                                <span class="badge bg-light text-dark border px-2 py-1 small rounded mb-2"><?php echo htmlspecialchars($appt['property_code']); ?></span>
-                                                <h5 class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($appt['project_name']); ?></h5>
-                                                <small class="text-muted"><i class="fas fa-concierge-bell me-1"></i><?php echo str_replace('_', ' ', $appt['service_type']); ?></small>
-                                            </div>
-                                            <div class="text-end">
-                                                <?php if ($appt['status'] === 'REQUESTED'): ?>
-                                                    <span class="badge bg-warning text-dark px-2 py-1 rounded small fw-bold"><i class="fas fa-spinner fa-spin me-1"></i> REQUESTED</span>
-                                                <?php elseif ($appt['status'] === 'ASSIGNED'): ?>
-                                                    <span class="badge bg-dark px-2 py-1 rounded small fw-bold"><i class="fas fa-user-check me-1"></i> AGENT ASSIGNED</span>
-                                                <?php elseif ($appt['status'] === 'COMPLETED'): ?>
-                                                    <span class="badge bg-success px-2 py-1 rounded small fw-bold"><i class="fas fa-check-circle me-1"></i> COMPLETED</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-danger px-2 py-1 rounded small fw-bold"><i class="fas fa-ban me-1"></i> CANCELLED</span>
+                <div class="row">
+                    <?php if ($appointments->num_rows > 0): ?>
+                        <?php while ($row = $appointments->fetch_assoc()): ?>
+                            <div class="col-md-6 mb-4">
+                                <div class="card shadow-sm border-0 h-100 rounded-4">
+                                    <div class="card-body p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="d-flex align-items-center gap-2" style="max-width: 70%;">
+                                                <?php if (in_array($row['status'], ['CANCELLED', 'COMPLETED', 'NO_SHOW'], true)): ?>
+                                                    <input type="checkbox" name="appointment_ids[]" value="<?php echo $row['appointment_id']; ?>" class="form-check-input appointment-delete-check me-1 flex-shrink-0">
                                                 <?php endif; ?>
+                                                <h4 class="fw-bold m-0 text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                                             </div>
+                                            <?php
+                                                $bg = 'secondary';
+                                                if ($row['status'] === 'REQUESTED' || $row['status'] === 'PENDING') $bg = 'warning text-dark';
+                                                if ($row['status'] === 'ASSIGNED') $bg = 'primary';
+                                                if ($row['status'] === 'COMPLETED') $bg = 'success';
+                                                if ($row['status'] === 'CANCELLED' || $row['status'] === 'NO_SHOW') $bg = 'danger';
+                                            ?>
+                                            <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($row['status']); ?></span>
                                         </div>
-
-                                        <div class="bg-light p-3 rounded-3 mb-3 small border-0">
-                                            <div class="row text-center text-md-start">
-                                                <div class="col-6 mb-2 mb-md-0">
-                                                    <span class="text-muted d-block">Target Date</span>
-                                                    <strong class="text-dark"><i class="far fa-calendar me-1"></i><?php echo htmlspecialchars($appt['appointment_date']); ?></strong>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span class="text-muted d-block">Allocation Window</span>
-                                                    <strong class="text-dark"><i class="far fa-clock me-1"></i><?php echo date('h:i A', strtotime($appt['appointment_time'])); ?></strong>
-                                                </div>
-                                            </div>
+                                        <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type'])); ?></p>
+                                        <p class="text-muted fs-5 mb-3"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>
+                                        
+                                        <div class="mt-auto pt-2">
+                                            <a href="adjust_appointment.php?type=appointment&id=<?php echo $row['appointment_id']; ?>" class="btn btn-outline-dark btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-sliders-h me-2"></i>Manage Appointment Details</a>
                                         </div>
-
-                                        <?php if (!empty($appt['staff_remarks'])): ?>
-                                            <div class="alert alert-secondary border-0 small p-2 mb-3 bg-light text-dark">
-                                                <i class="fas fa-comment-dots me-1 text-secondary"></i> <strong>Agent Executive Note:</strong> 
-                                                <span class="text-muted italic">"<?php echo htmlspecialchars($appt['staff_remarks']); ?>"</span>
+                                        
+                                        <?php if (!empty($row['staff_remarks'])): ?>
+                                            <div class="mt-3 p-3 bg-light rounded-3 border-start border-warning border-4">
+                                                <p class="m-0 small fw-bold text-dark"><i class="fas fa-comment-dots me-2"></i>Staff Remarks:</p>
+                                                <p class="m-0 text-muted small"><?php echo htmlspecialchars($row['staff_remarks']); ?></p>
                                             </div>
                                         <?php endif; ?>
-
-                                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                            <div>
-                                                <?php if ($is_historical): ?>
-                                                    <div class="form-check m-0">
-                                                        <input class="form-check-input appointment-delete-check" type="checkbox" name="appointment_ids[]" value="<?php echo $appt['appointment_id']; ?>" id="chk_<?php echo $appt['appointment_id']; ?>">
-                                                        <label class="form-check-label text-danger tiny fw-bold cursor-pointer" style="user-select: none;" for="chk_<?php echo $appt['appointment_id']; ?>">
-                                                            Purge Record
-                                                        </label>
-                                                    </div>
-                                                <?php else: ?>
-                                                    <small class="text-success tiny fw-bold"><i class="fas fa-lock me-1"></i> Action Sequence Open</small>
-                                                <?php endif; ?>
-                                            </div>
-                                            
-                                            <a href="adjust_appointment.php?type=appointment&id=<?php echo $appt['appointment_id']; ?>" class="btn btn-sm btn-dark fw-bold rounded-pill px-3">
-                                                <i class="fas fa-eye me-1"></i> View Details
-                                            </a>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         <?php endwhile; ?>
-                    </div>
-                <?php endif; ?>
-            </form>
+                    <?php else: ?>
+                        <div class="col-12 text-center py-5">
+                            <i class="far fa-calendar-times display-1 text-muted opacity-50 mb-3"></i>
+                            <h4 class="text-muted">No appointments found.</h4>
+                            <a href="properties.php" class="btn btn-dark mt-3 px-4 rounded-pill">Browse Properties</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="housing" role="tabpanel">
+                <div class="row">
+                    <?php if ($applications->num_rows > 0): ?>
+                        <?php while ($row = $applications->fetch_assoc()): ?>
+                            <div class="col-12 mb-4">
+                                <div class="card shadow-sm border-0 border-start border-success border-5 rounded-4">
+                                    <div class="card-body p-4 p-md-5">
+                                        
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                                            <div>
+                                                <h3 class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($row['project_name']); ?></h3>
+                                                <p class="text-muted fs-5 m-0"><i class="fas fa-map-marker-alt text-danger me-2"></i><?php echo htmlspecialchars($row['state']); ?></p>
+                                            </div>
+                                            <?php
+                                                $bg = 'secondary';
+                                                if ($row['status'] === 'PENDING_REVIEW') $bg = 'warning text-dark';
+                                                if ($row['status'] === 'APPROVED_FOR_DRAW') $bg = 'info text-dark';
+                                                if ($row['status'] === 'WINNER') $bg = 'success';
+                                                if ($row['status'] === 'REJECTED') $bg = 'danger';
+                                            ?>
+                                            <span class="badge bg-<?php echo $bg; ?> fs-5 px-4 py-2.5 shadow-sm rounded-pill text-uppercase"><?php echo htmlspecialchars(str_replace('_', ' ', $row['status'])); ?></span>
+                                        </div>
+
+                                        <div class="py-4 my-2 border-top border-bottom border-light">
+                                            <h6 class="text-uppercase tracking-wider fw-bold text-secondary small mb-4"><i class="fas fa-tasks me-2"></i>Application Pipeline Progress Matrix</h6>
+                                            <div class="timeline-container d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center position-relative gap-4 gap-md-2">
+                                                <div class="timeline-line d-none d-md-block"></div>
+                                                
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <div class="step-icon bg-success text-white shadow"><i class="fas fa-file-import"></i></div>
+                                                    <div class="fw-bold text-dark mt-2 small">1. Documents Submitted</div>
+                                                    <div class="text-muted font-monospace tiny-time"><?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></div>
+                                                </div>
+
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <?php if ($row['status'] !== 'PENDING_REVIEW'): ?>
+                                                        <div class="step-icon bg-success text-white shadow"><i class="fas fa-user-check"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">2. Regional Verification</div>
+                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-check me-1"></i>Verified Complete</div>
+                                                    <?php else: ?>
+                                                        <div class="step-icon bg-warning text-dark shadow"><i class="fas fa-spinner fa-spin"></i></div>
+                                                        <div class="fw-bold text-muted mt-2 small">2. Regional Verification</div>
+                                                        <div class="text-warning font-monospace tiny-time fw-bold">Awaiting Review...</div>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <div class="timeline-step text-md-center position-relative z-index-2">
+                                                    <?php if ($row['status'] === 'WINNER'): ?>
+                                                        <div class="step-icon bg-success text-white shadow"><i class="fas fa-trophy"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-star me-1"></i>Selected in Draw!</div>
+                                                    <?php elseif ($row['status'] === 'REJECTED'): ?>
+                                                        <div class="step-icon bg-danger text-white shadow"><i class="fas fa-times"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-danger font-monospace tiny-time fw-bold">Disqualified</div>
+                                                    <?php elseif ($row['status'] === 'APPROVED_FOR_DRAW'): ?>
+                                                        <div class="step-icon bg-info text-dark shadow"><i class="fas fa-ticket-alt"></i></div>
+                                                        <div class="fw-bold text-dark mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-info font-monospace tiny-time fw-bold">Awaiting Draw Runs</div>
+                                                    <?php else: ?>
+                                                        <div class="step-icon bg-light text-muted border"><i class="fas fa-hourglass-start"></i></div>
+                                                        <div class="fw-bold text-muted mt-2 small">3. Ballot Allocation</div>
+                                                        <div class="text-muted font-monospace tiny-time">Pending Stage 2</div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pt-3">
+                                            <p class="text-muted m-0 small"><i class="far fa-clock text-primary me-2"></i>Submission Registered: <?php echo htmlspecialchars(date('d M Y, h:i A', strtotime($row['application_date']))); ?></p>
+                                            <div>
+                                                <a href="adjust_appointment.php?type=housing&id=<?php echo $row['application_id']; ?>" class="btn btn-outline-success rounded-pill fw-bold px-4 py-2"><i class="fas fa-file-invoice me-2"></i>View Application Summary / Uploads</a>
+                                            </div>
+                                        </div>
+
+                                        <?php if ($row['status'] === 'REJECTED'): ?>
+                                            <div class="alert alert-danger border-0 shadow-sm p-4 mt-4 mb-0 rounded-3" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="fas fa-times-circle text-danger fa-lg me-3 mt-1"></i>
+                                                    <div>
+                                                        <h6 class="fw-bold text-danger mb-1">Application Request Disqualified</h6>
+                                                        <p class="mb-0 text-dark font-monospace fw-bold small">Sorry you’re dont match the application requirement. You still can try other Affodable House Application</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <?php if ($row['status'] === 'WINNER'): ?>
+                                            <div class="mt-4 p-4 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-50 mb-0">
+                                                <p class="m-0 fw-bold text-success"><i class="fas fa-trophy me-2 fa-lg animate-bounce"></i>Congratulations! Your application has been successfully drawn in the state ballot allocation pool. Our housing officers will contact you shortly for contract signing parameters.</p>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-file-invoice display-1 text-muted opacity-50 mb-3"></i>
+                            <h4 class="text-muted">No affordable housing applications found.</h4>
+                            <a href="properties.php?filter_type=AFFORDABLE" class="btn btn-success mt-3 px-4 rounded-pill">View Government Housing</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <style>
-.tiny { font-size: 0.72rem; }
-.hover-card { transition: transform 0.2s, box-shadow 0.2s; }
-.hover-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08)!important; }
-.cursor-pointer { cursor: pointer; }
+    .timeline-container { position: relative; width: 100%; }
+    .timeline-line { position: absolute; top: 20px; left: 5%; width: 90%; height: 4px; background-color: #e9ecef; z-index: 1; }
+    .step-icon { width: 45px; height: 45px; border-radius: 50%; background-color: #fff; border: 3px solid #e9ecef; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 16px; transition: all 0.3s ease; }
+    .tiny-time { font-size: 11px; margin-top: 2px; display: block; }
+    @media (max-width: 767.98px) {
+        .step-icon { margin: 0; display: inline-flex; }
+        .timeline-step { padding-left: 60px; text-align: left !important; width: 100%; }
+        .timeline-step .step-icon { position: absolute; left: 0; top: 0; }
+    }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+<script { sandbox: 'allow-scripts' }>
+document.addEventListener('DOMContentLoaded', function () {
+    const plusBtn = document.getElementById('dynamicPlusBtn');
+    const apptTab = document.getElementById('appt-tab');
+    const housingTab = document.getElementById('housing-tab');
+
+    if (plusBtn) {
+        if (apptTab) {
+            apptTab.addEventListener('shown.bs.tab', function () {
+                plusBtn.setAttribute('href', 'properties.php');
+            });
+        }
+        if (housingTab) {
+            housingTab.addEventListener('shown.bs.tab', function () {
+                plusBtn.setAttribute('href', 'properties.php?filter_type=AFFORDABLE');
+            });
+        }
+    }
+});
+
 const deleteAppointmentsForm = document.getElementById('deleteAppointmentsForm');
 const deleteSelectedAppointmentsBtn = document.getElementById('deleteSelectedAppointmentsBtn');
 const appointmentDeleteChecks = document.querySelectorAll('.appointment-delete-check');
