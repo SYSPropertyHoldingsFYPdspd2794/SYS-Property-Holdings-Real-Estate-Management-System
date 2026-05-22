@@ -104,47 +104,47 @@ $sqft = intval($property['built_up_sqft']);
 if ($is_afford) {
     $layoutHtml = '
         <div class="row text-center g-4">
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">3 Bedrooms</h5><p class="text-muted small mt-2 mb-0">Optimal family spacing</p></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-success mb-2"></i><h5 class="fw-bold mb-0">2 Bathrooms</h5><p class="text-muted small mt-2 mb-0">Standard sanitary fittings</p></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-couch fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Living Hall</h5><p class="text-muted small mt-2 mb-0">Open concept design</p></div></div>
-            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-utensils fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Kitchen</h5><p class="text-muted small mt-2 mb-0">Ventilated cooking area</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bed fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">3 Bedrooms</h6><p class="text-muted small mt-2 mb-0">Optimal family spacing</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bath fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">2 Bathrooms</h6><p class="text-muted small mt-2 mb-0">Standard sanitary fittings</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-couch fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Living Hall</h6><p class="text-muted small mt-2 mb-0">Open concept design</p></div></div>
+            <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-utensils fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Kitchen</h6><p class="text-muted small mt-2 mb-0">Ventilated cooking area</p></div></div>
         </div>';
 } else {
     if ($dbType === 'commercial') {
         $layoutHtml = '
             <div class="row text-center g-4">
-                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-store fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Open Workspaces</h5><p class="text-muted small mt-2 mb-0">Flexible partition ready</p></div></div>
-                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-briefcase fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">1 Manager Office</h5><p class="text-muted small mt-2 mb-0">Private executive suite</p></div></div>
-                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-toilet fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">2 Restrooms</h5><p class="text-muted small mt-2 mb-0">Client & staff designated</p></div></div>
+                <div class="col-md-4 col-12"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-store fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">2 Open Workspaces</h6><p class="text-muted small mt-2 mb-0">Flexible partition ready</p></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-briefcase fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Manager Office</h6><p class="text-muted small mt-2 mb-0">Private executive suite</p></div></div>
+                <div class="col-md-4 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-toilet fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">2 Restrooms</h6><p class="text-muted small mt-2 mb-0">Client & staff designated</p></div></div>
             </div>';
     } else {
         if ($dbType === 'bungalow') {
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">6 Bedrooms</h5><p class="text-muted small mt-2 mb-0">Premium suite sizing</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">5 Bathrooms</h5><p class="text-muted small mt-2 mb-0">Luxury en-suite setups</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-swimming-pool fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Private Pool</h5><p class="text-muted small mt-2 mb-0">Resort-style recreation</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-car-side fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">3 Car Porches</h5><p class="text-muted small mt-2 mb-0">Expansive driveway</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bed fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">6 Bedrooms</h6><p class="text-muted small mt-2 mb-0">Premium suite sizing</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bath fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">5 Bathrooms</h6><p class="text-muted small mt-2 mb-0">Luxury en-suite setups</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-swimming-pool fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Private Pool</h6><p class="text-muted small mt-2 mb-0">Resort-style recreation</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-car-side fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">3 Car Porches</h6><p class="text-muted small mt-2 mb-0">Expansive driveway</p></div></div>
                 </div>';
         } elseif ($dbType === 'apartment') {
             $rooms = ($sqft >= 1200) ? "4" : "3";
             $baths = ($sqft >= 1200) ? "3" : "2";
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5><p class="text-muted small mt-2 mb-0">High-rise scenic views</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5><p class="text-muted small mt-2 mb-0">Modern ventilation</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-dumbbell fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Gym Facility</h5><p class="text-muted small mt-2 mb-0">Resident exclusive access</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-water fa-2x text-info mb-2"></i><h5 class="fw-bold mb-0">1 Public Pool</h5><p class="text-muted small mt-2 mb-0">Maintained infinity pool</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bed fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">'.$rooms.' Bedrooms</h6><p class="text-muted small mt-2 mb-0">High-rise scenic views</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bath fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">'.$baths.' Bathrooms</h6><p class="text-muted small mt-2 mb-0">Modern ventilation</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-dumbbell fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Gym Facility</h6><p class="text-muted small mt-2 mb-0">Resident exclusive access</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-water fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Public Pool</h6><p class="text-muted small mt-2 mb-0">Maintained infinity pool</p></div></div>
                 </div>';
         } else { 
             $rooms = ($sqft >= 1800) ? "5" : "4";
             $baths = ($sqft >= 1800) ? "4" : "3";
             $layoutHtml = '
                 <div class="row text-center g-4">
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bed fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$rooms.' Bedrooms</h5><p class="text-muted small mt-2 mb-0">Multi-generational layout</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-bath fa-2x text-primary mb-2"></i><h5 class="fw-bold mb-0">'.$baths.' Bathrooms</h5><p class="text-muted small mt-2 mb-0">Functional water heating</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-warehouse fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">2 Car Porches</h5><p class="text-muted small mt-2 mb-0">Covered parking space</p></div></div>
-                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded shadow-sm h-100"><i class="fas fa-box-open fa-2x text-muted mb-2"></i><h5 class="fw-bold mb-0">1 Store Room</h5><p class="text-muted small mt-2 mb-0">Built-in storage solution</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bed fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">'.$rooms.' Bedrooms</h6><p class="text-muted small mt-2 mb-0">Multi-generational layout</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-bath fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">'.$baths.' Bathrooms</h6><p class="text-muted small mt-2 mb-0">Functional water heating</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-warehouse fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">2 Car Porches</h6><p class="text-muted small mt-2 mb-0">Covered parking space</p></div></div>
+                    <div class="col-md-3 col-6"><div class="p-4 bg-white border rounded-4 shadow-sm h-100 icon-box"><i class="fas fa-box-open fa-2x text-gold mb-3"></i><h6 class="fw-bold mb-0 text-uppercase tracking-wider">1 Store Room</h6><p class="text-muted small mt-2 mb-0">Built-in storage solution</p></div></div>
                 </div>';
         }
     }
@@ -265,10 +265,10 @@ $proximityHtml .= '</div>';
 <div class="container my-5">
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-sm border-0 overflow-hidden h-100">
-                <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
-                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
-                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
+            <div class="card shadow-lg border-0 overflow-hidden h-100 rounded-4">
+                <div class="position-relative zoom-container" style="cursor: zoom-in;" data-bs-toggle="modal" data-bs-target="#imageZoom">
+                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-25 zoom-overlay">
                         <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Click to Enlarge</span>
                     </div>
                 </div>
@@ -276,23 +276,23 @@ $proximityHtml .= '</div>';
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
-                            <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
+                            <h2 class="luxury-title fw-light text-dark mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                             <form method="POST" class="m-0">
-                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'btn-danger' : 'btn-outline-danger'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
-                                    <i class="<?php echo $is_wishlisted ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
+                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'bg-dark text-white' : 'btn-outline-dark'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; border-color: #212529 !important;">
+                                    <i class="<?php echo $is_wishlisted ? 'fas text-gold' : 'far'; ?> fa-heart fs-5"></i>
                                 </button>
                             </form>
                         </div>
                         <?php if ($is_sold_out): ?>
-                            <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm text-white">SOLD OUT</span>
+                            <span class="badge bg-danger px-4 py-2 text-uppercase tracking-wider shadow-sm text-white rounded-0">SOLD OUT</span>
                         <?php else: ?>
-                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
+                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-dark text-gold'; ?> px-4 py-2 text-uppercase tracking-wider shadow-sm rounded-0" style="border: 1px solid rgba(255,255,255,0.2);">
                                 <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
                             </span>
                         <?php endif; ?>
                     </div>
 
-                    <p class="fs-5 text-muted mb-4"><i class="fas fa-map-marker-alt text-danger me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
+                    <p class="fs-5 text-muted mb-4 tracking-wider text-uppercase" style="font-size: 0.85rem !important;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
 
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
@@ -304,16 +304,16 @@ $proximityHtml .= '</div>';
                     <hr class="my-4">
                     <div class="row text-center mb-4">
                         <div class="col-4 border-end">
-                            <small class="d-block text-muted fw-bold mb-1">SQFT</small>
-                            <span class="fs-4 fw-bold"><?php echo number_format($property['built_up_sqft']); ?></span>
+                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Area SQFT</small>
+                            <span class="fs-4 luxury-title text-dark"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
                         <div class="col-4 border-end">
-                            <small class="d-block text-muted fw-bold mb-1">AVAILABLE UNITS</small>
-                            <span class="fs-4 fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-success'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
+                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Availability</small>
+                            <span class="fs-4 luxury-title <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
                         </div>
                         <div class="col-4">
-                            <small class="d-block text-muted fw-bold mb-1">PROPERTY CODE</small>
-                            <span class="fs-5 fw-bold text-dark"><?php echo htmlspecialchars($property['property_code']); ?></span>
+                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Reference</small>
+                            <span class="fs-5 luxury-title text-muted"><?php echo htmlspecialchars($property['property_code']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -321,17 +321,17 @@ $proximityHtml .= '</div>';
         </div>
 
         <div class="col-md-5 mb-4">
-            <div class="card shadow-sm border-0 h-100 bg-light">
-                <div class="card-header bg-dark text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Payment Estimator</h4>
+            <div class="card shadow-lg border-0 h-100 bg-dark text-white rounded-4 estimator-card">
+                <div class="card-header bg-black bg-opacity-50 text-white p-4 border-0 rounded-top-4">
+                    <h5 class="fw-light text-uppercase tracking-wider mb-0 text-gold"><i class="fas fa-calculator me-2"></i>Financial Concierge</h5>
                 </div>
-                <div class="card-body p-4 p-lg-5 d-flex flex-column">
-                    <h3 class="text-success fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
+                <div class="card-body p-4 p-lg-5 d-flex flex-column bg-dark">
+                    <h3 class="text-white fw-light mb-4 border-bottom border-secondary border-opacity-50 pb-4 luxury-title">RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Select Finance Bank</label>
-                        <select id="bankSelect" class="form-select border-primary">
+                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Select Partner Bank</label>
+                        <select id="bankSelect" class="form-select bg-black text-white border-secondary">
                             <?php while ($bank = $banks_result->fetch_assoc()): ?>
                                 <option data-rate="<?php echo $bank['interest_rate']; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?> (<?php echo $bank['interest_rate']; ?>%)</option>
                             <?php endwhile; ?>
@@ -339,8 +339,8 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Downpayment (10% - 30%)</label>
-                        <select id="downpayment" class="form-select">
+                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Initial Deposit</label>
+                        <select id="downpayment" class="form-select bg-black text-white border-secondary">
                             <option value="10">10% (Minimum)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
@@ -348,28 +348,28 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary fs-4 fw-bold">35</span> Years</label>
+                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Tenure: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
                         </div>
                     </div>
 
-                    <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
-                        <p class="mb-1 text-muted fw-bold small">MONTHLY REPAYMENT</p>
-                        <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                    <div class="p-4 bg-black rounded-4 text-center shadow-sm mb-4 border border-secondary border-opacity-25">
+                        <p class="mb-2 text-muted text-uppercase tracking-wider" style="font-size: 0.7rem;">Estimated Monthly</p>
+                        <h2 class="text-gold fw-light m-0 luxury-title" id="monthlyResult">RM 0.00</h2>
+                        <small class="text-muted d-block mt-3" style="font-size: 0.75rem;">Effective Rate: <strong id="displayRate" class="text-white">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
                         <?php if ($is_sold_out): ?>
-                            <button type="button" class="btn btn-danger btn-lg fw-bold py-3 shadow" disabled>
+                            <button type="button" class="btn btn-outline-danger btn-lg fw-bold py-3 shadow text-uppercase tracking-wider" disabled>
                                 <i class="fas fa-lock me-2"></i>SOLD OUT
                             </button>
                         <?php else: ?>
                             <?php if ($is_afford): ?>
-                                <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
+                                <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-light py-3 shadow text-uppercase tracking-wider">Apply Now</a>
                             <?php else: ?>
-                                <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
+                                <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-light btn-lg fw-bold py-3 shadow text-uppercase tracking-wider text-dark">Book Private Viewing</a>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -381,21 +381,21 @@ $proximityHtml .= '</div>';
     <div class="row mt-5">
         <div class="col-12">
             
-            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
-                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h3>
-                <div class="text-center bg-white p-4 border rounded-3 shadow-sm">
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-drafting-compass text-gold me-3"></i> Architectural Masterplan</h3>
+                <div class="text-center bg-light p-4 rounded-4 shadow-inner">
                     <img src="<?php echo htmlspecialchars($finalFloorPlan); ?>" class="img-fluid rounded" alt="Floor Plan" style="max-height: 500px; object-fit: contain;">
                 </div>
             </div>
 
-            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
-                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-th-large text-primary me-2"></i> Internal Layout Specification</h3>
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-th-large text-gold me-3"></i> Interior Specifications</h3>
                 <div class="p-2"><?php echo $layoutHtml; ?></div>
             </div>
 
-            <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
-                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-map-signs text-primary me-2"></i> Regional Proximity & Neighborhood</h3>
-                <div class="p-3 bg-white border rounded shadow-sm mt-3">
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+                <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-map-signs text-gold me-3"></i> Premium Proximity</h3>
+                <div class="p-4 bg-light rounded-4 mt-3 shadow-inner">
                     <?php echo $proximityHtml; ?>
                 </div>
             </div>
@@ -413,6 +413,16 @@ $proximityHtml .= '</div>';
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+    
+    .luxury-title { font-family: 'Playfair Display', serif; }
+    .tracking-wider { letter-spacing: 0.1em; }
+    .text-gold { color: #c5a059 !important; }
+    .bg-gold { background-color: #c5a059 !important; }
+    .shadow-inner { box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); }
+    .icon-box { transition: all 0.3s ease; }
+    .icon-box:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important; border-color: rgba(197,160,89,0.3) !important; }
+    
     @keyframes driftUp {
         0% { opacity: 0; transform: translateY(60px); }
         100% { opacity: 1; transform: translateY(0); }
@@ -420,9 +430,10 @@ $proximityHtml .= '</div>';
     .reveal-card { animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
-    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
-    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
+    
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #495057; outline: none; }
+    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
+    .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
 </style>
 
 <script { sandbox: 'allow-scripts' }>

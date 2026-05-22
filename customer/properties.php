@@ -64,13 +64,13 @@ $result = $stmt->get_result();
 <div class="container my-5">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <h2 class="fw-bold display-5">Explore Properties</h2>
-            <p class="lead text-secondary">Find your home across all 13 states and 3 federal territories.</p>
-            <hr class="w-25 mx-auto bg-primary" style="height: 3px; opacity: 1;">
+            <h2 class="display-5 text-uppercase tracking-widest luxury-title mt-4">Exclusive Collections</h2>
+            <p class="text-muted tracking-wider mb-4">Discover unparalleled living across 13 states and 3 federal territories.</p>
+            <hr class="w-10 mx-auto bg-gold" style="height: 2px; opacity: 1;">
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 mb-5 bg-light rounded-4">
+    <div class="card shadow-lg border-0 mb-5 bg-white rounded-4 filter-glass">
         <div class="card-body p-4">
             <form method="GET" action="properties.php">
                 <div class="row g-3">
@@ -116,7 +116,7 @@ $result = $stmt->get_result();
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">Filter</button>
+                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm text-uppercase tracking-wider">Search</button>
                     </div>
                 </div>
             </form>
@@ -133,10 +133,10 @@ $result = $stmt->get_result();
                 // FIXED MATRIX: Determine active layout badge properties based on asset occupancy values
                 if ($is_sold_out) {
                     $badge_text = "SOLD OUT";
-                    $badge_class = "bg-danger text-white";
+                    $badge_class = "bg-danger text-white premium-badge";
                 } else {
                     $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
-                    $badge_class = $is_affordable ? "bg-success" : "bg-primary";
+                    $badge_class = $is_affordable ? "bg-success text-white premium-badge" : "bg-dark text-gold premium-badge";
                 }
                 
                 $dbType = strtolower(trim($row['property_type']));
@@ -157,34 +157,42 @@ $result = $stmt->get_result();
                     if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
                 }
                 ?>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden hover-card">
-                        <div class="position-relative" style="height: 220px;">
-                            <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
-                            <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
+                <div class="col-lg-4 col-md-6 mb-5">
+                    <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white">
+                        <div class="position-relative overflow-hidden" style="height: 280px;">
+                            <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100 image-zoom" style="object-fit: cover;">
+                            <div class="image-overlay"></div>
+                            <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-4 shadow-sm z-3 text-uppercase"><?php echo $badge_text; ?></span>
                             
-                            <form method="POST" class="position-absolute top-0 start-0 m-3 z-3">
+                            <form method="POST" class="position-absolute bottom-0 end-0 m-3 z-3">
                                 <input type="hidden" name="property_id" value="<?php echo $row['property_id']; ?>">
-                                <button type="submit" name="toggle_wishlist" class="btn btn-light rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
-                                    <i class="<?php echo in_array($row['property_id'], $wishlist_array) ? 'fas' : 'far'; ?> fa-heart text-danger fs-5"></i>
+                                <button type="submit" name="toggle_wishlist" class="btn btn-dark bg-opacity-75 text-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center luxury-wishlist-btn" title="Add to Wishlist">
+                                    <i class="<?php echo in_array($row['property_id'], $wishlist_array) ? 'fas text-gold' : 'far'; ?> fa-heart fs-6"></i>
                                 </button>
                             </form>
                         </div>
-                        <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="fw-bold text-dark text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h5>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
+                        <div class="card-body p-4 p-xl-5 d-flex flex-column position-relative">
+                            <p class="text-uppercase tracking-wider text-muted mb-2" style="font-size: 0.75rem;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($row['state']); ?></p>
+                            <h4 class="fw-light text-dark text-truncate mb-3 luxury-title"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                             
                             <?php if ($is_affordable): ?>
-                                <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></p>
+                                <p class="text-muted fw-bold small mb-3"><i class="fas fa-id-card text-gold me-2"></i> Income Limit: <span class="text-dark">RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></span></p>
                             <?php endif; ?>
 
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-dark rounded-pill px-4 shadow-sm">Details</a>
+                            <div class="mt-auto pt-4 border-top border-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="d-block text-muted small text-uppercase tracking-wider" style="font-size: 0.65rem;">Starting Price</span>
+                                    <h5 class="text-dark fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h5>
+                                </div>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 py-2 shadow-sm tracking-wider text-uppercase" style="font-size: 0.75rem;">View</a>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-0 py-3 text-center border-top">
-                            <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="<?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0 (SOLD OUT)' : $row['total_units']; ?></strong></small>
+                        <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
+                            <div class="d-flex align-items-center bg-light rounded-pill p-2 px-3">
+                                <i class="fas fa-key text-gold me-2"></i>
+                                <small class="text-muted text-uppercase tracking-wider" style="font-size: 0.65rem;">Availability:</small>
+                                <small class="ms-auto fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? 'SOLD OUT' : $row['total_units'] . ' Units'; ?></small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -198,8 +206,65 @@ $result = $stmt->get_result();
 </div>
 
 <style>
-.hover-card { transition: transform 0.3s; }
-.hover-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important; }
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+
+.luxury-title { font-family: 'Playfair Display', serif; }
+.tracking-wider { letter-spacing: 0.1em; }
+.tracking-widest { letter-spacing: 0.2em; }
+.text-gold { color: #c5a059 !important; }
+.bg-gold { background-color: #c5a059 !important; }
+
+.filter-glass {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.hover-card { 
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); 
+    border: 1px solid rgba(0,0,0,0.03) !important; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+}
+.hover-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important; 
+}
+.hover-card:hover .image-zoom {
+    transform: scale(1.05);
+}
+
+.image-zoom {
+    transition: transform 0.8s ease;
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+    z-index: 1;
+}
+
+.premium-badge { 
+    letter-spacing: 1px; 
+    font-weight: 500; 
+    font-size: 0.65rem; 
+    padding: 0.6em 1.2em; 
+    border-radius: 0;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.luxury-wishlist-btn {
+    width: 45px; 
+    height: 45px;
+    transition: all 0.3s ease;
+}
+.luxury-wishlist-btn:hover {
+    background-color: #000 !important;
+    transform: scale(1.1);
+}
 </style>
 
 <?php include_once '../includes/footer.php'; ?>
