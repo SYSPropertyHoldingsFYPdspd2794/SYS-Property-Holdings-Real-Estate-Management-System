@@ -116,6 +116,35 @@ h1, h2, h3, h4, h5, h6 {
 .btn-warning.text-white {
     color: #11151b !important;
 }
+.bg-light,
+.bg-white,
+.card:not(.bg-dark):not(.estimator-card),
+.list-group-item,
+.dropdown-menu,
+.modal-content:not(.bg-dark),
+.form-control,
+.form-select {
+    color: #212529;
+}
+.bg-light .lead:not([class*="text-"]),
+.bg-white .lead:not([class*="text-"]),
+.card:not(.bg-dark):not(.estimator-card) .lead:not([class*="text-"]) {
+    color: #343a40;
+}
+.bg-light h1:not([class*="text-"]),
+.bg-light h2:not([class*="text-"]),
+.bg-light h3:not([class*="text-"]),
+.bg-light h4:not([class*="text-"]),
+.bg-light h5:not([class*="text-"]),
+.bg-light h6:not([class*="text-"]),
+.bg-white h1:not([class*="text-"]),
+.bg-white h2:not([class*="text-"]),
+.bg-white h3:not([class*="text-"]),
+.bg-white h4:not([class*="text-"]),
+.bg-white h5:not([class*="text-"]),
+.bg-white h6:not([class*="text-"]) {
+    color: #11151b;
+}
 footer.luxury-footer {
     background: #07080d !important;
     color: var(--luxury-muted) !important;
