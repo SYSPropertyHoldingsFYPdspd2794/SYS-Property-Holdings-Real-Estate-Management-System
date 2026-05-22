@@ -1,3 +1,9 @@
+<?php
+if (!isset($root_prefix)) {
+    $current_folder = basename(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')));
+    $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
+}
+?>
 <footer class="bg-dark text-light py-5 mt-5 border-top border-secondary border-opacity-25" style="background-color: #111418 !important;">
     <div class="container py-3">
         <div class="row g-4">
@@ -15,8 +21,8 @@
             <div class="col-md-4 col-lg-2 mb-4 mb-md-0">
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Portfolios</h6>
                 <ul class="list-unstyled footer-menu-links font-monospace small">
-                    <li class="mb-2"><a href="properties.php" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Market Houses</a></li>
-                    <li class="mb-2"><a href="properties.php?filter_type=AFFORDABLE" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Affordable Units</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php'); ?>" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Market Houses</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php?filter_type=AFFORDABLE'); ?>" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Affordable Units</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Landed Terrace</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Luxury Bungalows</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Commercial Hubs</a></li>
@@ -26,7 +32,7 @@
             <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Governance & Links</h6>
                 <ul class="list-unstyled footer-menu-links font-monospace small">
-                    <li class="mb-2"><a href="about_us.php" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-shield-alt me-1 text-secondary"></i> Corporate Identity</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-shield-alt me-1 text-secondary"></i> Corporate Identity</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-calculator me-1 text-secondary"></i> Loan Estimator Matrix</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-user-shield me-1 text-secondary"></i> PDPA Privacy 2010</a></li>
                     <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-file-contract me-1 text-secondary"></i> Terms of Use</a></li>
@@ -56,7 +62,7 @@
     </div>
 </footer>
 
-<script { sandbox: 'allow-scripts' }>
+<script>
 /**
  * password: The string from the input field
  * prefix: A unique string (e.g., 'adm_') to identify which checklist to update

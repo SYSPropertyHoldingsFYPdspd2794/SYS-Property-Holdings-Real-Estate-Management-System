@@ -121,13 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action_type'] ?? '
 
     if (!$related_type || !customer_owns_record($conn, $type, $id, $account_id)) {
         $error = "Document action is not available for this record.";
-<<<<<<< HEAD
-    } elseif ($type === 'appointment' && !in_array($appointment_status, ['REQUESTED', 'ASSIGNED'], true)) {
-        $error = "This appointment document cannot be adjusted because the appointment is already completed or closed.";
-=======
     } elseif (!$allow_document_adjustment) {
         $error = "Action Denied: Current record state constraints do not permit modifying document payloads.";
->>>>>>> a569b1048510cbb6f153689057ce94d22d449514
     } elseif ($_POST['action_type'] === 'delete_document') {
         $doc_stmt = $conn->prepare("SELECT document_id, file_path FROM documents WHERE customer_id = ? AND related_to_type = ? AND related_to_id = ? AND is_purged = FALSE");
         $doc_stmt->bind_param("isi", $account_id, $related_type, $id);
@@ -145,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action_type'] ?? '
         } else {
             $error = "No active file payload was detected to purge.";
         }
-    } (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+    } elseif (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
         $error = "Please attach a valid PDF binary file data stream.";
     } else {
         $tmp_name = $_FILES['document']['tmp_name'];
@@ -192,30 +187,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action_type'] ?? '
                 $insert_doc->bind_param("isiss", $account_id, $related_type, $id, $document_type, $db_path);
                 $insert_doc->execute();
 
-<<<<<<< HEAD
                 if ($type === 'appointment' && $appointment_status === 'ASSIGNED') {
                     $status_stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id = NULL, status = 'REQUESTED', staff_remarks = NULL WHERE appointment_id = ? AND customer_id = ? AND status = 'ASSIGNED'");
                     $status_stmt->bind_param("ii", $id, $account_id);
                     $status_stmt->execute();
+                    $current_status = 'REQUESTED';
                 }
 
                 $conn->commit();
                 $success = ($type === 'appointment' && $appointment_status === 'ASSIGNED')
                     ? "Document resent successfully. Appointment status has returned to REQUESTED and awaits staff assignment."
                     : "Document resent successfully.";
-=======
-                // DYNAMIC APPOINTMENT REVERSION: If an ASSIGNED appointment uploads a new file, force revert to REQUESTED
-                if ($type === 'appointment' && $current_status === 'ASSIGNED') {
-                    $revert_stmt = $conn->prepare("UPDATE appointments SET status = 'REQUESTED', assigned_staff_id = NULL, staff_remarks = NULL WHERE appointment_id = ?");
-                    $revert_stmt->bind_param("i", $id);
-                    $revert_stmt->execute();
-                    $current_status = 'REQUESTED';
-                }
-
-                $conn->commit();
-                header("Location: adjust_appointment.php?type=" . urlencode($type) . "&id=" . $id . "&success_msg=uploaded");
-                exit();
->>>>>>> a569b1048510cbb6f153689057ce94d22d449514
             } catch (Throwable $e) {
                 $conn->rollback();
                 if (file_exists($target_file)) {
@@ -432,41 +414,17 @@ include '../includes/header.php';
                             <?php endif; ?>
                         </div>
 
-<<<<<<< HEAD
-                        <?php if ($canManageDocument): ?>
-                            <form method="POST" enctype="multipart/form-data" id="resendDocumentForm" class="mb-3">
-                                <input type="hidden" name="action_type" value="resend_document">
-                                <label class="form-label fw-bold"><?php echo $current_document ? 'Resend / Replace Document' : 'Send Document'; ?></label>
-=======
                         <?php if ($allow_document_adjustment): ?>
                             <form method="POST" enctype="multipart/form-data" id="resendDocumentForm" class="mb-3">
                                 <input type="hidden" name="action_type" value="resend_document">
                                 <label class="form-label fw-bold"><?php echo $current_document ? 'Resend / Replace Document' : 'Upload Document'; ?></label>
->>>>>>> a569b1048510cbb6f153689057ce94d22d449514
                                 <div class="input-group">
                                     <input type="file" name="document" class="form-control" accept="application/pdf" required>
                                     <button type="submit" class="btn btn-dark fw-bold">
                                         <i class="fas fa-paper-plane me-2"></i><?php echo $current_document ? 'Resend' : 'Upload'; ?>
                                     </button>
                                 </div>
-<<<<<<< HEAD
-                                <small class="text-muted d-block mt-2">PDF only, max 5MB.</small>
-                            </form>
-                        <?php else: ?>
-                            <div class="alert alert-secondary fw-bold mb-3">
-                                <i class="fas fa-lock me-2"></i>This appointment is completed or closed. Customer document changes are no longer allowed.
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if ($current_document && $canManageDocument): ?>
-                            <form method="POST" id="deleteDocumentForm" class="m-0">
-                                <input type="hidden" name="action_type" value="delete_document">
-                                <button type="button" id="deleteDocumentBtn" class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-4">
-                                    <i class="fas fa-trash-alt me-2"></i>Delete Document
-                                </button>
-=======
                                 <small class="text-muted d-block mt-2">PDF formats only, maximum weight boundary: 5MB.</small>
->>>>>>> a569b1048510cbb6f153689057ce94d22d449514
                             </form>
 
                             <?php if ($current_document): ?>
@@ -556,7 +514,7 @@ include '../includes/header.php';
     .border-dashed { border-style: dashed !important; }
 </style>
 
-<script { sandbox: 'allow-scripts' }>
+<script>
 const currentRecordType = <?php echo json_encode($type); ?>;
 const appointmentStatus = <?php echo json_encode($current_status); ?>;
 const documentHasCurrent = <?php echo $current_document ? 'true' : 'false'; ?>;
@@ -668,57 +626,4 @@ if (cancelAppointmentBtn) {
     });
 }
 </script>
-<<<<<<< HEAD
-<?php endif; ?>
-<script>
-const documentHasCurrent = <?php echo $current_document ? 'true' : 'false'; ?>;
-const appointmentStatus = '<?php echo $type === 'appointment' ? htmlspecialchars($data['status'], ENT_QUOTES) : ''; ?>';
-const resendDocumentForm = document.getElementById('resendDocumentForm');
-if (resendDocumentForm) {
-    resendDocumentForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const assignedStatusText = 'This will replace your current submitted document. Your appointment status will change from ASSIGNED to REQUESTED and wait for staff assignment again.';
-        const defaultStatusText = documentHasCurrent ? 'This will replace your current submitted document.' : 'This document will be submitted for this record.';
-        Swal.fire({
-            icon: 'question',
-            title: 'Resend Document?',
-            text: appointmentStatus === 'ASSIGNED' ? assignedStatusText : defaultStatusText,
-            showCancelButton: true,
-            confirmButtonText: appointmentStatus === 'ASSIGNED' ? 'Yes, resend and request again' : 'Yes, resend',
-            cancelButtonText: 'No',
-            confirmButtonColor: '#212529',
-            cancelButtonColor: '#6c757d',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                resendDocumentForm.submit();
-            }
-        });
-    });
-}
-
-const deleteDocumentBtn = document.getElementById('deleteDocumentBtn');
-if (deleteDocumentBtn) {
-    deleteDocumentBtn.addEventListener('click', function () {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Delete Document?',
-            text: 'Are you sure you want to delete this document?',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete',
-            cancelButtonText: 'No',
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteDocumentForm').submit();
-            }
-        });
-    });
-}
-</script>
 <?php include '../includes/footer.php'; ?>
-=======
-<?php include '../includes/footer.php'; ?>
->>>>>>> a569b1048510cbb6f153689057ce94d22d449514

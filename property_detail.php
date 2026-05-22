@@ -329,9 +329,9 @@ $proximityHtml .= '</div>';
 
                     <div class="d-grid mt-auto">
                         <?php if ($is_afford): ?>
-                            <a href="apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
+                            <a href="customer/apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
                         <?php else: ?>
-                            <a href="book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
+                            <a href="customer/book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -386,7 +386,7 @@ $proximityHtml .= '</div>';
     .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
 </style>
 
-<script { sandbox: 'allow-scripts' }>
+<script>
 function updateCalc() {
     const p = parseFloat(document.getElementById('propertyPrice').value);
     const bank = document.getElementById('bankSelect');
@@ -406,4 +406,4 @@ document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEvent
 window.onload = updateCalc;
 </script>
 
-<?php include_once '../includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
