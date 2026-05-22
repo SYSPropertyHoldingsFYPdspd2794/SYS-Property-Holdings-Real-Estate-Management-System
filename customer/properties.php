@@ -61,10 +61,10 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<div class="container my-5">
+<div class="container my-5 property-catalog-page">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <h2 class="display-5 text-uppercase tracking-widest luxury-title mt-4">Exclusive Collections</h2>
+            <h2 class="display-5 text-uppercase tracking-widest luxury-title mt-4 catalog-title">Exclusive Collections</h2>
             <p class="text-muted tracking-wider mb-4">Discover unparalleled living across 13 states and 3 federal territories.</p>
             <hr class="w-10 mx-auto bg-gold" style="height: 2px; opacity: 1;">
         </div>
@@ -76,11 +76,11 @@ $result = $stmt->get_result();
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-search me-1"></i> Project Name</label>
-                        <input type="text" name="search_name" class="form-control" value="<?php echo htmlspecialchars($search_name); ?>">
+                        <input type="text" name="search_name" class="form-control catalog-input" value="<?php echo htmlspecialchars($search_name); ?>">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt me-1"></i> State</label>
-                        <select name="filter_state" class="form-select">
+                        <select name="filter_state" class="form-select catalog-input">
                             <option value="">All Regions</option>
                             <optgroup label="States">
                                 <option value="Johor" <?php if($filter_state=='Johor') echo 'selected'; ?>>Johor</option>
@@ -106,7 +106,7 @@ $result = $stmt->get_result();
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold text-muted small"><i class="fas fa-home me-1"></i> Category</label>
-                        <select name="filter_type" class="form-select">
+                        <select name="filter_type" class="form-select catalog-input">
                             <option value="">All Categories</option>
                             <option value="AFFORDABLE" <?php if($filter_type=='AFFORDABLE') echo 'selected'; ?>>Affordable</option>
                             <option value="TERRACE" <?php if($filter_type=='TERRACE') echo 'selected'; ?>>Terrace</option>
@@ -116,7 +116,7 @@ $result = $stmt->get_result();
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm text-uppercase tracking-wider">Search</button>
+                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm text-uppercase tracking-wider catalog-search-btn">Search</button>
                     </div>
                 </div>
             </form>
@@ -184,7 +184,7 @@ $result = $stmt->get_result();
                                     <span class="d-block text-muted small text-uppercase tracking-wider" style="font-size: 0.65rem;">Starting Price</span>
                                     <h5 class="text-dark fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h5>
                                 </div>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 py-2 shadow-sm tracking-wider text-uppercase" style="font-size: 0.75rem;">View</a>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 py-2 shadow-sm tracking-wider text-uppercase view-btn" style="font-size: 0.75rem;">View</a>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
@@ -214,20 +214,48 @@ $result = $stmt->get_result();
 .text-gold { color: #c5a059 !important; }
 .bg-gold { background-color: #c5a059 !important; }
 
+.property-catalog-page {
+    color: #20242b;
+}
+
+.catalog-title {
+    color: #15191f;
+}
+
 .filter-glass {
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(20,24,31,0.08) !important;
+    box-shadow: 0 18px 45px rgba(20,24,31,0.08) !important;
+}
+
+.catalog-input {
+    min-height: 46px;
+    border-color: rgba(20,24,31,0.16);
+    color: #15191f;
+    background-color: #fff;
+}
+
+.catalog-input:focus {
+    border-color: #c5a059;
+    box-shadow: 0 0 0 0.18rem rgba(197,160,89,0.2);
+}
+
+.catalog-search-btn {
+    min-height: 46px;
+    background: #11151b;
+    border-color: #11151b;
 }
 
 .hover-card { 
-    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); 
-    border: 1px solid rgba(0,0,0,0.03) !important; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.04) !important;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; 
+    border: 1px solid rgba(20,24,31,0.08) !important; 
+    box-shadow: 0 12px 32px rgba(20,24,31,0.07) !important;
 }
 .hover-card:hover { 
-    transform: translateY(-8px); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important; 
+    transform: translateY(-6px); 
+    border-color: rgba(197,160,89,0.38) !important;
+    box-shadow: 0 22px 44px rgba(20,24,31,0.14) !important; 
 }
 .hover-card:hover .image-zoom {
     transform: scale(1.05);
@@ -243,27 +271,48 @@ $result = $stmt->get_result();
     left: 0;
     width: 100%;
     height: 50%;
-    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.56) 0%, rgba(0,0,0,0.08) 72%, rgba(0,0,0,0) 100%);
     z-index: 1;
 }
 
 .premium-badge { 
     letter-spacing: 1px; 
-    font-weight: 500; 
+    font-weight: 700; 
     font-size: 0.65rem; 
     padding: 0.6em 1.2em; 
-    border-radius: 0;
+    border-radius: 999px;
     border: 1px solid rgba(255,255,255,0.2);
+}
+
+.premium-badge.bg-dark,
+.luxury-wishlist-btn {
+    background-color: rgba(5,7,10,0.88) !important;
+    color: #ffffff !important;
 }
 
 .luxury-wishlist-btn {
     width: 45px; 
     height: 45px;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.35);
 }
 .luxury-wishlist-btn:hover {
     background-color: #000 !important;
     transform: scale(1.1);
+}
+
+.view-btn:hover {
+    background: #11151b;
+    color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+    .tracking-wider { letter-spacing: 0.06em; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .display-5 { font-size: 2rem; }
+    .hover-card .card-body {
+        padding: 1.5rem !important;
+    }
 }
 </style>
 

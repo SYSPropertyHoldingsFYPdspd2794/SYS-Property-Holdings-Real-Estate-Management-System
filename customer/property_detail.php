@@ -265,7 +265,7 @@ $proximityHtml .= '</div>';
 <div class="container my-5">
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-lg border-0 overflow-hidden h-100 rounded-4">
+            <div class="card shadow-lg border-0 overflow-hidden h-100 rounded-4 property-hero-card">
                 <div class="position-relative zoom-container" style="cursor: zoom-in;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-25 zoom-overlay">
@@ -322,16 +322,16 @@ $proximityHtml .= '</div>';
 
         <div class="col-md-5 mb-4">
             <div class="card shadow-lg border-0 h-100 bg-dark text-white rounded-4 estimator-card">
-                <div class="card-header bg-black bg-opacity-50 text-white p-4 border-0 rounded-top-4">
+                <div class="card-header text-white p-4 border-0 rounded-top-4 estimator-header">
                     <h5 class="fw-light text-uppercase tracking-wider mb-0 text-gold"><i class="fas fa-calculator me-2"></i>Financial Concierge</h5>
                 </div>
-                <div class="card-body p-4 p-lg-5 d-flex flex-column bg-dark">
+                <div class="card-body p-4 p-lg-5 d-flex flex-column">
                     <h3 class="text-white fw-light mb-4 border-bottom border-secondary border-opacity-50 pb-4 luxury-title">RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
 
                     <div class="mb-3">
-                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Select Partner Bank</label>
-                        <select id="bankSelect" class="form-select bg-black text-white border-secondary">
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Select Partner Bank</label>
+                        <select id="bankSelect" class="form-select panel-select">
                             <?php while ($bank = $banks_result->fetch_assoc()): ?>
                                 <option data-rate="<?php echo $bank['interest_rate']; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?> (<?php echo $bank['interest_rate']; ?>%)</option>
                             <?php endwhile; ?>
@@ -339,8 +339,8 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Initial Deposit</label>
-                        <select id="downpayment" class="form-select bg-black text-white border-secondary">
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Initial Deposit</label>
+                        <select id="downpayment" class="form-select panel-select">
                             <option value="10">10% (Minimum)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
@@ -348,16 +348,16 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label fw-light text-uppercase tracking-wider small text-muted">Tenure: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Tenure: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
                         </div>
                     </div>
 
-                    <div class="p-4 bg-black rounded-4 text-center shadow-sm mb-4 border border-secondary border-opacity-25">
-                        <p class="mb-2 text-muted text-uppercase tracking-wider" style="font-size: 0.7rem;">Estimated Monthly</p>
+                    <div class="p-4 rounded-4 text-center shadow-sm mb-4 monthly-card">
+                        <p class="mb-2 panel-label text-uppercase tracking-wider" style="font-size: 0.7rem;">Estimated Monthly</p>
                         <h2 class="text-gold fw-light m-0 luxury-title" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-3" style="font-size: 0.75rem;">Effective Rate: <strong id="displayRate" class="text-white">0.00</strong>% (p.a)</small>
+                        <small class="panel-note d-block mt-3" style="font-size: 0.75rem;">Effective Rate: <strong id="displayRate" class="text-white">0.00</strong>% (p.a)</small>
                     </div>
 
                     <div class="d-grid mt-auto">
@@ -381,21 +381,21 @@ $proximityHtml .= '</div>';
     <div class="row mt-5">
         <div class="col-12">
             
-            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card content-card">
                 <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-drafting-compass text-gold me-3"></i> Architectural Masterplan</h3>
-                <div class="text-center bg-light p-4 rounded-4 shadow-inner">
+                <div class="text-center bg-light p-4 rounded-4 shadow-inner floor-plan-frame">
                     <img src="<?php echo htmlspecialchars($finalFloorPlan); ?>" class="img-fluid rounded" alt="Floor Plan" style="max-height: 500px; object-fit: contain;">
                 </div>
             </div>
 
-            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card content-card">
                 <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-th-large text-gold me-3"></i> Interior Specifications</h3>
                 <div class="p-2"><?php echo $layoutHtml; ?></div>
             </div>
 
-            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
+            <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card content-card">
                 <h3 class="luxury-title text-dark mb-4 border-bottom border-secondary border-opacity-25 pb-3"><i class="fas fa-map-signs text-gold me-3"></i> Premium Proximity</h3>
-                <div class="p-4 bg-light rounded-4 mt-3 shadow-inner">
+                <div class="p-4 bg-light rounded-4 mt-3 shadow-inner proximity-frame">
                     <?php echo $proximityHtml; ?>
                 </div>
             </div>
@@ -419,9 +419,52 @@ $proximityHtml .= '</div>';
     .tracking-wider { letter-spacing: 0.1em; }
     .text-gold { color: #c5a059 !important; }
     .bg-gold { background-color: #c5a059 !important; }
+    .property-hero-card,
+    .content-card {
+        border: 1px solid rgba(20, 24, 31, 0.06) !important;
+        box-shadow: 0 18px 45px rgba(20, 24, 31, 0.08) !important;
+    }
     .shadow-inner { box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); }
-    .icon-box { transition: all 0.3s ease; }
-    .icon-box:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important; border-color: rgba(197,160,89,0.3) !important; }
+    .floor-plan-frame,
+    .proximity-frame {
+        background: #f7f5ef !important;
+    }
+    .icon-box {
+        border-color: rgba(20, 24, 31, 0.08) !important;
+        border-radius: 1rem !important;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .icon-box:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,24,31,0.1) !important; border-color: rgba(197,160,89,0.45) !important; }
+    .estimator-card {
+        background: linear-gradient(145deg, #101318 0%, #07090d 100%) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        box-shadow: 0 22px 50px rgba(0,0,0,0.28) !important;
+        overflow: hidden;
+    }
+    .estimator-header {
+        background: rgba(0,0,0,0.45);
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    .panel-label,
+    .panel-note,
+    .estimator-card label,
+    .estimator-card small {
+        color: #f8f5ed !important;
+    }
+    .panel-select {
+        background-color: #05070a !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255,255,255,0.32) !important;
+        min-height: 48px;
+    }
+    .panel-select:focus {
+        border-color: #c5a059 !important;
+        box-shadow: 0 0 0 0.18rem rgba(197,160,89,0.25) !important;
+    }
+    .monthly-card {
+        background: #020304;
+        border: 1px solid rgba(197,160,89,0.35);
+    }
     
     @keyframes driftUp {
         0% { opacity: 0; transform: translateY(60px); }
@@ -431,12 +474,17 @@ $proximityHtml .= '</div>';
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
     
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #495057; outline: none; }
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #f8f5ed; outline: none; }
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
     .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
+    @media (max-width: 767.98px) {
+        .tracking-wider { letter-spacing: 0.06em; }
+        .card-body.p-5 { padding: 1.5rem !important; }
+        .proximity-frame { padding: 1.25rem !important; }
+    }
 </style>
 
-<script { sandbox: 'allow-scripts' }>
+<script>
 function updateCalc() {
     const p = parseFloat(document.getElementById('propertyPrice').value);
     const bank = document.getElementById('bankSelect');
