@@ -82,7 +82,7 @@ $appt_stmt->bind_param("i", $account_id);
 $appt_stmt->execute();
 $appointments = $appt_stmt->get_result();
 
-$app_stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price FROM affordable_housing_applications ah JOIN properties p ON ah.property_id = p.property_id WHERE ah.customer_id = ? ORDER BY ah.application_date DESC");
+$app_stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state FROM affordable_housing_applications ah JOIN properties p ON ah.property_id = p.property_id WHERE ah.customer_id = ? ORDER BY ah.application_date DESC");
 $app_stmt->bind_param("i", $account_id);
 $app_stmt->execute();
 $applications = $app_stmt->get_result();
