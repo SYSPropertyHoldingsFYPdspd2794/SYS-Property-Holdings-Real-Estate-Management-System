@@ -91,11 +91,14 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, #c5a059 0%, #d5b06d 100%) !important;
     border-color: transparent !important;
     box-shadow: 0 14px 30px rgba(197,160,89,0.25);
+    color: #11151b !important;
+    font-weight: 600;
 }
 .btn-primary:hover,
 .btn-primary:focus {
     background: #d8b676 !important;
     border-color: transparent !important;
+    color: #11151b !important;
 }
 .btn-outline-secondary {
     color: var(--luxury-white) !important;
@@ -108,6 +111,11 @@ h1, h2, h3, h4, h5, h6 {
 footer.luxury-footer {
     background: #07080d !important;
     color: var(--luxury-muted) !important;
+}
+footer.luxury-footer .text-muted,
+footer.luxury-footer a.text-muted,
+footer.luxury-footer .text-secondary {
+    color: rgba(244,241,232,0.82) !important;
 }
 footer.luxury-footer a {
     color: var(--luxury-muted) !important;

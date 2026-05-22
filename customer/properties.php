@@ -65,7 +65,7 @@ $result = $stmt->get_result();
     <div class="row mb-4 text-center">
         <div class="col-md-12">
             <h2 class="display-5 text-uppercase tracking-widest luxury-title mt-4 catalog-title">Exclusive Collections</h2>
-            <p class="text-muted tracking-wider mb-4">Discover unparalleled living across 13 states and 3 federal territories.</p>
+            <p class="catalog-subtitle tracking-wider mb-4">Discover unparalleled living across 13 states and 3 federal territories.</p>
             <hr class="w-10 mx-auto bg-gold" style="height: 2px; opacity: 1;">
         </div>
     </div>
@@ -220,6 +220,10 @@ $result = $stmt->get_result();
 
 .catalog-title {
     color: #ffffff;
+}
+
+.catalog-subtitle {
+    color: #ddd7cc;
 }
 
 .filter-glass {
