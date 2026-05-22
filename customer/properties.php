@@ -255,6 +255,8 @@ $result = $stmt->get_result();
     transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease; 
     border: 1px solid rgba(20,24,31,0.08) !important; 
     box-shadow: 0 12px 32px rgba(20,24,31,0.07) !important;
+    background: #ffffff !important;
+    color: #212529;
 }
 .hover-card:hover { 
     transform: translateY(-6px); 

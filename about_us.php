@@ -58,30 +58,30 @@ include_once 'includes/header.php';
         <div class="col-lg-6 px-lg-5">
             <div class="mb-4">
                 <span class="badge bg-primary px-3 py-2 rounded-pill mb-2 text-uppercase fw-bold">Corporate Foundations</span>
-                <h2 class="fw-bold display-5 text-dark">Our Vision & Mission</h2>
+                <h2 class="fw-bold display-5 text-white">Our Vision & Mission</h2>
             </div>
-            <p class="fs-5 text-secondary mb-4 lead">To serve as Malaysia's premier structural catalyst in engineering secure, high-tech, and attainable smart communities, empowering families across generations to achieve wealth security through real estate ownership.</p>
+            <p class="fs-5 text-light mb-4 lead">To serve as Malaysia's premier structural catalyst in engineering secure, high-tech, and attainable smart communities, empowering families across generations to achieve wealth security through real estate ownership.</p>
             
             <div class="mt-4">
                 <div class="d-flex align-items-start mb-4">
                     <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3"><i class="fas fa-lightbulb fa-lg fa-fw"></i></div>
                     <div>
-                        <h5 class="fw-bold text-dark mb-1">Innovation-First Philosophy</h5>
-                        <p class="text-muted m-0">Re-imagining transactional frameworks via unified multi-platform algorithm matching systems.</p>
+                        <h5 class="fw-bold text-white mb-1">Innovation-First Philosophy</h5>
+                        <p class="text-light m-0">Re-imagining transactional frameworks via unified multi-platform algorithm matching systems.</p>
                     </div>
                 </div>
                 <div class="d-flex align-items-start mb-4">
                     <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle me-3"><i class="fas fa-shield-alt fa-lg fa-fw"></i></div>
                     <div>
-                        <h5 class="fw-bold text-dark mb-1">Uncompromising Governance Integrity</h5>
-                        <p class="text-muted m-0">Transparent pricing controls synchronized directly with verified bank interest amortization data vectors.</p>
+                        <h5 class="fw-bold text-white mb-1">Uncompromising Governance Integrity</h5>
+                        <p class="text-light m-0">Transparent pricing controls synchronized directly with verified bank interest amortization data vectors.</p>
                     </div>
                 </div>
                 <div class="d-flex align-items-start">
                     <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle me-3"><i class="fas fa-users fa-lg fa-fw"></i></div>
                     <div>
-                        <h5 class="fw-bold text-dark mb-1">Socioeconomic Inclusivity Pillars</h5>
-                        <p class="text-muted m-0">Forging long-term governmental public-private-partnerships to eliminate affordable tier entry barriers.</p>
+                        <h5 class="fw-bold text-white mb-1">Socioeconomic Inclusivity Pillars</h5>
+                        <p class="text-light m-0">Forging long-term governmental public-private-partnerships to eliminate affordable tier entry barriers.</p>
                     </div>
                 </div>
             </div>
@@ -119,8 +119,8 @@ include_once 'includes/header.php';
 
     <div class="text-center mb-5 mt-5 pt-4">
         <span class="badge bg-secondary px-3 py-2 rounded-pill mb-2 text-uppercase fw-bold">Operational Scope</span>
-        <h2 class="fw-bold text-dark display-6">Our Pillars of Excellence</h2>
-        <p class="text-muted w-50 mx-auto">Driving regional socioeconomic advancement across key strategic industry vectors.</p>
+        <h2 class="fw-bold text-white display-6">Our Pillars of Excellence</h2>
+        <p class="text-light w-50 mx-auto">Driving regional socioeconomic advancement across key strategic industry vectors.</p>
     </div>
 
     <div class="row g-4 text-center">

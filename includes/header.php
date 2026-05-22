@@ -192,6 +192,12 @@ footer.luxury-footer .social-links a {
     box-shadow: 0 18px 45px rgba(0,0,0,0.16) !important;
     background: rgba(255,255,255,0.02) !important;
 }
+.bg-light .hover-card,
+.bg-white .hover-card,
+.hover-card.bg-white {
+    background: #ffffff !important;
+    color: #212529;
+}
 .hover-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 26px 70px rgba(0,0,0,0.24) !important;

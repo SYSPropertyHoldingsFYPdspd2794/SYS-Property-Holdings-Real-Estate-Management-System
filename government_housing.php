@@ -10,8 +10,8 @@ include_once 'includes/header.php';
 <div class="container my-5 py-4">
     <div class="text-center mb-5">
         <span class="badge bg-primary px-3 py-2 fs-6 mb-3 shadow-sm">KPKT Authorized Partner</span>
-        <h1 class="display-4 fw-bold text-dark mb-3">Affordable Housing Initiative</h1>
-        <p class="lead text-muted w-75 mx-auto">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
+        <h1 class="display-4 fw-bold text-white mb-3">Affordable Housing Initiative</h1>
+        <p class="lead text-light w-75 mx-auto">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
         <hr class="w-25 mx-auto mt-4 border-primary border-2 opacity-75">
     </div>
 

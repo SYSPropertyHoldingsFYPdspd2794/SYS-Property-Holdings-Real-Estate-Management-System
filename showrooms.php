@@ -53,8 +53,8 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
 <div class="container my-5 py-4">
     <div class="text-center mb-5 pb-4">
-        <h2 class="fw-bold text-dark">The O2O Showroom Experience</h2>
-        <p class="text-muted">No online payments. No hidden gateways. 100% secure offline commitments.</p>
+        <h2 class="fw-bold text-white">The O2O Showroom Experience</h2>
+        <p class="text-light">No online payments. No hidden gateways. 100% secure offline commitments.</p>
     </div>
 
     <div class="row align-items-center mb-5 pb-4">
@@ -62,8 +62,8 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
             <img src="<?php echo $imgBase; ?>Office.jpg" class="img-fluid rounded-4 shadow" alt="Our Offline Office">
         </div>
         <div class="col-md-6 px-lg-5">
-            <h3 class="fw-bold text-primary mb-3">Welcome to Our Showrooms</h3>
-            <p class="fs-5 text-muted">Step into our state-of-the-art physical branches. While our online platform allows you to browse and calculate loans seamlessly, our doors are always open for you to explore architectural models and finalize material selections in person.</p>
+            <h3 class="fw-bold text-gold mb-3">Welcome to Our Showrooms</h3>
+            <p class="fs-5 text-light">Step into our state-of-the-art physical branches. While our online platform allows you to browse and calculate loans seamlessly, our doors are always open for you to explore architectural models and finalize material selections in person.</p>
         </div>
     </div>
 
@@ -72,8 +72,8 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
             <img src="<?php echo $imgBase; ?>Service_Staff.jpg" class="img-fluid rounded-4 shadow" alt="Professional Staff">
         </div>
         <div class="col-md-6 px-lg-5 text-md-end">
-            <h3 class="fw-bold text-primary mb-3">Professional Consultation</h3>
-            <p class="fs-5 text-muted">Our dedicated service staff are rigorously trained to provide exemplary hospitality. During your scheduled offline visit, our consultants will guide you through tailored financial solutions, ensuring you make the most informed decision.</p>
+            <h3 class="fw-bold text-gold mb-3">Professional Consultation</h3>
+            <p class="fs-5 text-light">Our dedicated service staff are rigorously trained to provide exemplary hospitality. During your scheduled offline visit, our consultants will guide you through tailored financial solutions, ensuring you make the most informed decision.</p>
         </div>
     </div>
 
@@ -82,8 +82,8 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
             <img src="<?php echo $imgBase; ?>Standard_Service.jpg" class="img-fluid rounded-4 shadow" alt="Transparent Standards">
         </div>
         <div class="col-md-6 px-lg-5">
-            <h3 class="fw-bold text-primary mb-3">Transparent Processes</h3>
-            <p class="fs-5 text-muted">We pride ourselves on absolute transparency. What you see on our digital catalog is exactly what you get. Our standard service protocol guarantees no hidden surcharges—every property detail and purchasing flow is explained clearly offline.</p>
+            <h3 class="fw-bold text-gold mb-3">Transparent Processes</h3>
+            <p class="fs-5 text-light">We pride ourselves on absolute transparency. What you see on our digital catalog is exactly what you get. Our standard service protocol guarantees no hidden surcharges—every property detail and purchasing flow is explained clearly offline.</p>
         </div>
     </div>
 
@@ -92,8 +92,8 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
             <img src="<?php echo $imgBase; ?>Offline_Service.jpg" class="img-fluid rounded-4 shadow" alt="Secure Offline Services">
         </div>
         <div class="col-md-6 px-lg-5 text-md-end">
-            <h3 class="fw-bold text-primary mb-3">Secure Offline Transactions</h3>
-            <p class="fs-5 text-muted">Your security is our priority. We strictly prohibit online deposits or financial transactions through our portal. All sensitive matters—including downpayments, legal contract signing, and the official handover of keys—are conducted face-to-face.</p>
+            <h3 class="fw-bold text-gold mb-3">Secure Offline Transactions</h3>
+            <p class="fs-5 text-light">Your security is our priority. We strictly prohibit online deposits or financial transactions through our portal. All sensitive matters—including downpayments, legal contract signing, and the official handover of keys—are conducted face-to-face.</p>
         </div>
     </div>
 </div>

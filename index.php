@@ -28,7 +28,7 @@ include 'includes/header.php';
 </section>
 
 <section class="container my-5 py-5">
-    <h2 class="fw-bold mb-4">New & Upcoming Developments</h2>
+    <h2 class="fw-bold mb-4 text-white">New & Upcoming Developments</h2>
     <div class="horizontal-scroll">
         <div class="card scroll-card">
             <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=300&fit=crop" class="card-img-top" alt="Development 1">
@@ -115,13 +115,13 @@ include 'includes/header.php';
     <div class="gov-housing-section p-5 rounded shadow-sm">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h2 class="fw-bold display-6 mb-3">Government Affordable Housing Initiative</h2>
-                <p class="lead mb-4">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
+                <h2 class="fw-bold display-6 mb-3 text-white">Government Affordable Housing Initiative</h2>
+                <p class="lead mb-4 text-light">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
                 <ul class="list-unstyled fs-5 mb-4">
-                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Malaysian Citizen</li>
-                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Age 18 and above</li>
-                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Household Income below RM10,000</li>
-                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> First-Time Homebuyer</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Malaysian Citizen</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Age 18 and above</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Household Income below RM10,000</li>
+                    <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> First-Time Homebuyer</li>
                 </ul>
                 <p class="text-danger fw-bold"><i class="fas fa-info-circle me-1"></i> Priority given to applicants with dependents</p>
                 <a href="<?php echo $apply_link; ?>" class="btn btn-dark btn-lg mt-3 px-5 rounded-pill shadow">Apply Now</a>

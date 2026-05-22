@@ -36,7 +36,7 @@ $stmt3->execute();
 $customer_name = $stmt3->get_result()->fetch_assoc()['full_name'];
 ?>
 <div class="container my-5">
-    <h2 class="fw-bold mb-4">Welcome back, <?php echo htmlspecialchars($customer_name); ?></h2>
+    <h2 class="fw-bold mb-4 text-white">Welcome back, <?php echo htmlspecialchars($customer_name); ?></h2>
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0">
@@ -57,7 +57,7 @@ $customer_name = $stmt3->get_result()->fetch_assoc()['full_name'];
     </div>
     <div class="d-flex gap-3 mt-3">
         <a href="properties.php" class="btn btn-primary">Browse Properties</a>
-        <a href="track_status.php" class="btn btn-outline-dark">My Applications</a>
+        <a href="track_status.php" class="btn btn-outline-light">My Applications</a>
     </div>
 </div>
 <?php include '../includes/footer.php'; ?>

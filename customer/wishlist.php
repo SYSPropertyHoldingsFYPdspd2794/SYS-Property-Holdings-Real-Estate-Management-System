@@ -41,7 +41,7 @@ $result = $stmt->get_result();
 <div class="container my-5">
     <div class="d-flex align-items-center mb-5 border-bottom pb-3">
         <i class="fas fa-heart text-danger fa-2x me-3"></i>
-        <h2 class="fw-bold mb-0 text-dark">My Saved Properties</h2>
+        <h2 class="fw-bold mb-0 text-white">My Saved Properties</h2>
     </div>
 
     <div class="row">

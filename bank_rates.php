@@ -13,8 +13,8 @@ $result = $conn->query($sql);
 
 <div class="container my-5 py-4">
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-dark mb-3"><i class="fas fa-chart-line text-primary me-3"></i>Current Bank Loan Rates</h1>
-        <p class="lead text-muted w-75 mx-auto">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
+        <h1 class="display-4 fw-bold text-white mb-3"><i class="fas fa-chart-line text-gold me-3"></i>Current Bank Loan Rates</h1>
+        <p class="lead text-light w-75 mx-auto">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
         <hr class="w-25 mx-auto mt-4 mb-5 border-primary border-2 opacity-75">
     </div>
 
