@@ -7,6 +7,7 @@
 
 include_once '../includes/header.php';
 require_once '../includes/auth_check.php';
+require_once '../includes/property_images.php';
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
@@ -49,24 +50,9 @@ $is_afford = (intval($property['is_affordable']) === 1);
 $is_sold_out = (trim($property['status']) === 'SOLD_OUT');
 $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC");
 
-// CATALOG MAIN IMAGE RESOLUTION
 $dbType = strtolower(trim($property['property_type']));
-$rawState = trim($property['state']);
-if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
-if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
-$stateName = ucwords(strtolower($rawState)); 
-
-$folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
-$filePrefix = ucfirst($dbType);
-
 $baseDir = $root_prefix . "SYS Property Catalog/";
-$finalImg = $baseDir . "placeholder.jpg"; 
-$fileName = $filePrefix . " - " . $stateName;
-
-foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
-    $testPath = $baseDir . $folder . $fileName . "." . $ext;
-    if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
-}
+$finalImg = property_catalog_image_path($property, $root_prefix, '../');
 
 // 1. FLOOR PLAN PATH 
 if ($is_afford || $dbType === 'affordable') {

@@ -1,10 +1,40 @@
 <?php
 require_once '../includes/db_connect.php';
 require_once '../includes/auth_check.php';
+require_once '../includes/property_images.php';
 
 protect_admin_page('ADMIN', $conn);
 
+$malaysia_regions = [
+    'Johor',
+    'Kedah',
+    'Kelantan',
+    'Melaka',
+    'Negeri Sembilan',
+    'Pahang',
+    'Penang',
+    'Perak',
+    'Perlis',
+    'Sabah',
+    'Sarawak',
+    'Selangor',
+    'Terengganu',
+    'Kuala Lumpur',
+    'Labuan',
+    'Putrajaya'
+];
+
+$property_types = [
+    'TERRACE' => 'Terrace',
+    'BUNGALOW' => 'Bungalow',
+    'COMMERCIAL' => 'Commercial',
+    'APARTMENT' => 'Apartment',
+    'AFFORDABLE' => 'Affordable'
+];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $redirect_page = "properties.php";
+
     if ($_POST['action'] === 'add') {
         $code = $_POST['property_code'];
         $name = $_POST['project_name'];
@@ -17,16 +47,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // ENHANCEMENT: Auto-generate filename based on code, hardcode keyword to NA
         $image_filename = $code . '.jpg';
         $image_keyword = 'NA';
+        $uploaded_image = save_property_image_upload('property_image', $code, __DIR__ . '/../SYS Property Catalog');
+        if ($uploaded_image !== null) {
+            $image_filename = $uploaded_image;
+        }
         
         $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, built_up_sqft, image_filename, image_search_keyword, is_affordable, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'ACTIVE')");
         $stmt->bind_param("ssssdiiss", $code, $name, $state, $type, $price, $total, $built_up, $image_filename, $image_keyword);
         $stmt->execute();
     } elseif ($_POST['action'] === 'edit') {
         $id = (int)$_POST['property_id'];
+        $code = trim($_POST['property_code']);
+        $name = trim($_POST['project_name']);
+        $state = $_POST['state'];
+        $type = $_POST['property_type'];
         $price = (float)$_POST['price'];
         $total = (int)$_POST['total_units'];
-        $stmt = $conn->prepare("UPDATE properties SET price = ?, total_units = ? WHERE property_id = ? AND is_affordable = 0");
-        $stmt->bind_param("dii", $price, $total, $id);
+        $built_up = (int)$_POST['built_up_sqft'];
+        $is_affordable = $type === 'AFFORDABLE' ? 1 : 0;
+
+        if ($is_affordable) {
+            $type = 'AFFORDABLE';
+            $redirect_page = "affordable_properties.php";
+        }
+
+        $stmt = $conn->prepare("UPDATE properties SET property_code = ?, project_name = ?, state = ?, property_type = ?, price = ?, total_units = ?, built_up_sqft = ?, is_affordable = ? WHERE property_id = ? AND is_affordable = 0");
+        $stmt->bind_param("ssssdiiii", $code, $name, $state, $type, $price, $total, $built_up, $is_affordable, $id);
         $stmt->execute();
     } elseif ($_POST['action'] === 'archive') {
         $id = (int)$_POST['property_id'];
@@ -35,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt->bind_param("si", $status, $id);
         $stmt->execute();
     }
-    header("Location: properties.php");
+    header("Location: " . $redirect_page);
     exit();
 }
 
@@ -142,23 +188,57 @@ include '../includes/header.php';
                             </tr>
 
                             <div class="modal fade" id="editModal<?php echo $p['property_id']; ?>" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Modify Structural Logistics</h5>
+                                                <h5 class="fw-bold">Modify Property Information</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="action" value="edit">
                                                 <input type="hidden" name="property_id" value="<?php echo $p['property_id']; ?>">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Adjusted Price (RM)</label>
-                                                    <input type="number" step="0.01" name="price" class="form-control" value="<?php echo $p['price']; ?>" required>
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Property Code</label>
+                                                        <input type="text" name="property_code" class="form-control" value="<?php echo htmlspecialchars($p['property_code'] ?? ''); ?>" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Property Name</label>
+                                                        <input type="text" name="project_name" class="form-control" value="<?php echo htmlspecialchars($p['project_name']); ?>" required>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Adjusted Total Units</label>
-                                                    <input type="number" name="total_units" class="form-control" value="<?php echo $p['total_units']; ?>" required>
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">State</label>
+                                                        <select name="state" class="form-select" required>
+                                                            <?php foreach ($malaysia_regions as $region): ?>
+                                                                <option value="<?php echo htmlspecialchars($region); ?>" <?php echo $p['state'] === $region ? 'selected' : ''; ?>><?php echo htmlspecialchars($region); ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Type</label>
+                                                        <select name="property_type" class="form-select" required>
+                                                            <?php foreach ($property_types as $type_value => $type_label): ?>
+                                                                <option value="<?php echo htmlspecialchars($type_value); ?>" <?php echo $p['property_type'] === $type_value ? 'selected' : ''; ?>><?php echo htmlspecialchars($type_label); ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Price (RM)</label>
+                                                        <input type="number" step="0.01" name="price" class="form-control" value="<?php echo $p['price']; ?>" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Total Units</label>
+                                                        <input type="number" name="total_units" class="form-control" value="<?php echo $p['total_units']; ?>" required>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Built Up (Sqft)</label>
+                                                        <input type="number" name="built_up_sqft" class="form-control" value="<?php echo $p['built_up_sqft']; ?>" required>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -209,7 +289,7 @@ include '../includes/header.php';
 <div class="modal fade" id="addPropModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="fw-bold">Register Free Market Property Unit</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -269,9 +349,13 @@ include '../includes/header.php';
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold">Floor Space Capacity (Sqft)</label>
                             <input type="number" name="built_up_sqft" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Property Photo</label>
+                            <input type="file" name="property_image" class="form-control" accept="image/jpeg,image/png,image/webp">
                         </div>
                     </div>
                 </div>

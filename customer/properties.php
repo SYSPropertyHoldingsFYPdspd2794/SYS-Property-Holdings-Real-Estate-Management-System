@@ -7,6 +7,7 @@
 
 include_once '../includes/header.php';
 require_once '../includes/auth_check.php';
+require_once '../includes/property_images.php';
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
@@ -139,23 +140,7 @@ $result = $stmt->get_result();
                     $badge_class = $is_affordable ? "bg-success text-white premium-badge" : "bg-dark text-gold premium-badge";
                 }
                 
-                $dbType = strtolower(trim($row['property_type']));
-                $rawState = trim($row['state']);
-                if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
-                if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
-                $stateName = ucwords(strtolower($rawState)); 
-                
-                $folder = ($dbType === 'commercial') ? "Commercial/" : (($dbType === 'terrace') ? "Terrace/" : (($dbType === 'bungalow') ? "Bungalow/" : "Apartment/"));
-                $filePrefix = ucfirst($dbType);
-
-                $baseDir = $root_prefix . "SYS Property Catalog/";
-                $fileName = $filePrefix . " - " . $stateName;
-                $finalImg = $baseDir . "placeholder.jpg"; 
-
-                foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
-                    $testPath = $baseDir . $folder . $fileName . "." . $ext;
-                    if (file_exists("../" . str_replace('../', '', $testPath))) { $finalImg = $testPath; break; }
-                }
+                $finalImg = property_catalog_image_path($row, $root_prefix, '../');
                 ?>
                 <div class="col-lg-4 col-md-6 mb-5">
                     <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white text-dark">
