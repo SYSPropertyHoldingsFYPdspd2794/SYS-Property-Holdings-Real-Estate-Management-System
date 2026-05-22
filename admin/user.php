@@ -313,13 +313,13 @@ include '../includes/header.php';
     <?php endif; ?>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="fas fa-users-cog text-primary me-2"></i>User Management</h2>
+        <h2 class="fw-bold text-white"><i class="fas fa-users-cog text-primary me-2"></i>User Management</h2>
         <button class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#registerModal">
             <i class="fas fa-user-plus me-2"></i>Add User
         </button>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 bg-white text-dark">
         <div class="card-body p-4">
             <div class="table-responsive">
                 <table id="usersTable" class="table table-hover align-middle">
@@ -367,7 +367,7 @@ include '../includes/header.php';
                             <?php ob_start(); ?>
                             <div class="modal fade" id="editModal<?php echo (int)$u['account_id']; ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
+                                    <div class="modal-content bg-white text-dark">
                                         <div class="modal-header bg-dark text-white">
                                             <h5 class="modal-title fw-bold">Edit <?php echo htmlspecialchars($role); ?> Account</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -468,7 +468,7 @@ include '../includes/header.php';
 
 <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content bg-white text-dark">
             <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title fw-bold">New User Account</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>

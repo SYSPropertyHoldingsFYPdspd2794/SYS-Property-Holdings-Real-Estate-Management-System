@@ -265,7 +265,7 @@ $proximityHtml .= '</div>';
 <div class="container my-5">
     <div class="row">
         <div class="col-md-7 mb-4">
-            <div class="card shadow-lg border-0 overflow-hidden h-100 rounded-4 property-hero-card">
+            <div class="card shadow-lg border-0 overflow-hidden h-100 rounded-4 property-hero-card bg-white">
                 <div class="position-relative zoom-container" style="cursor: zoom-in;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-25 zoom-overlay">

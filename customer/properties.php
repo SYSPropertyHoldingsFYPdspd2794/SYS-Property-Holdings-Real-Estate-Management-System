@@ -70,7 +70,7 @@ $result = $stmt->get_result();
         </div>
     </div>
 
-    <div class="card shadow-lg border-0 mb-5 bg-white rounded-4 filter-glass">
+    <div class="card shadow-lg border-0 mb-5 bg-white text-dark rounded-4 filter-glass">
         <div class="card-body p-4">
             <form method="GET" action="properties.php">
                 <div class="row g-3">
@@ -116,7 +116,7 @@ $result = $stmt->get_result();
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm text-uppercase tracking-wider catalog-search-btn">Search</button>
+                        <button type="submit" class="btn btn-dark text-white w-100 fw-bold shadow-sm text-uppercase tracking-wider catalog-search-btn">Search</button>
                     </div>
                 </div>
             </form>
@@ -158,7 +158,7 @@ $result = $stmt->get_result();
                 }
                 ?>
                 <div class="col-lg-4 col-md-6 mb-5">
-                    <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white">
+                    <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white text-dark">
                         <div class="position-relative overflow-hidden" style="height: 280px;">
                             <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100 image-zoom" style="object-fit: cover;">
                             <div class="image-overlay"></div>
@@ -215,11 +215,11 @@ $result = $stmt->get_result();
 .bg-gold { background-color: #c5a059 !important; }
 
 .property-catalog-page {
-    color: #20242b;
+    color: #f4f1e8;
 }
 
 .catalog-title {
-    color: #15191f;
+    color: #ffffff;
 }
 
 .filter-glass {
