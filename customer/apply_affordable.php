@@ -14,6 +14,12 @@ include '../includes/db_connect.php';
 
 $account_id = $_SESSION['account_id'];
 $error = '';
+$application_modal = null;
+
+if (isset($_SESSION['affordable_application_result'])) {
+    $application_modal = $_SESSION['affordable_application_result'];
+    unset($_SESSION['affordable_application_result']);
+}
 
 $user_stmt = $conn->prepare("SELECT monthly_income FROM customers WHERE customer_id = ?");
 $user_stmt->bind_param("i", $account_id);
@@ -24,7 +30,7 @@ $user_income = (float)($user['monthly_income'] ?? 0);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prop_id = isset($_POST['property_id']) ? (int)$_POST['property_id'] : 0;
     
-    $prop_check = $conn->prepare("SELECT property_id, income_limit_rm FROM properties WHERE property_id = ? AND status IN ('ACTIVE', 'AVAILABLE') AND is_affordable = 1");
+    $prop_check = $conn->prepare("SELECT property_id, project_name, income_limit_rm FROM properties WHERE property_id = ? AND status IN ('ACTIVE', 'AVAILABLE') AND is_affordable = 1");
     $prop_check->bind_param("i", $prop_id);
     $prop_check->execute();
     $prop_res = $prop_check->get_result();
@@ -75,7 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $doc_stmt->execute();
                         
                         $conn->commit();
-                        header("Location: track_status.php?success=application_submitted");
+                        $_SESSION['affordable_application_result'] = [
+                            'status' => 'qualified',
+                            'title' => 'Qualified Application',
+                            'message' => 'Your affordable housing application for ' . $property_data['project_name'] . ' has been submitted for review. Your declared monthly income is within the current income limit and your financial document was received.',
+                        ];
+                        header("Location: apply_affordable.php?result=qualified");
                         exit();
                     } else {
                         throw new Exception("File system error: Unable to save uploaded document.");
@@ -86,6 +97,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+    }
+
+    if ($error !== '') {
+        $application_modal = [
+            'status' => 'non_qualified',
+            'title' => 'Non Qualified Application',
+            'message' => $error . ' If your declared monthly income is incorrect, please update it in your Profile before submitting again.',
+        ];
     }
 }
 
@@ -121,7 +140,7 @@ include '../includes/header.php';
                         <div class="mb-4">
                             <label class="form-label fw-bold">Declared Monthly Income (RM)</label>
                             <input type="text" class="form-control form-control-lg bg-light" value="<?php echo number_format($user_income, 2); ?>" readonly>
-                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="profile.php" class="fw-bold text-decoration-none">Profile</a> before submitting.</small>
+                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="profile.php" class="fw-bold text-decoration-none income-profile-warning-link">Profile</a> before submitting.</small>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border border-primary">
                             <label class="form-label fw-bold"><i class="fas fa-file-pdf text-danger me-2"></i>Income Declaration / EPF Abstract *</label>
@@ -135,4 +154,73 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+
+<?php if ($application_modal !== null): ?>
+    <?php
+        $is_qualified = ($application_modal['status'] ?? '') === 'qualified';
+        $modal_header_class = $is_qualified ? 'bg-success text-white' : 'bg-danger text-white';
+        $modal_icon = $is_qualified ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    ?>
+    <div class="modal fade" id="applicationResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header <?php echo $modal_header_class; ?>">
+                    <h5 class="modal-title fw-bold"><i class="fas <?php echo $modal_icon; ?> me-2"></i><?php echo htmlspecialchars($application_modal['title']); ?></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-0"><?php echo htmlspecialchars($application_modal['message']); ?></p>
+                </div>
+                <div class="modal-footer">
+                    <?php if ($is_qualified): ?>
+                        <a href="dashboard.php" class="btn btn-success fw-bold">View Dashboard</a>
+                        <a href="track_status.php?success=application_submitted" class="btn btn-outline-dark fw-bold">Track Status</a>
+                    <?php else: ?>
+                        <a href="profile.php" class="btn btn-danger fw-bold income-profile-warning-link">Update Profile</a>
+                        <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Review Application</button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<div class="modal fade" id="incomeProfileWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold"><i class="fas fa-scale-balanced me-2"></i>Income Declaration Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-0">Your monthly income must be accurate and supported by your financial documents. False or misleading income information may cause rejection, cancellation of approval, and possible legal action for fraud.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Cancel</button>
+                <a href="profile.php" class="btn btn-warning fw-bold">I Understand, Go to Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const resultModalElement = document.getElementById('applicationResultModal');
+    if (resultModalElement) {
+        new bootstrap.Modal(resultModalElement).show();
+    }
+
+    const warningModalElement = document.getElementById('incomeProfileWarningModal');
+    if (warningModalElement) {
+        const warningModal = new bootstrap.Modal(warningModalElement);
+        document.querySelectorAll('.income-profile-warning-link').forEach(function (profileLink) {
+            profileLink.addEventListener('click', function (event) {
+                event.preventDefault();
+                warningModal.show();
+            });
+        });
+    }
+});
+</script>
+
 <?php include '../includes/footer.php'; ?>
