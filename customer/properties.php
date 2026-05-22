@@ -2,7 +2,7 @@
 /**
  * PROJECT: SYS Property Holdings
  * FILE: customer/properties.php
- * DESCRIPTION: Customer property catalog. Fixed Federal Territories value mapping to match database.
+ * DESCRIPTION: Customer property catalog. Upgraded with dynamic SOLD OUT badges and filtering parameters.
  */
 
 include_once '../includes/header.php';
@@ -38,7 +38,8 @@ $search_name = isset($_GET['search_name']) ? trim($_GET['search_name']) : '';
 $filter_state = isset($_GET['filter_state']) ? trim($_GET['filter_state']) : '';
 $filter_type = isset($_GET['filter_type']) ? trim($_GET['filter_type']) : '';
 
-$sql = "SELECT * FROM properties WHERE (status = 'ACTIVE' OR status = 'AVAILABLE')";
+// FIXED MATRIX: Expanded query layer scope to explicitly include SOLD_OUT assets in customer view
+$sql = "SELECT * FROM properties WHERE (status = 'ACTIVE' OR status = 'AVAILABLE' OR status = 'SOLD_OUT')";
 $params = [];
 $types = "";
 
@@ -127,8 +128,16 @@ $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $is_affordable = ($row['is_affordable'] == 1);
-                $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
-                $badge_class = $is_affordable ? "bg-success" : "bg-primary";
+                $is_sold_out = (trim($row['status']) === 'SOLD_OUT');
+                
+                // FIXED MATRIX: Determine active layout badge properties based on asset occupancy values
+                if ($is_sold_out) {
+                    $badge_text = "SOLD OUT";
+                    $badge_class = "bg-danger text-white";
+                } else {
+                    $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
+                    $badge_class = $is_affordable ? "bg-success" : "bg-primary";
+                }
                 
                 $dbType = strtolower(trim($row['property_type']));
                 $rawState = trim($row['state']);
@@ -175,7 +184,7 @@ $result = $stmt->get_result();
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 py-3 text-center border-top">
-                            <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
+                            <small class="text-muted"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="<?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0 (SOLD OUT)' : $row['total_units']; ?></strong></small>
                         </div>
                     </div>
                 </div>

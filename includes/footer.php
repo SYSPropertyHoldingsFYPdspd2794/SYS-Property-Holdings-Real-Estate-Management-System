@@ -1,34 +1,62 @@
-<footer class="bg-dark text-light py-5 mt-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5 class="text-uppercase fw-bold mb-3">SYS Property Holdings</h5>
-                <p>Empowering first-time homebuyers in Malaysia through a seamless online-to-offline real estate journey. Discover, apply, and own your dream home today.</p>
+<footer class="bg-dark text-light py-5 mt-5 border-top border-secondary border-opacity-25" style="background-color: #111418 !important;">
+    <div class="container py-3">
+        <div class="row g-4">
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <h5 class="text-uppercase fw-bold mb-3 text-white tracking-wider"><i class="fas fa-hotel text-warning me-2"></i>SYS Property</h5>
+                <p class="text-muted small lh-lg mb-4">SYS Property Holdings is a premier integrated real estate community developer in Malaysia. We engineer digital O2O solutions to simplify first-time homebuyer journeys, unlocking transparent housing data across multiple states.</p>
+                <div class="d-flex gap-3 social-links">
+                    <a href="#" class="btn btn-sm btn-outline-secondary rounded-circle text-white" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary rounded-circle text-white" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary rounded-circle text-white" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary rounded-circle text-white" title="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="text-uppercase fw-bold mb-3">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="#" class="text-light text-decoration-none">Property Catalog</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">RMMJ & RSKU Applications</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Loan Calculator</a></li>
-                    <li><a href="#" class="text-light text-decoration-none">Privacy Policy (PDPA)</a></li>
+            
+            <div class="col-md-4 col-lg-2 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Portfolios</h6>
+                <ul class="list-unstyled footer-menu-links font-monospace small">
+                    <li class="mb-2"><a href="properties.php" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Market Houses</a></li>
+                    <li class="mb-2"><a href="properties.php?filter_type=AFFORDABLE" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Affordable Units</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Landed Terrace</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Luxury Bungalows</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-secondary"></i> Commercial Hubs</a></li>
                 </ul>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="text-uppercase fw-bold mb-3">Contact Info</h5>
-                <p><i class="fas fa-map-marker-alt me-2"></i> SYS HQ, Johor Bahru, Malaysia</p>
-                <p><i class="fas fa-phone me-2"></i> +60 7-123 4567</p>
-                <p><i class="fas fa-envelope me-2"></i> hello@sysproperty.com.my</p>
+
+            <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Governance & Links</h6>
+                <ul class="list-unstyled footer-menu-links font-monospace small">
+                    <li class="mb-2"><a href="about_us.php" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-shield-alt me-1 text-secondary"></i> Corporate Identity</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-calculator me-1 text-secondary"></i> Loan Estimator Matrix</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-user-shield me-1 text-secondary"></i> PDPA Privacy 2010</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-file-contract me-1 text-secondary"></i> Terms of Use</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted text-decoration-none d-block py-1"><i class="fas fa-gavel me-1 text-secondary"></i> HDA Regulation Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">HQ Contact Center</h6>
+                <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-2 fa-fw"></i> SYS Tower HQ, Menara Iskandar, Johor Bahru, Malaysia</p>
+                <p class="text-muted small mb-2"><i class="fas fa-phone text-success me-2 fa-fw"></i> +60 7-123 4567</p>
+                <p class="text-muted small mb-3"><i class="fas fa-envelope text-info me-2 fa-fw"></i> solutions@sysproperty.com.my</p>
+                <div class="p-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-3">
+                    <small class="text-white d-block fw-bold mb-1"><i class="far fa-clock text-warning me-1"></i> Customer Desk Hours</small>
+                    <small class="text-muted d-block font-monospace">Mon — Fri: 09:00 AM - 06:00 PM</small>
+                    <small class="text-muted d-block font-monospace">Sat — Sun: 10:00 AM - 04:00 PM</small>
+                </div>
             </div>
         </div>
-        <hr class="bg-secondary">
-        <div class="text-center small text-muted">
-            &copy; <?php echo date('Y'); ?> SYS Property Holdings. All Rights Reserved.
+        
+        <hr class="bg-secondary opacity-25 my-4">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 text-muted small">
+            <div>&copy; <?php echo date('Y'); ?> SYS Property Holdings Group. All Rights Reserved.</div>
+            <div class="font-monospace text-uppercase" style="font-size: 10px; letter-spacing: 1px;">CIDB Grade G7 Corporate Registry / M&E Compliant</div>
         </div>
     </div>
 </footer>
 
-<script>
+<script { sandbox: 'allow-scripts' }>
 /**
  * password: The string from the input field
  * prefix: A unique string (e.g., 'adm_') to identify which checklist to update
