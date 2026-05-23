@@ -35,6 +35,17 @@ while ($row = $res->fetch_assoc()) {
     $settings[$row['setting_key']] = $row;
 }
 
+// Fetch expired documents violating PDPA retention policy
+$retention_days = (int) ($settings['DATA_RETENTION_DAYS']['setting_value'] ?? 7);
+$stmt_expired = $conn->prepare("SELECT document_id, document_type, file_path, uploaded_at FROM documents WHERE is_purged = FALSE AND uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY)");
+$stmt_expired->bind_param("i", $retention_days);
+$stmt_expired->execute();
+$expired_docs_res = $stmt_expired->get_result();
+$expired_docs = [];
+while ($doc = $expired_docs_res->fetch_assoc()) {
+    $expired_docs[] = $doc;
+}
+
 include '../includes/header.php';
 ?>
 
@@ -77,11 +88,92 @@ include '../includes/header.php';
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <small class="text-muted italic">Note: Security and password management are moved to the Admin Profile page.</small>
+            <div class="text-center mt-4 mb-5">
+                <small class="text-muted fst-italic">Note: Security and password management are moved to the Admin Profile page.</small>
+            </div>
+
+            <!-- PDPA Compliance Card -->
+            <div class="card shadow border-0 mt-5 mb-5">
+                <div class="card-header bg-danger text-white p-4 d-flex justify-content-between align-items-center">
+                    <h3 class="fw-bold m-0"><i class="fas fa-file-excel me-2"></i>PDPA Compliance - Expired Documents</h3>
+                    <?php if (count($expired_docs) > 0): ?>
+                        <button id="btnExecutePurge" class="btn btn-warning fw-bold text-dark shadow-sm">
+                            <i class="fas fa-trash-alt me-2"></i> Execute Purge Script
+                        </button>
+                    <?php else: ?>
+                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i> Fully Compliant</span>
+                    <?php endif; ?>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted">Documents older than <strong><?php echo $retention_days; ?> days</strong> violating the retention policy.</p>
+                    
+                    <div id="purgeAlertContainer"></div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Document ID</th>
+                                    <th>Type</th>
+                                    <th>File Path</th>
+                                    <th>Uploaded At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($expired_docs) > 0): ?>
+                                    <?php foreach ($expired_docs as $doc): ?>
+                                        <tr>
+                                            <td class="fw-bold text-danger">#<?php echo htmlspecialchars($doc['document_id']); ?></td>
+                                            <td><?php echo htmlspecialchars($doc['document_type']); ?></td>
+                                            <td class="font-monospace small"><?php echo htmlspecialchars($doc['file_path']); ?></td>
+                                            <td><?php echo htmlspecialchars($doc['uploaded_at']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">
+                                            No expired documents found. The system is compliant.
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnExecutePurge = document.getElementById('btnExecutePurge');
+    if (btnExecutePurge) {
+        btnExecutePurge.addEventListener('click', function() {
+            if (confirm('Are you sure you want to permanently delete all expired documents? This action cannot be undone.')) {
+                
+                btnExecutePurge.disabled = true;
+                btnExecutePurge.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Purging...';
+                
+                fetch('cron_purge.php', { method: 'POST' })
+                    .then(response => response.text())
+                    .then(data => {
+                        const alertContainer = document.getElementById('purgeAlertContainer');
+                        alertContainer.innerHTML = '<div class="alert alert-success fw-bold"><i class="fas fa-check-circle me-2"></i>' + data + ' Redirecting...</div>';
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    })
+                    .catch(error => {
+                        const alertContainer = document.getElementById('purgeAlertContainer');
+                        alertContainer.innerHTML = '<div class="alert alert-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Error executing purge.</div>';
+                        btnExecutePurge.disabled = false;
+                        btnExecutePurge.innerHTML = '<i class="fas fa-trash-alt me-2"></i> Execute Purge Script';
+                    });
+            }
+        });
+    }
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>
