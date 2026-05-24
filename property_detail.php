@@ -243,7 +243,7 @@ if ($is_afford) {
                             <div id="placesList" class="p-0 overflow-auto" style="height: 425px;">
                                 <div class="text-center text-muted py-5 mt-4">
                                     <i class="fas fa-satellite fa-2x mb-3 text-secondary"></i>
-                                    <p class="small">Scanning 5KM radius for key infrastructure...</p>
+                                    <p class="small">Scanning 15KM radius for key infrastructure...</p>
                                 </div>
                             </div>
                         </div>
@@ -340,10 +340,22 @@ function initMap() {
                 animation: google.maps.Animation.DROP
             });
 
-            // 3. Request Nearby Places (Radius 5KM)
+            const proximityCircle = new google.maps.Circle({
+                strokeColor: '#0d6efd',
+                strokeOpacity: 0.55,
+                strokeWeight: 2,
+                fillColor: '#0d6efd',
+                fillOpacity: 0.08,
+                map: map,
+                center: propertyLocation,
+                radius: 15000
+            });
+            map.fitBounds(proximityCircle.getBounds());
+
+            // 3. Request Nearby Places (Radius 15KM)
             const request = {
                 location: propertyLocation,
-                radius: '5000', 
+                radius: '15000', 
                 types: ['shopping_mall', 'hospital', 'school', 'university', 'transit_station']
             };
 
@@ -352,7 +364,7 @@ function initMap() {
                 if (placesStatus === google.maps.places.PlacesServiceStatus.OK) {
                     renderPlacesList(places, propertyLocation);
                 } else {
-                    document.getElementById('placesList').innerHTML = '<div class="alert alert-warning m-3 small"><i class="fas fa-exclamation-circle me-2"></i>No nearby amenities found within 5KM radius.</div>';
+                    document.getElementById('placesList').innerHTML = '<div class="alert alert-warning m-3 small"><i class="fas fa-exclamation-circle me-2"></i>No nearby amenities found within 15KM radius.</div>';
                 }
             });
         } else {
@@ -367,8 +379,7 @@ function renderPlacesList(places, propertyLocation) {
     const listContainer = document.getElementById('placesList');
     listContainer.innerHTML = ''; 
 
-    // We aim for the top 8-10 closest places
-    const maxPlaces = Math.min(places.length, 10);
+    const maxPlaces = Math.min(places.length, 8);
     document.getElementById('placesCount').innerText = maxPlaces + " Locations";
 
     // Calculate exact straight-line distances using Spherical Geometry

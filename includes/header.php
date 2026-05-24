@@ -227,6 +227,8 @@ footer.luxury-footer .social-links a {
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>">Government Housing</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>">Showrooms</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-1"></i>Financial Planner</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-1"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
