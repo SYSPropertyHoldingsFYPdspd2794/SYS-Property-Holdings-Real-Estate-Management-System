@@ -11,7 +11,13 @@ $sql = "SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC";
 $result = $conn->query($sql);
 ?>
 
-<div class="container my-5 py-4">
+<div class="container my-5 py-4 position-relative">
+    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'ADMIN'): ?>
+        <div class="position-absolute top-0 end-0 mt-3 me-3 z-3">
+            <a href="admin/edit_bank_rates.php" class="btn btn-warning shadow"><i class="fas fa-edit me-2"></i>Edit Rates</a>
+        </div>
+    <?php endif; ?>
+
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold text-white mb-3"><i class="fas fa-chart-line text-gold me-3"></i>Current Bank Loan Rates</h1>
         <p class="lead text-light w-75 mx-auto">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
