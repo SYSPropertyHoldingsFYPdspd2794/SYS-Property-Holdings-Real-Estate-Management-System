@@ -181,6 +181,7 @@ footer.luxury-footer .social-links a {
 .step-icon { font-size: 3rem; color: var(--luxury-gold); margin-bottom: 1rem; }
 .gov-housing-section { background-color: rgba(255,255,255,0.04); border-left: 5px solid var(--luxury-gold); }
 .password-toggle-btn { min-width: 44px; }
+.password-toggle-btn i { color: #6c757d; }
 .password-toggle-btn:focus { box-shadow: 0 0 0 .25rem rgba(197,160,89,.24); }
 .luxury-title { font-family: 'Playfair Display', serif; letter-spacing: 0.08em; }
 .tracking-wider { letter-spacing: 0.1em; }
