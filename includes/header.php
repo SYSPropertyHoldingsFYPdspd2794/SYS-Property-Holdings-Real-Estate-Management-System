@@ -12,6 +12,7 @@ $dashboard_link = $root_prefix . 'login.php';
 $profile_link = $root_prefix . 'login.php';
 $wishlist_link = $root_prefix . 'login.php';
 $wishlist_text = 'Wishlist';
+$wishlist_icon = 'fas fa-heart';
 
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'ADMIN') {
@@ -19,11 +20,13 @@ if (isset($_SESSION['role'])) {
         $profile_link = $root_prefix . 'admin/profile.php';
         $wishlist_link = $root_prefix . 'admin/interest_timeline.php'; 
         $wishlist_text = 'Interest Timeline';
+        $wishlist_icon = 'fas fa-chart-line';
     } elseif ($_SESSION['role'] === 'STAFF') {
         $dashboard_link = $root_prefix . 'staff/dashboard.php';
         $profile_link = $root_prefix . 'staff/profile.php';
         $wishlist_link = $root_prefix . 'staff/state_inventory.php';
         $wishlist_text = 'State Inventory';
+        $wishlist_icon = 'fas fa-map-location-dot';
     } elseif ($_SESSION['role'] === 'CUSTOMER') {
         $dashboard_link = $root_prefix . 'customer/dashboard.php';
         $profile_link = $root_prefix . 'customer/profile.php';
@@ -225,7 +228,7 @@ footer.luxury-footer .social-links a {
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>">Government Housing</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>">Showrooms</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="fas fa-heart me-1"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-1"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
 </ul>
 <div class="d-flex">

@@ -222,7 +222,9 @@ INSERT INTO `audit_logs` (`log_id`, `account_id`, `action_type`, `entity_type`, 
 CREATE TABLE `banks` (
   `bank_id` int(11) NOT NULL,
   `bank_name` varchar(100) NOT NULL,
-  `interest_rate` decimal(4,2) NOT NULL
+  `interest_rate` decimal(4,2) NOT NULL,
+  `effective_quarter` varchar(10) DEFAULT 'Q1',
+  `effective_year` int(4) DEFAULT 2026
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

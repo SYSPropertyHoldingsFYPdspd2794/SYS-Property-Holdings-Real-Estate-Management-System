@@ -18,12 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rates'])) {
     if (isset($_POST['rates']) && is_array($_POST['rates'])) {
         $conn->begin_transaction();
         try {
-            $stmt = $conn->prepare("UPDATE banks SET interest_rate = ? WHERE bank_id = ?");
-            foreach ($_POST['rates'] as $bank_id => $rate) {
-                // Ensure rate is a valid decimal
-                $rate_val = floatval($rate);
+            $stmt = $conn->prepare("UPDATE banks SET interest_rate = ?, effective_quarter = ?, effective_year = ? WHERE bank_id = ?");
+            foreach ($_POST['rates'] as $bank_id => $data) {
+                // Ensure values are properly casted
+                $rate_val = floatval($data['rate']);
+                $quarter_val = trim($data['quarter']);
+                $year_val = intval($data['year']);
                 $bank_id_val = intval($bank_id);
-                $stmt->bind_param("di", $rate_val, $bank_id_val);
+                $stmt->bind_param("dsii", $rate_val, $quarter_val, $year_val, $bank_id_val);
                 $stmt->execute();
             }
             $conn->commit();
@@ -36,11 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rates'])) {
 }
 
 // Fetch current rates
-$sql = "SELECT bank_id, bank_name, interest_rate FROM banks ORDER BY interest_rate ASC";
+$sql = "SELECT bank_id, bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY interest_rate ASC";
 $result = $conn->query($sql);
 $banks = [];
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
+        // Fallbacks if null
+        $row['effective_quarter'] = $row['effective_quarter'] ?? 'Q1';
+        $row['effective_year'] = $row['effective_year'] ?? date('Y');
         $banks[] = $row;
     }
 }
@@ -76,8 +81,9 @@ include '../includes/header.php';
                     <table class="table text-white table-hover align-middle mb-0" style="background: transparent;">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-uppercase text-muted border-bottom border-secondary" style="width: 50%;">Bank Name</th>
-                                <th scope="col" class="text-uppercase text-muted border-bottom border-secondary" style="width: 50%;">Interest Rate (p.a)</th>
+                                <th scope="col" class="text-uppercase text-muted border-bottom border-secondary" style="width: 40%;">Bank Name</th>
+                                <th scope="col" class="text-uppercase text-muted border-bottom border-secondary" style="width: 30%;">Interest Rate (p.a)</th>
+                                <th scope="col" class="text-uppercase text-muted border-bottom border-secondary" style="width: 30%;">Effective Period</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,9 +93,26 @@ include '../includes/header.php';
                                         <?php echo htmlspecialchars($bank['bank_name']); ?>
                                     </td>
                                     <td class="border-bottom border-secondary" style="background: transparent;">
-                                        <div class="input-group" style="max-width: 200px;">
-                                            <input type="number" step="0.01" min="0" max="100" class="form-control" name="rates[<?php echo $bank['bank_id']; ?>]" value="<?php echo htmlspecialchars($bank['interest_rate']); ?>" required>
+                                        <div class="input-group" style="max-width: 180px;">
+                                            <input type="number" step="0.01" min="0" max="100" class="form-control" name="rates[<?php echo $bank['bank_id']; ?>][rate]" value="<?php echo htmlspecialchars($bank['interest_rate']); ?>" required>
                                             <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                        </div>
+                                    </td>
+                                    <td class="border-bottom border-secondary" style="background: transparent;">
+                                        <div class="d-flex gap-2" style="max-width: 250px;">
+                                            <select class="form-select form-select-sm" name="rates[<?php echo $bank['bank_id']; ?>][quarter]">
+                                                <?php foreach(['Q1','Q2','Q3','Q4'] as $q): ?>
+                                                    <option value="<?php echo $q; ?>" <?php echo ($bank['effective_quarter'] === $q) ? 'selected' : ''; ?>><?php echo $q; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <select class="form-select form-select-sm" name="rates[<?php echo $bank['bank_id']; ?>][year]">
+                                                <?php 
+                                                    $current_year = date('Y');
+                                                    for($y = $current_year - 2; $y <= $current_year + 2; $y++): 
+                                                ?>
+                                                    <option value="<?php echo $y; ?>" <?php echo ($bank['effective_year'] == $y) ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                                                <?php endfor; ?>
+                                            </select>
                                         </div>
                                     </td>
                                 </tr>

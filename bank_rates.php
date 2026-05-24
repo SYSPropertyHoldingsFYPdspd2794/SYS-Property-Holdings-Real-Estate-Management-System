@@ -7,7 +7,7 @@
 
 include_once 'includes/header.php';
 
-$sql = "SELECT bank_name, interest_rate FROM banks ORDER BY interest_rate ASC";
+$sql = "SELECT bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY interest_rate ASC";
 $result = $conn->query($sql);
 ?>
 
@@ -85,6 +85,7 @@ $result = $conn->query($sql);
                             <h6 class="fw-bold text-dark mb-3"><?php echo $bankName; ?></h6>
                             <p class="text-uppercase text-muted fw-bold small mb-1" style="letter-spacing: 1px;">Interest Rate (p.a)</p>
                             <h2 class="display-5 fw-bold text-primary mb-0"><?php echo $rate; ?>%</h2>
+                            <p class="text-muted small mt-2 mb-0"><i class="fas fa-clock me-1"></i>As of <?php echo htmlspecialchars($row['effective_quarter'] ?? 'Q1') . ' ' . htmlspecialchars($row['effective_year'] ?? '2026'); ?></p>
                         </div>
                     </div>
                 </div>
