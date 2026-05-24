@@ -10,8 +10,8 @@ include_once 'includes/header.php';
 <div class="position-relative overflow-hidden bg-dark text-white py-5 mb-5" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat; padding-top: 100px !important; padding-bottom: 100px !important;">
     <div class="container py-5 text-center position-relative z-3">
         <h6 class="text-uppercase fw-bold text-warning tracking-widest mb-3" style="letter-spacing: 4px;">Master Community Developer</h6>
-        <h1 class="display-2 fw-bold text-white mb-4 tracking-tight">Architecting Sustainable Tomorrow</h1>
-        <p class="lead w-75 mx-auto text-light opacity-75 fs-4">SYS Property Holdings stands at the vanguard of Malaysia's real estate tech evolution. We blend state-of-the-art structural craftsmanship with our proprietary Online-to-Offline (O2O) deployment ecosystem to shape liveable future cities.</p>
+        <h1 class="display-2 fw-bold text-white mb-4">Architecting Sustainable Tomorrow</h1>
+        <p class="lead mx-auto text-light opacity-75 fs-4" style="max-width: 900px;">SYS Property Holdings stands at the vanguard of Malaysia's real estate tech evolution. We blend state-of-the-art structural craftsmanship with our proprietary Online-to-Offline (O2O) deployment ecosystem to shape liveable future cities.</p>
     </div>
     <div class="position-absolute bottom-0 start-0 w-100 bg-light" style="height: 15px; clip-path: polygon(0 100%, 100% 100%, 100% 0);"></div>
 </div>
@@ -88,11 +88,11 @@ include_once 'includes/header.php';
         </div>
     </div>
 
-    <div class="bg-light rounded-4 p-5 mb-5 shadow-sm border">
+    <div class="bg-light rounded-4 p-4 p-lg-5 mb-5 shadow-sm border">
         <div class="text-center mb-5">
             <span class="badge bg-dark px-3 py-2 rounded-pill mb-2 text-uppercase fw-bold">Chronicle Record</span>
             <h2 class="fw-bold text-dark">Our Journey Horizon</h2>
-            <p class="text-muted w-50 mx-auto">Tracing our history from a specialized infrastructure firm into a diversified real estate enterprise group.</p>
+            <p class="text-muted mx-auto" style="max-width: 620px;">Tracing our history from a specialized infrastructure firm into a diversified real estate enterprise group.</p>
         </div>
         
         <div class="row g-4 justify-content-center timeline-row font-monospace">
@@ -120,7 +120,7 @@ include_once 'includes/header.php';
     <div class="text-center mb-5 mt-5 pt-4">
         <span class="badge bg-secondary px-3 py-2 rounded-pill mb-2 text-uppercase fw-bold">Operational Scope</span>
         <h2 class="fw-bold text-white display-6">Our Pillars of Excellence</h2>
-        <p class="text-light w-50 mx-auto">Driving regional socioeconomic advancement across key strategic industry vectors.</p>
+        <p class="text-light mx-auto" style="max-width: 620px;">Driving regional socioeconomic advancement across key strategic industry vectors.</p>
     </div>
 
     <div class="row g-4 text-center">
@@ -154,12 +154,5 @@ include_once 'includes/header.php';
         </div>
     </div>
 </div>
-
-<style>
-.tracking-widest { letter-spacing: 3px; }
-.hover-lift { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-bottom: 4px solid transparent; }
-.hover-lift:hover { transform: translateY(-8px); border-bottom: 4px solid #0d6efd; box-shadow: 0 1rem 3rem rgba(0,0,0,0.12)!important; }
-.timeline-row .card { transition: border-color 0.3s ease; }
-</style>
 
 <?php include_once 'includes/footer.php'; ?>

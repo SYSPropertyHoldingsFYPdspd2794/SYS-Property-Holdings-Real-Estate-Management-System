@@ -10,11 +10,12 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 ?>
 
 <div class="container-fluid bg-dark text-white py-5 text-center shadow-sm">
-    <h1 class="display-4 fw-bold mb-3 mt-3">Locate Our Showrooms</h1>
-    <p class="lead w-50 mx-auto opacity-75 mb-4">Bridging the digital divide. Explore properties online, but finalize your purchase securely at our physical branches nationwide.</p>
+    <div class="section-kicker mb-2 pt-3">Nationwide showroom network</div>
+    <h1 class="display-4 fw-bold mb-3">Locate Our Showrooms</h1>
+    <p class="lead mx-auto opacity-75 mb-4" style="max-width: 760px;">Bridging the digital divide. Explore properties online, but finalize your purchase securely at our physical branches nationwide.</p>
     
     <div class="d-flex justify-content-center pb-4">
-        <select id="mapStateSelect" class="form-select form-select-lg w-auto text-center shadow fw-bold border-0" style="min-width: 350px;">
+        <select id="mapStateSelect" class="form-select form-select-lg text-center shadow fw-bold border-0" style="max-width: 420px;">
             <option value="" selected disabled>-- Locate Your Nearest Branch --</option>
             <optgroup label="States">
                 <option value="Johor Bahru">Johor</option>
@@ -40,7 +41,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
     </div>
 </div>
 
-<div class="container mt-n5 position-relative z-1 mb-5">
+<div class="container position-relative z-1 mb-5" style="margin-top: -3rem;">
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
         <div class="card-body p-0" style="height: 450px;" id="showroomMapFrame">
             <div class="d-flex h-100 flex-column justify-content-center align-items-center text-muted bg-light">
@@ -53,8 +54,9 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
 <div class="container my-5 py-4">
     <div class="text-center mb-5 pb-4">
-        <h2 class="fw-bold text-white">The O2O Showroom Experience</h2>
-        <p class="text-light">No online payments. No hidden gateways. 100% secure offline commitments.</p>
+        <div class="section-kicker mb-2">In-person confidence</div>
+        <h2 class="section-title text-white">The O2O Showroom Experience</h2>
+        <p class="text-light mx-auto" style="max-width: 680px;">No online payments. No hidden gateways. 100% secure offline commitments.</p>
     </div>
 
     <div class="row align-items-center mb-5 pb-4">
@@ -83,7 +85,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
         </div>
         <div class="col-md-6 px-lg-5">
             <h3 class="fw-bold text-gold mb-3">Transparent Processes</h3>
-            <p class="fs-5 text-light">We pride ourselves on absolute transparency. What you see on our digital catalog is exactly what you get. Our standard service protocol guarantees no hidden surcharges—every property detail and purchasing flow is explained clearly offline.</p>
+            <p class="fs-5 text-light">We pride ourselves on absolute transparency. What you see on our digital catalog is exactly what you get. Our standard service protocol guarantees no hidden surcharges, and every property detail and purchasing flow is explained clearly offline.</p>
         </div>
     </div>
 
@@ -93,7 +95,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
         </div>
         <div class="col-md-6 px-lg-5 text-md-end">
             <h3 class="fw-bold text-gold mb-3">Secure Offline Transactions</h3>
-            <p class="fs-5 text-light">Your security is our priority. We strictly prohibit online deposits or financial transactions through our portal. All sensitive matters—including downpayments, legal contract signing, and the official handover of keys—are conducted face-to-face.</p>
+            <p class="fs-5 text-light">Your security is our priority. We strictly prohibit online deposits or financial transactions through our portal. All sensitive matters, including downpayments, legal contract signing, and the official handover of keys, are conducted face-to-face.</p>
         </div>
     </div>
 </div>

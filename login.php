@@ -55,12 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include 'includes/header.php';
 ?>
 
-<div class="container my-5">
+<div class="container my-5 py-4">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 auth-card">
                 <div class="card-body p-5">
-                    <h2 class="text-center fw-bold mb-4">Sign In</h2>
+                    <div class="text-center mb-4">
+                        <div class="section-kicker mb-2">Welcome back</div>
+                        <h2 class="fw-bold mb-2">Sign In</h2>
+                        <p class="text-muted mb-0">Access your dashboard, saved homes, and appointments.</p>
+                    </div>
                     
                     <?php if ($error_message !== ''): ?>
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>

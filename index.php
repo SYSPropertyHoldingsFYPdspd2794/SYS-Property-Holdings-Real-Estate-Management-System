@@ -19,16 +19,53 @@ if (isset($_SESSION['role'])) {
 include 'includes/header.php';
 ?>
 
-<section class="hero-banner text-center">
+<section class="hero-banner">
     <div class="container">
-        <h1 class="display-3 fw-bold mb-4">Your First Home Starts Here</h1>
-        <p class="lead mb-5">Experience Malaysia's premier Online-to-Offline real estate platform. Exclusive access to top-tier commercial units, standard terraces, and government subsidized housing.</p>
-        <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow">View Catalog</a>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8">
+                <div class="section-kicker mb-3">Online to offline real estate</div>
+                <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
+                <p class="lead mb-5 fs-4">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3">View Catalog</a>
+                    <a href="showrooms.php" class="btn btn-outline-light btn-lg px-4 py-3">Find Showrooms</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="hero-stat-panel bg-white text-dark p-4 rounded-4 shadow-lg">
+                    <div class="d-flex justify-content-between gap-3 mb-3">
+                        <div>
+                            <small class="text-muted text-uppercase fw-bold">Active regions</small>
+                            <h3 class="fw-bold mb-0">16</h3>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted text-uppercase fw-bold">O2O model</small>
+                            <h3 class="fw-bold mb-0">100%</h3>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-3 bg-light">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="step-icon mb-0"><i class="fas fa-shield-alt"></i></span>
+                            <div>
+                                <h6 class="fw-bold mb-1">Secure by design</h6>
+                                <p class="small text-muted mb-0">Browse online, confirm commitments with trained consultants offline.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
 <section class="container my-5 py-5">
-    <h2 class="fw-bold mb-4 text-white">New & Upcoming Developments</h2>
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <div class="section-kicker mb-2">Featured launches</div>
+            <h2 class="section-title text-white mb-0">New & Upcoming Developments</h2>
+        </div>
+        <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-light">Browse all</a>
+    </div>
     <div class="horizontal-scroll">
         <div class="card scroll-card">
             <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=300&fit=crop" class="card-img-top" alt="Development 1">
@@ -63,12 +100,13 @@ include 'includes/header.php';
 
 <section class="bg-light py-5">
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center g-5">
             <div class="col-lg-5 mb-4 mb-lg-0">
-                <h2 class="fw-bold mb-4">Locate Our Offline Showrooms</h2>
-                <p class="lead mb-4">We are present nationwide. Select your state to find the nearest physical showroom for your exclusive offline tour and financial consultation.</p>
+                <div class="section-kicker mb-2">Nationwide support</div>
+                <h2 class="section-title mb-4">Locate Our Offline Showrooms</h2>
+                <p class="lead mb-4">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
-                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm border-primary">
+                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
                     <option value="" selected disabled>-- Select a State / Territory --</option>
                     <optgroup label="States">
                         <option value="Johor">Johor</option>
@@ -94,7 +132,7 @@ include 'includes/header.php';
             </div>
             
             <div class="col-lg-7">
-                <div class="card border-0 shadow rounded-4 overflow-hidden">
+                <div class="card border-0 overflow-hidden">
                     <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
                         <h4 class="fw-bold mb-1"><i class="fas fa-store text-primary me-2"></i>Our Showroom Location</h4>
                         <p id="showroomCity" class="text-muted mb-3">Please select a state to view details.</p>
@@ -112,9 +150,10 @@ include 'includes/header.php';
 </section>
 
 <section class="container my-5 py-5">
-    <div class="gov-housing-section p-5 rounded shadow-sm">
-        <div class="row align-items-center">
+    <div class="gov-housing-section p-4 p-lg-5 rounded-4">
+        <div class="row align-items-center g-4">
             <div class="col-lg-8">
+                <div class="section-kicker mb-2">Affordable pathway</div>
                 <h2 class="fw-bold display-6 mb-3 text-white">Government Affordable Housing Initiative</h2>
                 <p class="lead mb-4 text-light">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
                 <ul class="list-unstyled fs-5 mb-4">
@@ -124,7 +163,7 @@ include 'includes/header.php';
                     <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> First-Time Homebuyer</li>
                 </ul>
                 <p class="text-danger fw-bold"><i class="fas fa-info-circle me-1"></i> Priority given to applicants with dependents</p>
-                <a href="<?php echo $apply_link; ?>" class="btn btn-dark btn-lg mt-3 px-5 rounded-pill shadow">Apply Now</a>
+                <a href="<?php echo $apply_link; ?>" class="btn btn-primary btn-lg mt-3 px-5">Apply Now</a>
             </div>
             <div class="col-lg-4 d-none d-lg-flex align-items-center justify-content-center">
                 <i class="fas fa-home text-primary" style="font-size: 10rem; opacity: 0.1;"></i>
@@ -133,9 +172,11 @@ include 'includes/header.php';
     </div>
 </section>
 
-<section class="container-fluid my-5 py-5 text-center bg-white">
-    <h2 class="fw-bold mb-5">Your O2O Property Journey</h2>
-    <div class="row justify-content-center">
+<section class="my-5 py-5 text-center bg-white">
+    <div class="container">
+    <div class="section-kicker mb-2">How it works</div>
+    <h2 class="section-title mb-5">Your O2O Property Journey</h2>
+    <div class="row justify-content-center g-4">
         <div class="col-md-3 col-sm-6 mb-4">
             <i class="fas fa-laptop-house step-icon"></i>
             <h5 class="fw-bold">1. Explore 3D Catalogs</h5>
@@ -152,15 +193,19 @@ include 'includes/header.php';
             <p class="text-muted">Visit our physical locations for a personalized guided experience.</p>
         </div>
     </div>
+    </div>
 </section>
 
 <section class="bg-light py-5">
     <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Featured Active Projects</h2>
-            <a href="<?php echo $catalog_link; ?>" class="text-decoration-none fw-bold">View All <i class="fas fa-arrow-right ms-1"></i></a>
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <div class="section-kicker mb-2">Ready to explore</div>
+                <h2 class="section-title mb-0">Featured Active Projects</h2>
+            </div>
+            <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-dark">View All <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
-        <div class="row">
+        <div class="row g-4">
         <?php
         if(isset($conn)) {
             $sql = "SELECT property_id, project_name, state, property_type, price FROM properties WHERE status = 'ACTIVE' ORDER BY property_id DESC LIMIT 3";
@@ -171,8 +216,8 @@ include 'includes/header.php';
                     
                     $detail_link = $catalog_link === 'login.php' ? 'login.php' : (isset($_SESSION['role']) && $_SESSION['role'] === 'CUSTOMER' ? 'customer/property_detail.php?id='.$row['property_id'] : 'property_detail.php?id='.$row['property_id']);
 
-                    echo '<div class="col-md-4 mb-4">';
-                    echo '<div class="card h-100 border-0 shadow-sm hover-card">';
+                    echo '<div class="col-md-4">';
+                    echo '<div class="card h-100 border-0 hover-card">';
                     echo '<div class="card-body p-4 d-flex flex-column">';
                     echo '<div><span class="badge bg-primary mb-3 px-3 py-2 shadow-sm">'. htmlspecialchars($row['property_type']). '</span></div>';
                     echo '<h5 class="card-title fw-bold text-dark mb-2">'. htmlspecialchars($row['project_name']). '</h5>';
@@ -180,7 +225,7 @@ include 'includes/header.php';
                     echo '<div class="mt-auto">';
                     echo '<small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">STARTING FROM</small>';
                     echo '<h4 class="text-success fw-bold mb-3">RM '. $formatted_price. '</h4>';
-                    echo '<a href="'.$detail_link.'" class="btn btn-outline-dark w-100 rounded-pill fw-bold">View Details</a>';
+                    echo '<a href="'.$detail_link.'" class="btn btn-outline-dark w-100">View Details</a>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -239,10 +284,5 @@ document.getElementById('stateSelect').addEventListener('change', function() {
     }
 });
 </script>
-
-<style>
-.hover-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.hover-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important; }
-</style>
 
 <?php include 'includes/footer.php';?>

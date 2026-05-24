@@ -61,12 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="container my-5">
+<div class="container my-5 py-4">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 auth-card">
                 <div class="card-body p-5">
-                    <h2 class="text-center fw-bold mb-5">Create an Account</h2>
+                    <div class="text-center mb-5">
+                        <div class="section-kicker mb-2">Start your home journey</div>
+                        <h2 class="fw-bold mb-2">Create an Account</h2>
+                        <p class="text-muted mb-0">Save properties, book visits, and track affordable housing applications.</p>
+                    </div>
 
                     <?php if ($error_message !== ''): ?>
                         <div class="alert alert-danger shadow-sm border-0 mb-4">

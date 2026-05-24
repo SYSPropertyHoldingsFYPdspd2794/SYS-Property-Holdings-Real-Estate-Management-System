@@ -19,9 +19,9 @@ $result = $conn->query($sql);
     <?php endif; ?>
 
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold text-white mb-3"><i class="fas fa-chart-line text-gold me-3"></i>Current Bank Loan Rates</h1>
-        <p class="lead text-light w-75 mx-auto">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
-        <hr class="w-25 mx-auto mt-4 mb-5 border-primary border-2 opacity-75">
+        <div class="section-kicker mb-2">Financing comparison</div>
+        <h1 class="display-4 fw-bold text-white mb-3">Current Bank Loan Rates</h1>
+        <p class="lead text-light mx-auto" style="max-width: 760px;">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
     </div>
 
     <div class="row g-4">
@@ -72,7 +72,7 @@ $result = $conn->query($sql);
                 ?>
                 
                 <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="card h-100 border-0 shadow hover-bank-card overflow-hidden">
+                    <div class="card h-100 border-0 hover-bank-card overflow-hidden">
                         <div class="bg-white p-4 text-center position-relative border-bottom d-flex align-items-center justify-content-center" style="height: 120px;">
                             <?php if($rank <= 3): ?>
                                 <span class="position-absolute top-0 end-0 badge <?php echo $badgeClass; ?> m-2 shadow-sm z-3"><?php echo $badgeText; ?></span>
@@ -98,10 +98,5 @@ $result = $conn->query($sql);
         ?>
     </div>
 </div>
-
-<style>
-.hover-bank-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 15px; }
-.hover-bank-card:hover { transform: translateY(-8px); box-shadow: 0 1.5rem 3rem rgba(0,0,0,0.15)!important; }
-</style>
 
 <?php include_once 'includes/footer.php'; ?>

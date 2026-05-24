@@ -9,10 +9,9 @@ include_once 'includes/header.php';
 
 <div class="container my-5 py-4">
     <div class="text-center mb-5">
-        <span class="badge bg-primary px-3 py-2 fs-6 mb-3 shadow-sm">KPKT Authorized Partner</span>
+        <div class="section-kicker mb-2">KPKT Authorized Partner</div>
         <h1 class="display-4 fw-bold text-white mb-3">Affordable Housing Initiative</h1>
-        <p class="lead text-light w-75 mx-auto">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
-        <hr class="w-25 mx-auto mt-4 border-primary border-2 opacity-75">
+        <p class="lead text-light mx-auto" style="max-width: 780px;">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
     </div>
 
     <div class="row align-items-center mb-5 bg-white p-4 p-lg-5 shadow-sm rounded-4 border">
@@ -97,7 +96,7 @@ include_once 'includes/header.php';
         </div>
     </div>
 
-    <div class="bg-light rounded-4 p-5 text-center shadow-sm">
+    <div class="bg-light rounded-4 p-4 p-lg-5 text-center shadow-sm">
         <h3 class="fw-bold mb-5">The Safe O2O Application Process</h3>
         <div class="row g-4 position-relative">
             <div class="col-md-3">
@@ -136,7 +135,7 @@ include_once 'includes/header.php';
                 $targetUrl = ($_SESSION['role'] === 'CUSTOMER') ? 'customer/properties.php?filter_type=AFFORDABLE' : 'properties.php?filter_type=AFFORDABLE';
             }
             ?>
-            <a href="<?php echo $targetUrl; ?>" class="btn btn-primary btn-lg px-5 rounded-pill shadow fw-bold">View Affordable Inventory</a>
+            <a href="<?php echo $targetUrl; ?>" class="btn btn-primary btn-lg px-5 shadow">View Affordable Inventory</a>
         </div>
     </div>
 </div>

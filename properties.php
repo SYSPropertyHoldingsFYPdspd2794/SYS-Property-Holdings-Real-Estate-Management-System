@@ -36,16 +36,16 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<div class="container my-5">
+<div class="container my-5 py-4">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <h2 class="fw-bold display-5 text-dark">Inventory Catalog</h2>
-            <p class="lead text-secondary text-uppercase small" style="letter-spacing: 2px;">Internal Staff & Administration Management View</p>
-            <hr class="w-25 mx-auto bg-primary" style="height: 3px; opacity: 1;">
+            <div class="section-kicker mb-2">Property inventory</div>
+            <h2 class="fw-bold display-5 text-white">Inventory Catalog</h2>
+            <p class="lead text-light opacity-75">Internal staff and administration management view</p>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 mb-5 bg-light rounded-4">
+    <div class="card shadow-sm border-0 mb-5 bg-light">
         <div class="card-body p-4">
             <form method="GET" action="properties.php">
                 <div class="row g-3">
@@ -91,14 +91,14 @@ $result = $stmt->get_result();
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-dark w-100 fw-bold shadow-sm">Filter</button>
+                        <button type="submit" class="btn btn-dark w-100 shadow-sm"><i class="fas fa-sliders-h me-2"></i>Filter</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <?php
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -108,8 +108,8 @@ $result = $stmt->get_result();
                 
                 $finalImg = property_catalog_image_path($row);
                 ?>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden hover-card">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 overflow-hidden hover-card">
                         <div class="position-relative" style="height: 220px;">
                             <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
@@ -124,7 +124,7 @@ $result = $stmt->get_result();
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 shadow-sm fw-bold">View Details</a>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 py-3 text-center border-top">
@@ -140,10 +140,5 @@ $result = $stmt->get_result();
         ?>
     </div>
 </div>
-
-<style>
-.hover-card { transition: transform 0.3s; }
-.hover-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.15)!important; }
-</style>
 
 <?php include_once 'includes/footer.php'; ?>
