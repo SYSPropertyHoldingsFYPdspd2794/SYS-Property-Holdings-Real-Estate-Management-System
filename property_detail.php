@@ -1,8 +1,8 @@
 <?php
 /**
  * PROJECT: SYS Property Holdings
- * FILE: property_detail.php (ROOT DIRECTORY)
- * DESCRIPTION: Admin and Staff internal workspace. Upgraded Internal Layout and 16-Region Proximity coverage.
+ * FILE: property_detail.php
+ * DESCRIPTION: Upgraded Internal Layout and Dynamic Google Maps Proximity Engine.
  */
 
 include_once 'includes/header.php';
@@ -50,7 +50,7 @@ if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
 
-$finalFloorPlan = $baseDir . $floorPlanName;
+$finalFloorPlan = $baseDir . $floorPlanName; 
 
 // ==================================================================
 // SECTION 1: DETAILED INTERNAL LAYOUT SPECIFICATION
@@ -106,117 +106,6 @@ if ($is_afford) {
         }
     }
 }
-
-// ==================================================================
-// SECTION 2: 16 REGIONS PROXIMITY & NEIGHBORHOOD MAPPING
-// ==================================================================
-$proximityHtml = '<div class="row g-4 fs-5 text-secondary">';
-$stateCheck = strtoupper(trim($property['state']));
-
-if ($stateCheck === 'JOHOR') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Teknologi Malaysia (UTM) <strong class="text-dark">3.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>AEON Mall Tebrau City <strong class="text-dark">5.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Sultanah Aminah Hospital <strong class="text-dark">8.1 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Senai International Airport <strong class="text-dark">18.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'KEDAH') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Aman Central Mall <strong class="text-dark">3.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Sultanah Bahiyah <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Sultan Abdul Halim Airport <strong class="text-dark">12.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Utara Malaysia (UUM) <strong class="text-dark">15.5 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'KELANTAN') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Aeon Mall Kota Bharu <strong class="text-dark">4.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Hospital Raja Perempuan Zainab II <strong class="text-dark">3.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-danger fa-fw me-3"></i> <span>Siti Khadijah Market <strong class="text-dark">2.1 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Ismail Petra Airport <strong class="text-dark">9.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'MELAKA' || $stateCheck === 'MALACCA') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-map-signs text-danger fa-fw me-3"></i> <span>Jonker Street Heritage Area <strong class="text-dark">2.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Melaka General Hospital <strong class="text-dark">4.1 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Dataran Pahlawan Megamall <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-warning fa-fw me-3"></i> <span>Multimedia University (MMU) <strong class="text-dark">6.5 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'NEGERI SEMBILAN') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Palm Mall Seremban <strong class="text-dark">3.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Tuanku Ja\'afar <strong class="text-dark">4.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>UiTM Seremban Campus <strong class="text-dark">7.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store-alt text-warning fa-fw me-3"></i> <span>Seremban Gateway <strong class="text-dark">2.8 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'PAHANG') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>East Coast Mall <strong class="text-dark">4.1 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Hospital Tengku Ampuan Afzan <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-umbrella-beach text-warning fa-fw me-3"></i> <span>Teluk Cempedak Beach <strong class="text-dark">5.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Pahang <strong class="text-dark">18.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'PERAK') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>Ipoh Parade Shopping Centre <strong class="text-dark">2.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Raja Permaisuri Bainun <strong class="text-dark">3.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Azlan Shah Airport <strong class="text-dark">6.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Teknologi PETRONAS <strong class="text-dark">14.5 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'PERLIS') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>C-Mart Arau Hypermarket <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Hospital Tuanku Fauziah <strong class="text-dark">5.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Perlis (UniMAP) <strong class="text-dark">8.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-warning fa-fw me-3"></i> <span>Arau KTM Railway Station <strong class="text-dark">3.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'PENANG' || $stateCheck === 'PULAU PINANG') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-archway text-danger fa-fw me-3"></i> <span>Penang Bridge <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-industry text-primary fa-fw me-3"></i> <span>Bayan Lepas Free Industrial Zone <strong class="text-dark">6.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-success fa-fw me-3"></i> <span>Queensbay Mall <strong class="text-dark">3.8 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-warning fa-fw me-3"></i> <span>Penang General Hospital <strong class="text-dark">7.1 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'SABAH') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Imago Shopping Mall <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Queen Elizabeth Hospital <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Kota Kinabalu International Airport <strong class="text-dark">7.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-danger fa-fw me-3"></i> <span>Universiti Malaysia Sabah (UMS) <strong class="text-dark">12.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'SARAWAK') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-cart text-primary fa-fw me-3"></i> <span>The Spring Shopping Mall <strong class="text-dark">3.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Sarawak General Hospital <strong class="text-dark">4.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Kuching International Airport <strong class="text-dark">8.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Malaysia Sarawak <strong class="text-dark">15.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'SELANGOR') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-danger fa-fw me-3"></i> <span>Sunway Pyramid Mall <strong class="text-dark">4.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-graduation-cap text-primary fa-fw me-3"></i> <span>Monash University Malaysia <strong class="text-dark">3.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Subang Jaya Medical Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Nearest LRT/MRT Station <strong class="text-dark">1.8 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'TERENGGANU') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>KTCC Mall <strong class="text-dark">2.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Hospital Sultanah Nur Zahirah <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-university text-danger fa-fw me-3"></i> <span>Universiti Sultan Zainal Abidin <strong class="text-dark">9.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane text-warning fa-fw me-3"></i> <span>Sultan Mahmud Airport <strong class="text-dark">11.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'KUALA LUMPUR' || $stateCheck === 'WP KUALA LUMPUR') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-train text-danger fa-fw me-3"></i> <span>KLCC LRT Station <strong class="text-dark">1.2 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>Pavilion Bukit Bintang <strong class="text-dark">2.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-success fa-fw me-3"></i> <span>International School of KL (ISKL) <strong class="text-dark">4.3 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-tree text-warning fa-fw me-3"></i> <span>Perdana Botanical Garden <strong class="text-dark">5.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'LABUAN' || $stateCheck === 'WP LABUAN') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-building text-primary fa-fw me-3"></i> <span>Financial Park Labuan <strong class="text-dark">1.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital text-success fa-fw me-3"></i> <span>Labuan Nucleus Hospital <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Labuan International School <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-plane-departure text-warning fa-fw me-3"></i> <span>Labuan Airport <strong class="text-dark">5.0 KM</strong></span></div></div>';
-} elseif ($stateCheck === 'PUTRAJAYA' || $stateCheck === 'WP PUTRAJAYA') {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-shopping-bag text-primary fa-fw me-3"></i> <span>IOI City Mall <strong class="text-dark">6.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-hospital-alt text-success fa-fw me-3"></i> <span>Hospital Putrajaya <strong class="text-dark">4.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store-alt text-danger fa-fw me-3"></i> <span>Alamanda Shopping Centre <strong class="text-dark">5.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-subway text-warning fa-fw me-3"></i> <span>Putrajaya Sentral Station <strong class="text-dark">3.5 KM</strong></span></div></div>';
-} else {
-    $proximityHtml .= '
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-school text-danger fa-fw me-3"></i> <span>Regional Secondary School <strong class="text-dark">1.5 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-store text-primary fa-fw me-3"></i> <span>Local Commercial Complex <strong class="text-dark">2.3 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-clinic-medical text-success fa-fw me-3"></i> <span>Community Health Center <strong class="text-dark">3.0 KM</strong></span></div></div>
-        <div class="col-md-6"><div class="d-flex align-items-center"><i class="fas fa-bus text-warning fa-fw me-3"></i> <span>Central Transit Hub <strong class="text-dark">4.2 KM</strong></span></div></div>';
-}
-$proximityHtml .= '</div>';
 ?>
 
 <div class="container my-5">
@@ -234,11 +123,6 @@ $proximityHtml .= '</div>';
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
                             <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
-                            <form method="POST" class="m-0">
-                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'btn-danger' : 'btn-outline-danger'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
-                                    <i class="<?php echo $is_wishlisted ? 'fas' : 'far'; ?> fa-heart fs-5"></i>
-                                </button>
-                            </form>
                         </div>
                         <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
                             <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
@@ -312,14 +196,6 @@ $proximityHtml .= '</div>';
                         <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
                         <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
                     </div>
-
-                    <div class="d-grid mt-auto">
-                        <?php if ($is_afford): ?>
-                            <a href="customer/apply_affordable.php?id=<?php echo $property_id; ?>" class="btn btn-success btn-lg fw-bold py-3 shadow">Submit Application</a>
-                        <?php else: ?>
-                            <a href="customer/book_appointment.php?id=<?php echo $property_id; ?>" class="btn btn-primary btn-lg fw-bold py-3 shadow">Book Viewing</a>
-                        <?php endif; ?>
-                    </div>
                 </div>
             </div>
         </div>
@@ -341,9 +217,37 @@ $proximityHtml .= '</div>';
             </div>
 
             <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
-                <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-map-signs text-primary me-2"></i> Regional Proximity & Neighborhood</h3>
-                <div class="p-3 bg-white border rounded shadow-sm mt-3">
-                    <?php echo $proximityHtml; ?>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-primary border-2 pb-3 mb-4">
+                    <h3 class="fw-bold text-dark m-0"><i class="fas fa-map-marked-alt text-primary me-2"></i> Interactive Regional Proximity</h3>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="fas fa-satellite-dish me-1"></i> Live Geo-Data</span>
+                </div>
+                
+                <div class="row mt-3 g-4">
+                    <div class="col-lg-8">
+                        <div id="propertyMap" class="rounded shadow-sm border border-secondary border-opacity-25" style="height: 480px; width: 100%;">
+                            <div class="d-flex h-100 justify-content-center align-items-center bg-white">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-3x mb-3 text-primary"></i>
+                                    <p class="fw-bold">Initializing Satellite Mapping Coordinates...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="bg-white border rounded shadow-sm h-100 d-flex flex-column">
+                            <div class="p-3 bg-dark text-white rounded-top d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold"><i class="fas fa-location-arrow text-warning me-2"></i> Surrounding Amenities</h6>
+                                <span class="badge bg-light text-dark" id="placesCount">0 Found</span>
+                            </div>
+                            <div id="placesList" class="p-0 overflow-auto" style="height: 425px;">
+                                <div class="text-center text-muted py-5 mt-4">
+                                    <i class="fas fa-satellite fa-2x mb-3 text-secondary"></i>
+                                    <p class="small">Scanning 5KM radius for key infrastructure...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -370,6 +274,14 @@ $proximityHtml .= '</div>';
     .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
     .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
     .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
+    .hover-place { transition: background-color 0.2s; }
+    .hover-place:hover { background-color: #f8f9fa; }
+    
+    /* Scrollbar styling for places list */
+    #placesList::-webkit-scrollbar { width: 6px; }
+    #placesList::-webkit-scrollbar-track { background: #f1f1f1; }
+    #placesList::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+    #placesList::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 </style>
 
 <script>
@@ -390,6 +302,124 @@ function updateCalc() {
 }
 document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEventListener('input', updateCalc));
 window.onload = updateCalc;
+
+// =======================================================
+// GOOGLE MAPS DYNAMIC PROXIMITY ENGINE
+// =======================================================
+let map;
+let service;
+
+function initMap() {
+    // Generate an accurate search query based on database strings
+    const propertySearchQuery = "<?php echo addslashes($property['project_name'] . ', ' . $property['state'] . ', Malaysia'); ?>";
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ 'address': propertySearchQuery }, function(results, status) {
+        if (status === 'OK') {
+            const propertyLocation = results[0].geometry.location;
+
+            // 1. Initialize Map
+            map = new google.maps.Map(document.getElementById('propertyMap'), {
+                center: propertyLocation,
+                zoom: 14,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+                styles: [
+                    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#747474" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#c9c9c9" }] }
+                ]
+            });
+
+            // 2. Place Main Property Marker
+            new google.maps.Marker({
+                map: map,
+                position: propertyLocation,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                title: "<?php echo addslashes($property['project_name']); ?>",
+                animation: google.maps.Animation.DROP
+            });
+
+            // 3. Request Nearby Places (Radius 5KM)
+            const request = {
+                location: propertyLocation,
+                radius: '5000', 
+                types: ['shopping_mall', 'hospital', 'school', 'university', 'transit_station']
+            };
+
+            service = new google.maps.places.PlacesService(map);
+            service.nearbySearch(request, function(places, placesStatus) {
+                if (placesStatus === google.maps.places.PlacesServiceStatus.OK) {
+                    renderPlacesList(places, propertyLocation);
+                } else {
+                    document.getElementById('placesList').innerHTML = '<div class="alert alert-warning m-3 small"><i class="fas fa-exclamation-circle me-2"></i>No nearby amenities found within 5KM radius.</div>';
+                }
+            });
+        } else {
+            // Geocoding Failure Fallback
+            document.getElementById('propertyMap').innerHTML = '<div class="d-flex h-100 justify-content-center align-items-center bg-light text-muted"><p><i class="fas fa-map-marked-alt fa-2x mb-2 d-block text-center"></i>Location coordinates unavailable.</p></div>';
+            document.getElementById('placesList').innerHTML = '<div class="alert alert-secondary m-3 small">Data mapping restricted.</div>';
+        }
+    });
+}
+
+function renderPlacesList(places, propertyLocation) {
+    const listContainer = document.getElementById('placesList');
+    listContainer.innerHTML = ''; 
+
+    // We aim for the top 8-10 closest places
+    const maxPlaces = Math.min(places.length, 10);
+    document.getElementById('placesCount').innerText = maxPlaces + " Locations";
+
+    // Calculate exact straight-line distances using Spherical Geometry
+    places.forEach(place => {
+        place.distanceValue = google.maps.geometry.spherical.computeDistanceBetween(propertyLocation, place.geometry.location);
+    });
+    
+    // Sort from closest to furthest
+    places.sort((a, b) => a.distanceValue - b.distanceValue);
+
+    for (let i = 0; i < maxPlaces; i++) {
+        const place = places[i];
+        const distanceText = (place.distanceValue / 1000).toFixed(1) + ' KM';
+        
+        // Dynamic Icon Logic based on Google Place Types
+        let iconClass = 'fas fa-map-marker-alt text-secondary';
+        let typeName = 'Amenity';
+        
+        if (place.types.includes('shopping_mall')) { iconClass = 'fas fa-shopping-bag text-primary'; typeName = 'Shopping Mall'; }
+        else if (place.types.includes('hospital')) { iconClass = 'fas fa-hospital text-success'; typeName = 'Healthcare'; }
+        else if (place.types.includes('school') || place.types.includes('university')) { iconClass = 'fas fa-graduation-cap text-danger'; typeName = 'Education'; }
+        else if (place.types.includes('transit_station')) { iconClass = 'fas fa-subway text-warning'; typeName = 'Transit'; }
+
+        // Place a blue marker for the amenity
+        new google.maps.Marker({
+            map: map,
+            position: place.geometry.location,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+            title: place.name
+        });
+
+        // Append UI Card
+        const html = `
+            <div class="d-flex align-items-center p-3 border-bottom hover-place">
+                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3 border shadow-sm flex-shrink-0" style="width: 45px; height: 45px;">
+                    <i class="${iconClass} fs-5"></i>
+                </div>
+                <div class="flex-grow-1 overflow-hidden pe-2">
+                    <h6 class="mb-0 fw-bold text-dark text-truncate" title="${place.name}">${place.name}</h6>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">${typeName}</small>
+                </div>
+                <div class="text-end flex-shrink-0">
+                    <span class="badge bg-dark text-white fw-bold shadow-sm px-2 py-1">${distanceText}</span>
+                </div>
+            </div>
+        `;
+        listContainer.innerHTML += html;
+    }
+}
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry&callback=initMap"></script>
 
 <?php include_once 'includes/footer.php'; ?>
