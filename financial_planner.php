@@ -6,13 +6,13 @@
  */
 
 session_start();
-require_once '../includes/db_connect.php';
+require_once 'includes/db_connect.php';
 
 // Allow both logged-in customers and guests to use the planner to attract leads
 $is_logged_in = isset($_SESSION['account_id']) && $_SESSION['role'] === 'CUSTOMER';
 $account_id = $is_logged_in ? $_SESSION['account_id'] : null;
 
-include_once '../includes/header.php';
+include_once 'includes/header.php';
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -698,4 +698,4 @@ window.onload = function() {
 
 </script>
 
-<?php include_once '../includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
