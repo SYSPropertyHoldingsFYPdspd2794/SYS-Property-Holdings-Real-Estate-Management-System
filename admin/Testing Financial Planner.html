@@ -56,26 +56,22 @@ include_once 'includes/header.php';
                         <div class="mb-4">
                             <label class="form-label fw-bold text-secondary">Target Property State</label>
                             <select id="hc-state" class="form-select form-select-lg bg-light border-0 shadow-sm">
-                                <optgroup label="13 States">
-                                    <option value="Johor">Johor</option>
-                                    <option value="Kedah">Kedah</option>
-                                    <option value="Kelantan">Kelantan</option>
-                                    <option value="Melaka">Melaka</option>
-                                    <option value="Negeri Sembilan">Negeri Sembilan</option>
-                                    <option value="Pahang">Pahang</option>
-                                    <option value="Perak">Perak</option>
-                                    <option value="Perlis">Perlis</option>
-                                    <option value="Pulau Pinang">Pulau Pinang</option>
-                                    <option value="Sabah">Sabah</option>
-                                    <option value="Sarawak">Sarawak</option>
-                                    <option value="Selangor">Selangor</option>
-                                    <option value="Terengganu">Terengganu</option>
-                                </optgroup>
-                                <optgroup label="3 Federal Territories">
-                                    <option value="Kuala Lumpur">Kuala Lumpur</option>
-                                    <option value="Labuan">Labuan</option>
-                                    <option value="Putrajaya">Putrajaya</option>
-                                </optgroup>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                <option value="Labuan">Labuan</option>
+                                <option value="Putrajaya">Putrajaya</option>
                             </select>
                         </div>
 
@@ -95,7 +91,7 @@ include_once 'includes/header.php';
                                 <span>Downpayment (%)</span>
                                 <span class="text-primary" id="hc-dp-display">10%</span>
                             </label>
-                            <input type="range" class="form-range custom-slider" id="hc-dp-slider" min="10" max="45" step="1" value="10">
+                            <input type="range" class="form-range custom-slider" id="hc-dp-slider" min="0" max="100" step="5" value="10">
                         </div>
 
                         <div class="mb-4 p-3 bg-primary bg-opacity-10 rounded-3 border border-primary border-opacity-25">
@@ -222,7 +218,7 @@ include_once 'includes/header.php';
 
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0 text-white"><i class="fas fa-chart-area text-warning me-2"></i> 30-Year Wealth Accumulation Projection</h5>
+                    <h5 class="fw-bold m-0"><i class="fas fa-chart-area text-warning me-2"></i> 30-Year Wealth Accumulation Projection</h5>
                     <select id="rb-tenure" class="form-select form-select-sm w-auto bg-dark text-white border-secondary">
                         <option value="10">10 Year Projection</option>
                         <option value="20">20 Year Projection</option>
@@ -306,14 +302,6 @@ include_once 'includes/header.php';
                                 <label class="form-label fw-bold text-muted small">Utilities & Subs</label>
                                 <input type="number" id="dsr-util" class="form-control bg-light" value="300">
                             </div>
-
-                            <div class="col-12 mt-4 d-flex justify-content-between align-items-center border-bottom pb-2">
-                                <h6 class="fw-bold text-secondary text-uppercase tracking-wider small m-0">Dynamic Incomes & Expenses</h6>
-                                <button type="button" class="btn btn-sm btn-primary rounded-pill shadow-sm fw-bold" onclick="addDynamicField()"><i class="fas fa-plus me-1"></i> Add Item</button>
-                            </div>
-                            <div id="dynamic-fields-container" class="col-12 m-0 p-0 row g-3 mt-2">
-                                <!-- dynamic fields go here -->
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -347,11 +335,11 @@ include_once 'includes/header.php';
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="pe-2">
+                                <div>
                                     <span class="d-block text-warning fw-bold fs-6 text-uppercase">Recommended Max Price</span>
                                     <small class="text-muted tiny">Based on 35 Years, 4.0% Rate</small>
                                 </div>
-                                <div class="text-end fw-bold text-warning fs-2 m-0" id="dsr-max-price" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;">RM 0.00</div>
+                                <div class="text-end fw-bold text-warning display-6 m-0" id="dsr-max-price">RM 0.00</div>
                             </div>
                         </div>
                     </div>
@@ -509,8 +497,7 @@ function calculateRentVsBuy() {
     let currentMonthlyRent = currentRent;
     
     // Standard Loan Math
-    const dpPercent = parseFloat(document.getElementById('hc-dp-slider').value) / 100;
-    const dp = propertyPrice * dpPercent;
+    const dp = propertyPrice * 0.10; // Assume 10% DP for simulation
     let loanBalance = propertyPrice - dp;
     const monthlyRate = loanRate / 12;
     const totalMonths = tenureYears * 12;
@@ -612,63 +599,26 @@ rbInputs.forEach(id => {
 // ==========================================
 let dsrChartInstance = null;
 
-function addDynamicField() {
-    const container = document.getElementById('dynamic-fields-container');
-    const row = document.createElement('div');
-    row.className = 'col-12 dynamic-field-row d-flex gap-2 align-items-center mb-2';
-    row.innerHTML = `
-        <select class="form-select bg-light w-auto dynamic-type" onchange="calculateDSR()">
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-        </select>
-        <input type="text" class="form-control bg-light dynamic-name" placeholder="Item Name (e.g. Side Hustle)">
-        <div class="input-group">
-            <span class="input-group-text bg-light border-0">RM</span>
-            <input type="number" class="form-control bg-light border-0 dynamic-amount" value="0" oninput="calculateDSR()">
-        </div>
-        <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.dynamic-field-row').remove(); calculateDSR();"><i class="fas fa-trash"></i></button>
-    `;
-    container.appendChild(row);
-}
-
 function calculateDSR() {
-    let dynamicIncome = 0;
-    let dynamicExpense = 0;
-
-    document.querySelectorAll('.dynamic-field-row').forEach(row => {
-        const type = row.querySelector('.dynamic-type').value;
-        const amount = parseFloat(row.querySelector('.dynamic-amount').value) || 0;
-        if (type === 'income') dynamicIncome += amount;
-        else dynamicExpense += amount;
-    });
-
-    const baseIncome = parseFloat(document.getElementById('dsr-income').value) || 0;
-    const totalIncome = baseIncome + dynamicIncome;
-    
-    // Lifestyle metrics
-    const food = parseFloat(document.getElementById('dsr-food').value) || 0;
-    const ent = parseFloat(document.getElementById('dsr-ent').value) || 0;
-    const util = parseFloat(document.getElementById('dsr-util').value) || 0;
-    
-    const lifestyleExpenses = food + ent + util + dynamicExpense;
-
-    // Subtracted from Net Income to ensure DSR calculation is accurate
-    let dsrNetIncome = totalIncome - lifestyleExpenses;
-    if (dsrNetIncome <= 0) dsrNetIncome = 1; // Prevent division by zero
-
+    const income = parseFloat(document.getElementById('dsr-income').value) || 0;
     const car = parseFloat(document.getElementById('dsr-car').value) || 0;
     const cc = parseFloat(document.getElementById('dsr-cc').value) || 0;
     const ptptn = parseFloat(document.getElementById('dsr-ptptn').value) || 0;
+    
+    // Lifestyle metrics (Not used for bank DSR, but used for reality check)
+    const food = parseFloat(document.getElementById('dsr-food').value) || 0;
+    const ent = parseFloat(document.getElementById('dsr-ent').value) || 0;
+    const util = parseFloat(document.getElementById('dsr-util').value) || 0;
 
     const totalBankDebt = car + cc + ptptn;
-    const dsrLimit = dsrNetIncome < 3500 ? 0.60 : 0.70; // Bank Negara safe limits
+    const dsrLimit = income < 3500 ? 0.60 : 0.70; // Bank Negara safe limits
     
     let currentDSR = 0;
-    if (dsrNetIncome > 0) {
-        currentDSR = (totalBankDebt / dsrNetIncome) * 100;
+    if (income > 0) {
+        currentDSR = (totalBankDebt / income) * 100;
     }
 
-    const maxAllowedTotalDebt = dsrNetIncome * dsrLimit;
+    const maxAllowedTotalDebt = income * dsrLimit;
     let maxSafeInstallment = maxAllowedTotalDebt - totalBankDebt;
     if (maxSafeInstallment < 0) maxSafeInstallment = 0;
 
@@ -688,16 +638,6 @@ function calculateDSR() {
     document.getElementById('dsr-percentage-display').innerText = currentDSR.toFixed(1) + '%';
     document.getElementById('dsr-max-installment').innerText = formatRM(maxSafeInstallment);
     document.getElementById('dsr-max-price').innerText = formatRM(maxPropPrice);
-    
-    // Fit text for max price
-    const maxPriceEl = document.getElementById('dsr-max-price');
-    if (maxPropPrice > 9999999) {
-        maxPriceEl.classList.remove('fs-2');
-        maxPriceEl.classList.add('fs-4');
-    } else {
-        maxPriceEl.classList.remove('fs-4');
-        maxPriceEl.classList.add('fs-2');
-    }
 
     // Update Warning Box
     const warnBox = document.getElementById('dsr-warning-box');

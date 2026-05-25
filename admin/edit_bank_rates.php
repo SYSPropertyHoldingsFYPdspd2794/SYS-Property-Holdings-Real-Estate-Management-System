@@ -89,8 +89,8 @@ include '../includes/header.php';
                         <tbody>
                             <?php foreach ($banks as $bank): ?>
                                 <tr>
-                                    <td class="fw-bold border-bottom border-secondary" style="background: transparent;">
-                                        <?php echo htmlspecialchars($bank['bank_name']); ?>
+                                    <td class="fw-bold border-bottom border-secondary text-white" style="background: transparent;">
+                                        <span class="text-white" style="color: #ffffff !important;"><?php echo htmlspecialchars($bank['bank_name']); ?></span>
                                     </td>
                                     <td class="border-bottom border-secondary" style="background: transparent;">
                                         <div class="input-group" style="max-width: 180px;">
