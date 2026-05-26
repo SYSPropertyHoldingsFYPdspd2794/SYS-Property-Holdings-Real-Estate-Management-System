@@ -5,7 +5,7 @@
  * DESCRIPTION: Customer property catalog. Upgraded with dynamic SOLD OUT badges and filtering parameters.
  */
 
-include_once '../includes/header.php';
+require_once '../includes/db_connect.php';
 require_once '../includes/auth_check.php';
 require_once '../includes/property_images.php';
 protect_customer_page('CUSTOMER', $conn);
@@ -15,6 +15,8 @@ $account_id = $_SESSION['account_id'];
 // WISHLIST LOGIC
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
     $prop_id = intval($_POST['property_id']);
+    $is_saved = false;
+
     $chk = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
     $chk->bind_param("ii", $account_id, $prop_id);
     $chk->execute();
@@ -26,7 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
         $ins = $conn->prepare("INSERT INTO wishlists (customer_id, property_id) VALUES (?, ?)");
         $ins->bind_param("ii", $account_id, $prop_id);
         $ins->execute();
+        $is_saved = true;
     }
+
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'saved' => $is_saved,
+            'property_id' => $prop_id
+        ]);
+        exit();
+    }
+
     header("Location: properties.php?" . $_SERVER['QUERY_STRING']);
     exit();
 }
@@ -60,6 +74,8 @@ $stmt = $conn->prepare($sql);
 if (!empty($params)) { $stmt->bind_param($types, ...$params); }
 $stmt->execute();
 $result = $stmt->get_result();
+
+include_once '../includes/header.php';
 ?>
 
 <div class="container my-5 property-catalog-page">
@@ -149,7 +165,7 @@ $result = $stmt->get_result();
                             <div class="image-overlay"></div>
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-4 shadow-sm z-3 text-uppercase"><?php echo $badge_text; ?></span>
                             
-                            <form method="POST" class="position-absolute bottom-0 end-0 m-3 z-3" onclick="event.stopPropagation();">
+                            <form method="POST" class="wishlist-toggle-form position-absolute bottom-0 end-0 m-3 z-3" onclick="event.stopPropagation();">
                                 <input type="hidden" name="property_id" value="<?php echo $row['property_id']; ?>">
                                 <button type="submit" name="toggle_wishlist" class="btn btn-dark bg-opacity-75 text-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center luxury-wishlist-btn" title="Add to Wishlist">
                                     <i class="<?php echo in_array($row['property_id'], $wishlist_array) ? 'fas text-gold' : 'far'; ?> fa-heart fs-6"></i>
@@ -295,6 +311,11 @@ $result = $stmt->get_result();
     transform: scale(1.1);
 }
 
+.luxury-wishlist-btn.is-loading {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
 .view-btn:hover {
     background: #11151b;
     color: #ffffff;
@@ -309,5 +330,54 @@ $result = $stmt->get_result();
     }
 }
 </style>
+
+<script>
+document.querySelectorAll('.wishlist-toggle-form').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const button = form.querySelector('.luxury-wishlist-btn');
+        const icon = button ? button.querySelector('i') : null;
+        const data = new FormData(form);
+        data.append('toggle_wishlist', '1');
+
+        if (button) {
+            button.classList.add('is-loading');
+            button.disabled = true;
+        }
+
+        fetch('properties.php<?php echo !empty($_SERVER['QUERY_STRING']) ? '?' . htmlspecialchars($_SERVER['QUERY_STRING'], ENT_QUOTES) : ''; ?>', {
+            method: 'POST',
+            body: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Wishlist update failed');
+            }
+            return response.json();
+        })
+        .then(function (result) {
+            if (!result.success || !icon) {
+                return;
+            }
+
+            icon.className = result.saved ? 'fas text-gold fa-heart fs-6' : 'far fa-heart fs-6';
+        })
+        .catch(function () {
+            HTMLFormElement.prototype.submit.call(form);
+        })
+        .finally(function () {
+            if (button) {
+                button.classList.remove('is-loading');
+                button.disabled = false;
+            }
+        });
+    });
+});
+</script>
 
 <?php include_once '../includes/footer.php'; ?>
