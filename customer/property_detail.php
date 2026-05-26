@@ -272,13 +272,13 @@ $proximityHtml .= '</div>';
                         <?php if ($is_sold_out): ?>
                             <span class="badge bg-danger px-4 py-2 text-uppercase tracking-wider shadow-sm text-white rounded-0">SOLD OUT</span>
                         <?php else: ?>
-                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-dark text-gold'; ?> px-4 py-2 text-uppercase tracking-wider shadow-sm rounded-0" style="border: 1px solid rgba(255,255,255,0.2);">
+                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-gold text-dark'; ?> px-4 py-2 text-uppercase tracking-wider shadow-sm rounded-0" style="border: 1px solid rgba(255,255,255,0.2);">
                                 <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
                             </span>
                         <?php endif; ?>
                     </div>
 
-                    <p class="fs-5 text-muted mb-4 tracking-wider text-uppercase" style="font-size: 0.85rem !important;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
+                    <p class="text-secondary fw-bold mb-4 tracking-wider text-uppercase" style="font-size: 0.9rem !important;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
 
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
@@ -289,17 +289,17 @@ $proximityHtml .= '</div>';
 
                     <hr class="my-4">
                     <div class="row text-center mb-4">
-                        <div class="col-4 border-end">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Area SQFT</small>
-                            <span class="fs-4 luxury-title text-dark"><?php echo number_format($property['built_up_sqft']); ?></span>
+                        <div class="col-4 border-end px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Area SQFT</small>
+                            <span class="fs-4 fw-bold text-dark"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
-                        <div class="col-4 border-end">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Availability</small>
-                            <span class="fs-4 luxury-title <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
+                        <div class="col-4 border-end px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Availability</small>
+                            <span class="fs-4 fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
                         </div>
-                        <div class="col-4">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Reference</small>
-                            <span class="fs-5 luxury-title text-muted"><?php echo htmlspecialchars($property['property_code']); ?></span>
+                        <div class="col-4 px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Reference</small>
+                            <span class="fs-5 fw-bold text-secondary"><?php echo htmlspecialchars($property['property_code']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -430,9 +430,10 @@ $proximityHtml .= '</div>';
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
     
     .luxury-title { font-family: 'Playfair Display', serif; }
+    p { line-height: 1.65; }
     .tracking-wider { letter-spacing: 0.1em; }
-    .text-gold { color: #c5a059 !important; }
-    .bg-gold { background-color: #c5a059 !important; }
+    .text-gold { color: #FFC000 !important; }
+    .bg-gold { background-color: #FFC000 !important; }
     .property-hero-card,
     .content-card {
         border: 1px solid rgba(20, 24, 31, 0.06) !important;
@@ -448,7 +449,7 @@ $proximityHtml .= '</div>';
         border-radius: 1rem !important;
         transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
-    .icon-box:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,24,31,0.1) !important; border-color: rgba(197,160,89,0.45) !important; }
+    .icon-box:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,24,31,0.1) !important; border-color: rgba(255,192,0,0.45) !important; }
     .estimator-card {
         background: linear-gradient(145deg, #101318 0%, #07090d 100%) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
@@ -472,12 +473,12 @@ $proximityHtml .= '</div>';
         min-height: 48px;
     }
     .panel-select:focus {
-        border-color: #c5a059 !important;
-        box-shadow: 0 0 0 0.18rem rgba(197,160,89,0.25) !important;
+        border-color: #FFC000 !important;
+        box-shadow: 0 0 0 0.18rem rgba(255,192,0,0.25) !important;
     }
     .monthly-card {
         background: #020304;
-        border: 1px solid rgba(197,160,89,0.35);
+        border: 1px solid rgba(255,192,0,0.35);
     }
     
     @keyframes driftUp {
@@ -489,14 +490,14 @@ $proximityHtml .= '</div>';
     .zoom-container:hover .zoom-overlay { opacity: 1; }
     
     .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #f8f5ed; outline: none; }
-    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
-    .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #c5a059; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(197,160,89,0.5); }
+    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #FFC000; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(255,192,0,0.5); }
+    .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #FFC000; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(255,192,0,0.5); }
     .hover-place { transition: background-color 0.2s ease; }
     .hover-place:hover { background-color: #f8f5ed; }
     #placesList::-webkit-scrollbar { width: 6px; }
     #placesList::-webkit-scrollbar-track { background: #f1f1f1; }
-    #placesList::-webkit-scrollbar-thumb { background: #c5a059; border-radius: 10px; }
-    #placesList::-webkit-scrollbar-thumb:hover { background: #a8894a; }
+    #placesList::-webkit-scrollbar-thumb { background: #FFC000; border-radius: 10px; }
+    #placesList::-webkit-scrollbar-thumb:hover { background: #cc9a00; }
     @media (max-width: 767.98px) {
         .tracking-wider { letter-spacing: 0.06em; }
         .card-body.p-5 { padding: 1.5rem !important; }
@@ -558,10 +559,10 @@ function initMap() {
             });
 
             const proximityCircle = new google.maps.Circle({
-                strokeColor: '#c5a059',
+                strokeColor: '#FFC000',
                 strokeOpacity: 0.6,
                 strokeWeight: 2,
-                fillColor: '#c5a059',
+                fillColor: '#FFC000',
                 fillOpacity: 0.1,
                 map: map,
                 center: propertyLocation,

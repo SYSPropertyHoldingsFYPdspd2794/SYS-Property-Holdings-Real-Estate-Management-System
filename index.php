@@ -25,7 +25,7 @@ include 'includes/header.php';
             <div class="col-lg-8">
                 <div class="section-kicker mb-3">Online to offline real estate</div>
                 <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
-                <p class="lead mb-5 fs-4">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
+                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3">View Catalog</a>
                     <a href="showrooms.php" class="btn btn-outline-light btn-lg px-4 py-3">Find Showrooms</a>
@@ -104,7 +104,7 @@ include 'includes/header.php';
             <div class="col-lg-5 mb-4 mb-lg-0">
                 <div class="section-kicker mb-2">Nationwide support</div>
                 <h2 class="section-title mb-4">Locate Our Offline Showrooms</h2>
-                <p class="lead mb-4">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
+                <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
                 <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
                     <option value="" selected disabled>-- Select a State / Territory --</option>
@@ -155,7 +155,7 @@ include 'includes/header.php';
             <div class="col-lg-8">
                 <div class="section-kicker mb-2">Affordable pathway</div>
                 <h2 class="fw-bold display-6 mb-3 text-white">Government Affordable Housing Initiative</h2>
-                <p class="lead mb-4 text-light">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
+                <p class="fs-5 mb-4 text-white" style="line-height: 1.6;">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
                 <ul class="list-unstyled fs-5 mb-4">
                     <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Malaysian Citizen</li>
                     <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Age 18 and above</li>
@@ -220,12 +220,12 @@ include 'includes/header.php';
                     echo '<div class="card h-100 border-0 hover-card">';
                     echo '<div class="card-body p-4 d-flex flex-column">';
                     echo '<div><span class="badge bg-primary mb-3 px-3 py-2 shadow-sm">'. htmlspecialchars($row['property_type']). '</span></div>';
-                    echo '<h5 class="card-title fw-bold text-dark mb-2">'. htmlspecialchars($row['project_name']). '</h5>';
+                    echo '<h5 class="card-title fw-bold text-warning mb-2">'. htmlspecialchars($row['project_name']). '</h5>';
                     echo '<p class="card-text text-muted mb-4"><i class="fas fa-map-marker-alt text-danger me-2"></i> '. htmlspecialchars($row['state']). '</p>';
                     echo '<div class="mt-auto">';
                     echo '<small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">STARTING FROM</small>';
                     echo '<h4 class="text-success fw-bold mb-3">RM '. $formatted_price. '</h4>';
-                    echo '<a href="'.$detail_link.'" class="btn btn-outline-dark w-100">View Details</a>';
+                    echo '<a href="'.$detail_link.'" class="btn btn-warning text-dark fw-bold w-100">View Details</a>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';

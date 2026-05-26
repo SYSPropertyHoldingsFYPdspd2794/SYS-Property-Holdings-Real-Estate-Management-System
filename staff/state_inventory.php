@@ -150,7 +150,7 @@ if ($staff_state !== '') {
                                         <span class="fw-bold"><?php echo htmlspecialchars($prop['state']); ?></span>
                                     </td>
                                     <td>
-                                        <span class="badge <?php echo $is_affordable ? 'bg-success' : 'bg-dark'; ?> px-3 py-2">
+                                        <span class="badge <?php echo $is_affordable ? 'bg-success' : 'bg-gold text-dark'; ?> px-3 py-2">
                                             <?php echo $is_affordable ? 'AFFORDABLE' : htmlspecialchars($prop['property_type']); ?>
                                         </span>
                                         <?php if ($is_affordable): ?>
@@ -204,7 +204,8 @@ if ($staff_state !== '') {
 
 <style>
 .state-inventory-page .tracking-wider { letter-spacing: 0.1em; }
-.state-inventory-page .text-gold { color: #c5a059 !important; }
+.state-inventory-page .text-gold { color: #FFC000 !important; }
+.bg-gold { background-color: #FFC000 !important; }
 .inventory-metric {
     background: #ffffff;
     color: #15191f;

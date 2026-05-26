@@ -84,7 +84,7 @@ $result = $stmt->get_result();
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <span class="badge bg-primary mb-2 align-self-start"><?php echo htmlspecialchars($row['property_type']); ?></span>
-                            <h5 class="fw-bold fs-5 text-truncate" title="<?php echo htmlspecialchars($row['project_name']); ?>"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                            <h5 class="fw-bold fs-5 text-warning text-truncate" title="<?php echo htmlspecialchars($row['project_name']); ?>"><?php echo htmlspecialchars($row['project_name']); ?></h5>
                             <p class="text-muted small mb-3"><i class="fas fa-map-marker-alt me-1 text-danger"></i><?php echo htmlspecialchars($row['state']); ?></p>
                             <h4 class="text-success fw-bold mt-auto mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
                         </div>
@@ -94,7 +94,7 @@ $result = $stmt->get_result();
                                 <input type="hidden" name="wishlist_id" value="<?php echo $row['wishlist_id']; ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3"><i class="fas fa-trash-alt me-1"></i> Remove</button>
                             </form>
-                            <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-sm btn-dark fw-bold rounded-pill px-4">View</a>
+                            <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-4">View Details</a>
                         </div>
                     </div>
                 </div>
