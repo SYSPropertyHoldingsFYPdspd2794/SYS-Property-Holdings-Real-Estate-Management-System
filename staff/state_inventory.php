@@ -204,8 +204,8 @@ if ($staff_state !== '') {
 
 <style>
 .state-inventory-page .tracking-wider { letter-spacing: 0.1em; }
-.state-inventory-page .text-gold { color: #c5a059 !important; }
-.bg-gold { background-color: #c5a059 !important; }
+.state-inventory-page .text-gold { color: #FFC000 !important; }
+.bg-gold { background-color: #FFC000 !important; }
 .inventory-metric {
     background: #ffffff;
     color: #15191f;

@@ -173,9 +173,9 @@ $result = $stmt->get_result();
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
-                            <div class="d-flex align-items-center rounded-pill p-2 px-3" style="background-color: rgba(197, 160, 89, 0.15);">
+                            <div class="d-flex align-items-center rounded-pill p-2 px-3" style="background-color: rgba(255, 192, 0, 0.15);">
                                 <i class="fas fa-key text-gold me-2"></i>
-                                <small class="text-uppercase tracking-wider fw-bold" style="font-size: 0.65rem; color: #a8894a;">Availability:</small>
+                                <small class="text-uppercase tracking-wider fw-bold" style="font-size: 0.65rem; color: #cc9a00;">Availability:</small>
                                 <small class="ms-auto fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? 'SOLD OUT' : $row['total_units'] . ' Units'; ?></small>
                             </div>
                         </div>
@@ -196,8 +196,8 @@ $result = $stmt->get_result();
 .luxury-title { font-family: 'Playfair Display', serif; }
 .tracking-wider { letter-spacing: 0.1em; }
 .tracking-widest { letter-spacing: 0.2em; }
-.text-gold { color: #c5a059 !important; }
-.bg-gold { background-color: #c5a059 !important; }
+.text-gold { color: #FFC000 !important; }
+.bg-gold { background-color: #FFC000 !important; }
 
 .property-catalog-page {
     color: #f4f1e8;
@@ -226,8 +226,8 @@ $result = $stmt->get_result();
 }
 
 .catalog-input:focus {
-    border-color: #c5a059;
-    box-shadow: 0 0 0 0.18rem rgba(197,160,89,0.2);
+    border-color: #FFC000;
+    box-shadow: 0 0 0 0.18rem rgba(255,192,0,0.2);
 }
 
 .catalog-search-btn {
@@ -245,7 +245,7 @@ $result = $stmt->get_result();
 }
 .hover-card:hover { 
     transform: translateY(-6px); 
-    border-color: rgba(197,160,89,0.38) !important;
+    border-color: rgba(255,192,0,0.38) !important;
     box-shadow: 0 22px 44px rgba(20,24,31,0.14) !important; 
 }
 .hover-card:hover .image-zoom {

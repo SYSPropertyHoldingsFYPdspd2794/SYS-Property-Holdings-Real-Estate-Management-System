@@ -127,8 +127,8 @@ $result = $stmt->get_result();
                                 <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
-                        <div class="card-footer border-0 py-3 text-center border-top" style="background-color: rgba(197, 160, 89, 0.15);">
-                            <small style="color: #a8894a; font-weight: 600;"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
+                        <div class="card-footer border-0 py-3 text-center border-top" style="background-color: rgba(255, 192, 0, 0.15);">
+                            <small style="color: #cc9a00; font-weight: 600;"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>
                 </div>

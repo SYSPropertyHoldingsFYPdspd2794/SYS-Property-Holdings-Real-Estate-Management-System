@@ -207,8 +207,8 @@ $result = $conn->query($query);
 
 <style>
 .interest-timeline-page .tracking-wider { letter-spacing: 0.1em; }
-.interest-timeline-page .text-gold { color: #c5a059 !important; }
-.bg-gold { background-color: #c5a059 !important; }
+.interest-timeline-page .text-gold { color: #FFC000 !important; }
+.bg-gold { background-color: #FFC000 !important; }
 .timeline-metric {
     background: #ffffff;
     color: #15191f;
