@@ -7,6 +7,7 @@
 
 include_once '../includes/header.php';
 require_once '../includes/auth_check.php';
+require_once '../includes/property_images.php';
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
@@ -48,33 +49,8 @@ $result = $stmt->get_result();
         <?php if ($result && $result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): 
                 
-                // IMAGE MAPPING LOGIC (Must match properties.php)
-                $dbType = strtolower(trim($row['property_type']));
-                $rawState = trim($row['state']);
-                if (strtoupper($rawState) === 'PENANG') $rawState = 'Pulau Pinang';
-                if (strtoupper($rawState) === 'MALACCA') $rawState = 'Melaka';
-                $stateName = ucwords(strtolower($rawState)); 
-                
-                $folder = ""; $filePrefix = "";
-                switch($dbType) {
-                    case 'commercial': $folder = "Commercial/"; $filePrefix = "Commercial"; break;
-                    case 'standard': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    case 'affordable': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-                    case 'bungalow': $folder = "Bungalow/"; $filePrefix = "Bungalow"; break;
-                    case 'apartment': $folder = "Apartment/"; $filePrefix = "Apartment"; break;
-                    case 'terrace': $folder = "Terrace/"; $filePrefix = "Terrace"; break;
-                    default: $folder = ucfirst($dbType) . "/"; $filePrefix = ucfirst($dbType);
-                }
-
-                $baseDir = $root_prefix . "SYS Property Catalog/";
-                $fileName = $filePrefix . " - " . $stateName;
-                $finalImg = $baseDir . "placeholder.jpg"; 
-
-                $exts = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
-                foreach ($exts as $ext) {
-                    $testPath = $baseDir . $folder . $fileName . "." . $ext;
-                    if (file_exists($testPath)) { $finalImg = $testPath; break; }
-                }
+                // Use the centralized helper function to handle paths and fallbacks
+                $finalImg = property_catalog_image_path($row, $root_prefix ?? '', '../');
             ?>
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
