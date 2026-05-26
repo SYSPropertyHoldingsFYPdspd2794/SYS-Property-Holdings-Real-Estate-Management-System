@@ -87,6 +87,7 @@ include '../includes/header.php';
                         <a href="affordable_approvals.php" class="btn btn-warning btn-lg fw-bold text-dark">View Approvals Log</a>
                         <a href="user.php" class="btn btn-outline-dark btn-lg fw-bold">Manage Users</a>
                         <a href="business_reports.php" class="btn btn-info btn-lg fw-bold text-white">Generate Business Reports</a>
+                        <a href="pdpa_management.php" class="btn btn-danger btn-lg fw-bold">PDPA Document Management</a>
                     </div>
                 </div>
             </div>

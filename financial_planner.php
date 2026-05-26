@@ -691,12 +691,10 @@ function calculateDSR() {
     
     // Fit text for max price
     const maxPriceEl = document.getElementById('dsr-max-price');
-    if (maxPropPrice > 9999999) {
-        maxPriceEl.classList.remove('fs-2');
-        maxPriceEl.classList.add('fs-4');
+    if (maxPropPrice > 999999) {
+        maxPriceEl.className = 'text-end fw-bold text-warning fs-4 m-0';
     } else {
-        maxPriceEl.classList.remove('fs-4');
-        maxPriceEl.classList.add('fs-2');
+        maxPriceEl.className = 'text-end fw-bold text-warning fs-3 m-0';
     }
 
     // Update Warning Box
