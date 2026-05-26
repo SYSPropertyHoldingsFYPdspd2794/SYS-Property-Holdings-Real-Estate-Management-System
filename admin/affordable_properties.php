@@ -25,7 +25,6 @@ $malaysia_regions = [
 ];
 
 $property_types = [
-    'AFFORDABLE' => 'Affordable',
     'TERRACE' => 'Terrace',
     'BUNGALOW' => 'Bungalow',
     'COMMERCIAL' => 'Commercial',

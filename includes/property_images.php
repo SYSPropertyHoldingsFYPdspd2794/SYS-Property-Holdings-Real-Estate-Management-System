@@ -14,7 +14,8 @@ function property_catalog_image_path(array $property, string $url_prefix = '', s
         }
     }
 
-    $db_type = strtolower(trim((string)($property['property_type'] ?? '')));
+    $is_affordable = (isset($property['is_affordable']) && (int)$property['is_affordable'] === 1);
+    $db_type = $is_affordable ? 'affordable' : strtolower(trim((string)($property['property_type'] ?? '')));
     $raw_state = trim((string)($property['state'] ?? ''));
     if (strtoupper($raw_state) === 'PENANG') {
         $raw_state = 'Pulau Pinang';
