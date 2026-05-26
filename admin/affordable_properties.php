@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $code = $_POST['property_code'];
         $name = $_POST['project_name'];
         $state = $_POST['state'];
+        $type = $_POST['property_type'];
         $price = (float)$_POST['price'];
         $total = (int)$_POST['total_units'];
         $built_up = (int)$_POST['built_up_sqft'];
@@ -52,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $image_filename = $uploaded_image;
         }
         
-        $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, built_up_sqft, income_limit_rm, image_filename, image_search_keyword, is_affordable, status) VALUES (?, ?, ?, 'AFFORDABLE', ?, ?, ?, ?, ?, ?, 1, 'ACTIVE')");
-        $stmt->bind_param("sssdiiiss", $code, $name, $state, $price, $total, $built_up, $income_limit, $image_filename, $image_search_keyword);
+        $stmt = $conn->prepare("INSERT INTO properties (property_code, project_name, state, property_type, price, total_units, built_up_sqft, income_limit_rm, image_filename, image_search_keyword, is_affordable, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'ACTIVE')");
+        $stmt->bind_param("ssssdiiiss", $code, $name, $state, $type, $price, $total, $built_up, $income_limit, $image_filename, $image_search_keyword);
         $stmt->execute();
     } elseif ($_POST['action'] === 'edit') {
         $id = (int)$_POST['property_id'];
@@ -65,15 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $total = (int)$_POST['total_units'];
         $built_up = (int)$_POST['built_up_sqft'];
         $income_limit = (float)$_POST['income_limit_rm'];
-        $is_affordable = $type === 'AFFORDABLE' ? 1 : 0;
-        $income_limit_value = $is_affordable ? $income_limit : null;
+        
+        // BUG FIX: Ensure the property remains affordable regardless of its physical type
+        $is_affordable = 1;
 
-        if (!$is_affordable) {
-            $redirect_page = "properties.php";
-        }
-
-        $stmt = $conn->prepare("UPDATE properties SET property_code = ?, project_name = ?, state = ?, property_type = ?, price = ?, total_units = ?, built_up_sqft = ?, income_limit_rm = ?, is_affordable = ? WHERE property_id = ? AND is_affordable = 1");
-        $stmt->bind_param("ssssdiidii", $code, $name, $state, $type, $price, $total, $built_up, $income_limit_value, $is_affordable, $id);
+        $stmt = $conn->prepare("UPDATE properties SET property_code = ?, project_name = ?, state = ?, property_type = ?, price = ?, total_units = ?, built_up_sqft = ?, income_limit_rm = ?, is_affordable = ? WHERE property_id = ?");
+        $stmt->bind_param("ssssdiidii", $code, $name, $state, $type, $price, $total, $built_up, $income_limit, $is_affordable, $id);
         $stmt->execute();
     } elseif ($_POST['action'] === 'archive') {
         $id = (int)$_POST['property_id'];
@@ -326,8 +324,12 @@ include '../includes/header.php';
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Applicant Maximum Income Cap (Had Pendapatan)</label>
-                            <input type="number" step="0.01" name="income_limit_rm" class="form-control" required>
+                            <label class="form-label fw-bold">Layout Core Categorization</label>
+                            <select name="property_type" class="form-select" required>
+                                <?php foreach ($property_types as $type_value => $type_label): ?>
+                                    <option value="<?php echo htmlspecialchars($type_value); ?>"><?php echo htmlspecialchars($type_label); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
@@ -335,6 +337,12 @@ include '../includes/header.php';
                             <label class="form-label fw-bold">Regulated Subsidized Price (RM)</label>
                             <input type="number" step="0.01" name="price" class="form-control" required>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Applicant Maximum Income Cap (Had Pendapatan)</label>
+                            <input type="number" step="0.01" name="income_limit_rm" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Total Scheme Allocation Units</label>
                             <input type="number" name="total_units" class="form-control" required>

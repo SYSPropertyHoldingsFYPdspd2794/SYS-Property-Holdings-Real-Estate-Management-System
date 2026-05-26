@@ -28,8 +28,7 @@ $property_types = [
     'TERRACE' => 'Terrace',
     'BUNGALOW' => 'Bungalow',
     'COMMERCIAL' => 'Commercial',
-    'APARTMENT' => 'Apartment',
-    'AFFORDABLE' => 'Affordable'
+    'APARTMENT' => 'Apartment'
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -64,14 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $price = (float)$_POST['price'];
         $total = (int)$_POST['total_units'];
         $built_up = (int)$_POST['built_up_sqft'];
-        $is_affordable = $type === 'AFFORDABLE' ? 1 : 0;
+        
+        // Ensure standard properties remain standard (is_affordable = 0)
+        $is_affordable = 0;
 
-        if ($is_affordable) {
-            $type = 'AFFORDABLE';
-            $redirect_page = "affordable_properties.php";
-        }
-
-        $stmt = $conn->prepare("UPDATE properties SET property_code = ?, project_name = ?, state = ?, property_type = ?, price = ?, total_units = ?, built_up_sqft = ?, is_affordable = ? WHERE property_id = ? AND is_affordable = 0");
+        $stmt = $conn->prepare("UPDATE properties SET property_code = ?, project_name = ?, state = ?, property_type = ?, price = ?, total_units = ?, built_up_sqft = ?, is_affordable = ? WHERE property_id = ?");
         $stmt->bind_param("ssssdiiii", $code, $name, $state, $type, $price, $total, $built_up, $is_affordable, $id);
         $stmt->execute();
     } elseif ($_POST['action'] === 'archive') {
