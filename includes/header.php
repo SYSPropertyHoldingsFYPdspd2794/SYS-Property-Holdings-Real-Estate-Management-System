@@ -19,12 +19,14 @@ if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'ADMIN') {
         $dashboard_link = $root_prefix . 'admin/dashboard.php';
         $profile_link = $root_prefix . 'admin/profile.php';
+        $profile_text = 'Setting';
         $wishlist_link = $root_prefix . 'admin/interest_timeline.php'; 
         $wishlist_text = 'Interest Timeline';
         $wishlist_icon = 'fas fa-chart-line';
     } elseif ($_SESSION['role'] === 'STAFF') {
         $dashboard_link = $root_prefix . 'staff/dashboard.php';
         $profile_link = $root_prefix . 'staff/profile.php';
+        $profile_text = 'Setting';
         $wishlist_link = $root_prefix . 'staff/state_inventory.php';
         $wishlist_text = 'State Inventory';
         $wishlist_icon = 'fas fa-map-location-dot';

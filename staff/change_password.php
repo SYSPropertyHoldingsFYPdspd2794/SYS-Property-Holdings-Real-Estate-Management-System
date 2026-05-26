@@ -3,11 +3,10 @@ include '../includes/db_connect.php';
 include '../includes/auth_check.php';
 include '../includes/functions.php';
 
-protect_customer_page('CUSTOMER', $conn);
+protect_staff_page('STAFF', $conn);
 
 $account_id = $_SESSION['account_id'];
 $alert_msg = '';
-$alert_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
     $old_pass = $_POST['old_password'] ?? '';
@@ -15,11 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
     $confirm_pass = $_POST['confirm_password'] ?? '';
 
     if (!validate_password_strength($new_pass)) {
-        $alert_msg = 'Password must follow all security rules.';
-        $alert_type = 'danger';
+        $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Password does not meet requirements.</div>';
     } elseif ($new_pass !== $confirm_pass) {
-        $alert_msg = 'Passwords do not match.';
-        $alert_type = 'danger';
+        $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Passwords do not match.</div>';
     } else {
         $stmt_check = $conn->prepare("SELECT password_hash FROM accounts WHERE account_id = ?");
         $stmt_check->bind_param("i", $account_id);
@@ -31,11 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
             $upd = $conn->prepare("UPDATE accounts SET password_hash = ? WHERE account_id = ?");
             $upd->bind_param("si", $hashed, $account_id);
             $upd->execute();
-            $alert_msg = 'Password successfully updated.';
-            $alert_type = 'success';
+            $alert_msg = '<div class="alert alert-success fw-bold shadow-sm">Password updated successfully!</div>';
         } else {
-            $alert_msg = 'Current password incorrect.';
-            $alert_type = 'danger';
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Current password incorrect.</div>';
         }
     }
 }
@@ -46,24 +41,19 @@ include '../includes/header.php';
 <div class="container my-5">
     <div class="mb-4">
         <h2 class="fw-bold text-white mb-1">Setting</h2>
-        <p class="text-light opacity-75 mb-0">Manage your account profile and security preferences.</p>
+        <p class="text-light opacity-75 mb-0">Manage your staff profile and security preferences.</p>
     </div>
 
-    <?php if ($alert_msg): ?>
-        <div class="alert alert-<?php echo $alert_type; ?> shadow-sm"><?php echo htmlspecialchars($alert_msg); ?></div>
-    <?php endif; ?>
+    <?php echo $alert_msg; ?>
 
     <div class="row g-4">
         <div class="col-lg-3 col-md-4">
             <div class="profile-settings-nav shadow-sm">
                 <a href="profile.php" class="profile-settings-link">
-                    <i class="fas fa-user me-2"></i>Profile
+                    <i class="fas fa-id-badge me-2"></i>Profile
                 </a>
                 <a href="change_password.php" class="profile-settings-link active">
                     <i class="fas fa-lock me-2"></i>Change Password
-                </a>
-                <a href="privacy_data.php" class="profile-settings-link">
-                    <i class="fas fa-shield-alt me-2"></i>Privacy & Data
                 </a>
             </div>
         </div>
@@ -79,20 +69,20 @@ include '../includes/header.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">New Password</label>
-                            <input type="password" name="new_password" class="form-control" required onkeyup="checkPasswordRealtime(this.value, 'cus_')">
+                            <input type="password" name="new_password" class="form-control" required onkeyup="checkPasswordRealtime(this.value, 'stf_')">
 
                             <div class="mt-3 p-3 border rounded bg-light" style="font-size: 0.85rem;">
                                 <ul class="list-unstyled mb-0">
-                                    <li id="cus_length" class="text-danger"><i class="fas fa-times-circle me-2"></i>8+ Characters</li>
-                                    <li id="cus_upper" class="text-danger"><i class="fas fa-times-circle me-2"></i>Uppercase (A-Z)</li>
-                                    <li id="cus_lower" class="text-danger"><i class="fas fa-times-circle me-2"></i>Lowercase (a-z)</li>
-                                    <li id="cus_number" class="text-danger"><i class="fas fa-times-circle me-2"></i>Number (0-9)</li>
-                                    <li id="cus_symbol" class="text-danger"><i class="fas fa-times-circle me-2"></i>Symbol (@#$!)</li>
+                                    <li id="stf_length" class="text-danger"><i class="fas fa-times-circle me-2"></i>8+ Characters</li>
+                                    <li id="stf_upper" class="text-danger"><i class="fas fa-times-circle me-2"></i>Uppercase (A-Z)</li>
+                                    <li id="stf_lower" class="text-danger"><i class="fas fa-times-circle me-2"></i>Lowercase (a-z)</li>
+                                    <li id="stf_number" class="text-danger"><i class="fas fa-times-circle me-2"></i>Number (0-9)</li>
+                                    <li id="stf_symbol" class="text-danger"><i class="fas fa-times-circle me-2"></i>Symbol (@#$!)</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Confirm New Password</label>
+                            <label class="form-label fw-bold">Confirm Password</label>
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <button type="submit" name="update_password" class="btn btn-primary fw-bold px-4">Update Password</button>

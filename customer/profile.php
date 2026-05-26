@@ -67,6 +67,11 @@ include '../includes/header.php';
 ?>
 
 <div class="container my-5">
+    <div class="mb-4">
+        <h2 class="fw-bold text-white mb-1">Setting</h2>
+        <p class="text-light opacity-75 mb-0">Manage your account profile and security preferences.</p>
+    </div>
+
     <?php if ($alert_msg): ?>
         <div class="alert alert-<?php echo $alert_type; ?> shadow-sm"><?php echo htmlspecialchars($alert_msg); ?></div>
     <?php endif; ?>
@@ -87,7 +92,7 @@ include '../includes/header.php';
         <div class="col-lg-9 col-md-8">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h4 class="fw-bold mb-4 border-bottom pb-2">Customer Information</h4>
+                    <h4 class="fw-bold mb-4 border-bottom pb-2">Profile</h4>
                     <form method="POST" enctype="multipart/form-data">
                         <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
                             <label for="customerProfileImage" class="avatar-upload-wrap position-relative flex-shrink-0" title="Upload profile avatar">

@@ -111,6 +111,11 @@ include '../includes/header.php';
 ?>
 
 <div class="container my-5">
+    <div class="mb-4">
+        <h2 class="fw-bold text-white mb-1">Setting</h2>
+        <p class="text-light opacity-75 mb-0">Manage your account profile and security preferences.</p>
+    </div>
+
     <?php if ($alert_msg): ?>
         <div class="alert alert-<?php echo $alert_type; ?> shadow-sm"><?php echo htmlspecialchars($alert_msg); ?></div>
     <?php endif; ?>
