@@ -351,7 +351,7 @@ include_once 'includes/header.php';
                                     <span class="d-block text-warning fw-bold fs-6 text-uppercase">Recommended Max Price</span>
                                     <small class="text-muted tiny">Based on 35 Years, 4.0% Rate</small>
                                 </div>
-                                <div class="text-end fw-bold text-warning fs-2 m-0" id="dsr-max-price" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;">RM 0.00</div>
+                                <div class="text-end fw-bold text-warning fs-3 m-0 text-wrap text-break" id="dsr-max-price">RM 0.00</div>
                             </div>
                         </div>
                     </div>

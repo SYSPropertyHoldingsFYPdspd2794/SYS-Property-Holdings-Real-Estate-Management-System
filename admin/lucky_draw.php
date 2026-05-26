@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['load_pool'])) {
 }
 
 // FETCH HISTORICAL WINNERS
-$winners = $conn->query("SELECT aha.application_id, c.full_name, c.monthly_income, p.project_name, p.state 
+$winners = $conn->query("SELECT aha.application_id, aha.application_date, c.full_name, c.phone_number, c.monthly_income, p.project_name, p.state 
                          FROM affordable_housing_applications aha 
                          JOIN customers c ON aha.customer_id = c.customer_id 
                          JOIN properties p ON aha.property_id = p.property_id 
@@ -215,8 +215,9 @@ include '../includes/header.php';
     </div>
 
     <div class="card shadow-sm border-0 rounded-4 mb-5">
-        <div class="card-header bg-dark text-white p-4 rounded-top-4">
+        <div class="card-header bg-dark text-white p-4 rounded-top-4 d-flex justify-content-between align-items-center">
             <h4 class="fw-bold mb-0"><i class="fas fa-trophy text-success me-2"></i>Historical Winners Registry</h4>
+            <button id="bulkWaBtn" class="btn btn-sm btn-success fw-bold rounded-pill shadow-sm px-3"><i class="fab fa-whatsapp me-2"></i>Bulk Notify Displayed</button>
         </div>
         <div class="card-body p-4">
             <div class="row g-3 mb-4 p-3 bg-light rounded-3 border">
@@ -259,16 +260,30 @@ include '../includes/header.php';
                             <th>Income (RM)</th>
                             <th>Property Scheme</th>
                             <th>State</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($w = $winners->fetch_assoc()): ?>
+                        <?php while ($w = $winners->fetch_assoc()): 
+                            $phone = preg_replace('/[^0-9]/', '', $w['phone_number']);
+                            if (strpos($phone, '60') !== 0 && strpos($phone, '0') === 0) {
+                                $phone = '60' . substr($phone, 1);
+                            }
+                            $appDate = date('Y-m-d', strtotime($w['application_date']));
+                            $waText = urlencode("Hello {$w['full_name']}, we are from SYS Property Holdings, congratulations on being selected for the {$w['project_name']}, your application date is {$appDate}.");
+                            $waLink = "https://wa.me/{$phone}?text={$waText}";
+                        ?>
                             <tr>
                                 <td class="font-monospace text-muted">WIN-<?php echo str_pad($w['application_id'], 4, '0', STR_PAD_LEFT); ?></td>
                                 <td class="fw-bold text-success"><?php echo htmlspecialchars($w['full_name']); ?></td>
                                 <td class="fw-bold text-dark"><?php echo number_format($w['monthly_income'], 2); ?></td>
                                 <td class="fw-bold text-secondary"><?php echo htmlspecialchars($w['project_name']); ?></td>
                                 <td><span class="badge bg-primary px-3 py-2 rounded-pill"><?php echo htmlspecialchars($w['state']); ?></span></td>
+                                <td class="text-end">
+                                    <a href="<?php echo $waLink; ?>" target="_blank" class="btn btn-sm btn-success rounded-pill shadow-sm" title="Send WhatsApp">
+                                        <i class="fab fa-whatsapp"></i> Notify
+                                    </a>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -383,6 +398,26 @@ include '../includes/header.php';
 
         $('#histNameFilter').on('keyup change', function() {
             table.column(1).search(this.value).draw();
+        });
+
+        $('#bulkWaBtn').on('click', function() {
+            let count = 0;
+            // Get all rows currently matching the filter (search: 'applied')
+            table.rows({search: 'applied'}).nodes().each(function(node) {
+                const waLink = $(node).find('a[title="Send WhatsApp"]').attr('href');
+                if (waLink) {
+                    setTimeout(() => {
+                        window.open(waLink, '_blank');
+                    }, count * 1000); // 1 second delay per tab to prevent popup blocking
+                    count++;
+                }
+            });
+            
+            if (count > 0) {
+                Swal.fire('Processing WhatsApp Notifications', `Opening ${count} WhatsApp Web tabs based on your current filter.<br><br><small class="text-danger">Ensure pop-ups are allowed in your browser.</small>`, 'info');
+            } else {
+                Swal.fire('No Records', 'No winners displayed to notify. Please adjust your filters.', 'warning');
+            }
         });
     });
 
