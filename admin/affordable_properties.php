@@ -374,13 +374,7 @@ include '../includes/header.php';
         width: auto !important;
         display: inline-block;
     }
-    /* Ensure pagination and length menu align properly */
-    .bottom-controls {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 1.5rem;
-    }
+    /* Ensure pagination and info align properly without extra margins */
     .dataTables_paginate {
         margin: 0 !important;
     }
@@ -396,7 +390,7 @@ include '../includes/header.php';
         const table = $('#affTable').DataTable({
             "order": [[0, "desc"]],
             "dom": "<'row'<'col-sm-12'tr>>" +
-                   "<'row mt-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 bottom-controls'pl>>"
+                   "<'row mt-3 align-items-center'<'col-sm-12 col-md-4 text-start'i><'col-sm-12 col-md-4 d-flex justify-content-center'p><'col-sm-12 col-md-4 d-flex justify-content-end'l>>"
         });
 
         $('#filterAffName').on('keyup change', function() {
