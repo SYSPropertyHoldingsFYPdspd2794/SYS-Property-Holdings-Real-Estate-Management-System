@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： sql102.infinityfree.com
--- 生成日期： 2026-05-25 03:27:36
+-- 生成日期： 2026-05-26 13:26:16
 -- 服务器版本： 11.4.11-MariaDB
 -- PHP 版本： 7.2.22
 
@@ -141,7 +141,6 @@ INSERT INTO `affordable_housing_applications` (`application_id`, `customer_id`, 
 (6, 51, 57, 'APPROVED_FOR_DRAW', 46, '2026-05-16 12:00:58'),
 (7, 51, 177, 'PENDING_REVIEW', NULL, '2026-05-18 17:49:20'),
 (8, 51, 57, 'REJECTED', 46, '2026-05-19 01:09:00'),
-(9, 51, 54, 'PENDING_REVIEW', NULL, '2026-05-22 07:15:13'),
 (10, 51, 93, 'PENDING_REVIEW', NULL, '2026-05-22 08:58:55');
 
 -- --------------------------------------------------------
@@ -187,7 +186,8 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `property_id`, `ass
 (27, 51, 51, NULL, 'SHOWROOM_VIEWING', '2026-05-30', '15:00:00', 'REQUESTED', NULL),
 (28, 51, 52, 46, 'SHOWROOM_VIEWING', '2026-05-29', '13:00:00', 'COMPLETED', 'Dear WIN, we have receive your Financial Document. As I opinion your loan will be approved for this property.'),
 (29, 51, 171, NULL, 'SHOWROOM_VIEWING', '2026-06-05', '16:00:00', 'REQUESTED', NULL),
-(30, 51, 51, 56, 'SHOWROOM_VIEWING', '2026-06-03', '16:00:00', 'ASSIGNED', NULL);
+(30, 51, 51, 56, 'SHOWROOM_VIEWING', '2026-06-03', '16:00:00', 'ASSIGNED', NULL),
+(31, 51, 88, NULL, 'SHOWROOM_VIEWING', '2026-06-06', '19:30:00', 'REQUESTED', NULL);
 
 -- --------------------------------------------------------
 
@@ -223,7 +223,10 @@ INSERT INTO `audit_logs` (`log_id`, `account_id`, `action_type`, `entity_type`, 
 (12, 54, 'LEAD_ASSIGNED', 'appointment_id', 28, '2026-05-19 00:56:17'),
 (13, 54, 'LEAD_ASSIGNED', 'appointment_id', 19, '2026-05-22 06:49:37'),
 (14, 54, 'LEAD_ASSIGNED', 'appointment_id', 29, '2026-05-22 06:53:34'),
-(15, 54, 'LEAD_ASSIGNED', 'appointment_id', 30, '2026-05-25 00:20:36');
+(15, 54, 'LEAD_ASSIGNED', 'appointment_id', 30, '2026-05-25 00:20:36'),
+(16, NULL, 'DOCUMENT_PURGED', 'document_id', 30, '2026-05-26 08:31:58'),
+(17, NULL, 'DOCUMENT_PURGED', 'document_id', 28, '2026-05-26 08:33:35'),
+(18, NULL, 'DOCUMENT_PURGED', 'document_id', 32, '2026-05-26 08:39:02');
 
 -- --------------------------------------------------------
 
@@ -291,7 +294,7 @@ INSERT INTO `customers` (`customer_id`, `full_name`, `phone_number`, `marital_st
 (47, 'testcus', '012-9876543', 'SINGLE', 0, 'Student', '11000.00', '/storage/profile_images/customer_47_5993a459f668b573.jpg'),
 (49, 'test', '1111', 'SINGLE', 0, 'Student', '0.00', NULL),
 (50, 'KHAIRUNNISA KAMAL', '017283783893', 'SINGLE', 1, 'teacher', '4500.00', NULL),
-(51, 'WIN', '017', 'SINGLE', 0, 'Student', '3000.00', NULL),
+(51, 'WIN', '017', 'SINGLE', 0, 'Student', '8000.00', NULL),
 (54, '12', '12', '', 0, 'student', '0.00', NULL),
 (57, '1234', '1234', 'SINGLE', 0, 'student', '0.00', NULL),
 (59, 'kahjun', '999', 'SINGLE', 0, 'student', '5.00', NULL);
@@ -337,10 +340,10 @@ INSERT INTO `documents` (`document_id`, `customer_id`, `related_to_type`, `relat
 (24, 51, 'APPLICATION', 8, 'EPF_STATEMENT_SUMMARY', 'storage/docs/app_8_1779373110.pdf', '2026-05-21 07:18:30', 0, NULL),
 (25, 51, 'APPOINTMENT', 29, 'PAYSLIP_SUMMARY', 'storage/docs/appt_29_1779457953.pdf', '2026-05-22 06:52:33', 0, NULL),
 (26, 51, 'APPLICATION', 7, 'EPF_STATEMENT_SUMMARY', 'storage/docs/app_7_1779458206.pdf', '2026-05-22 06:56:47', 0, NULL),
-(28, 51, 'APPOINTMENT', 10, 'PAYSLIP_SUMMARY', 'storage/docs/appt_10_1779458397.pdf', '2026-05-22 06:59:57', 0, NULL),
+(28, 51, 'APPOINTMENT', 10, 'PAYSLIP_SUMMARY', 'storage/docs/appt_10_1779458397.pdf', '2026-05-22 06:59:57', 1, '2026-05-26 08:33:35'),
 (29, 47, 'APPOINTMENT', 23, 'PAYSLIP_SUMMARY', 'storage/docs/appt_23_1779458475.pdf', '2026-05-22 07:01:14', 0, NULL),
-(30, 51, 'APPLICATION', 9, 'EPF_STATEMENT_SUMMARY', 'storage/docs/app_9_1779459313.pdf', '2026-05-22 07:15:13', 0, NULL),
-(31, 51, 'APPLICATION', 10, 'EPF_STATEMENT_SUMMARY', 'storage/docs/app_10_1779465536.pdf', '2026-05-22 08:58:55', 0, NULL);
+(31, 51, 'APPLICATION', 10, 'EPF_STATEMENT_SUMMARY', 'storage/docs/app_10_1779465536.pdf', '2026-05-22 08:58:55', 0, NULL),
+(32, 51, 'APPOINTMENT', 31, 'PAYSLIP_SUMMARY', 'storage/docs/appt_31_1779809856.pdf', '2026-05-26 08:37:36', 1, '2026-05-26 08:39:02');
 
 -- --------------------------------------------------------
 
@@ -541,16 +544,17 @@ INSERT INTO `properties` (`property_id`, `property_code`, `project_name`, `state
 (170, 'W-BG-MK002', 'Mont Kiara Grandeur Estate', 'Kuala Lumpur', 'BUNGALOW', '3465000.00', 35, 5500, NULL, 'ACTIVE', 'W-BG-MK002.jpg', 'premium detached house mont kiara exterior', 0),
 (171, 'W-BG-CH003', 'Cheras Elite Haven', 'Kuala Lumpur', 'BUNGALOW', '2520000.00', 40, 5000, NULL, 'ACTIVE', 'W-BG-CH003.jpg', 'luxury bungalow cheras kuala lumpur architecture', 0),
 (172, 'W-TR-BB001', 'Residensi Bintang Harmoni', 'Kuala Lumpur', 'TERRACE', '945000.00', 45, 2200, NULL, 'ACTIVE', 'W-TR-BB001.jpg', 'modern double storey terrace bukit bintang', 0),
-(173, 'W-TR-MK002', 'Laman Mont Kiara Indah', 'Kuala Lumpur', 'TERRACE', '819000.00', 50, 2000, NULL, 'ARCHIVED', 'W-TR-MK002.jpg', 'luxury terrace house mont kiara neighborhood', 0),
+(173, 'W-TR-MK002', 'Laman Mont Kiara Indah', 'Kuala Lumpur', 'TERRACE', '820000.00', 50, 2000, NULL, 'ACTIVE', 'W-TR-MK002.jpg', 'luxury terrace house mont kiara neighborhood', 0),
 (174, 'W-TR-CH003', 'Taman Cheras Utama KL', 'Kuala Lumpur', 'TERRACE', '630000.00', 50, 1800, NULL, 'ACTIVE', 'W-TR-CH003.jpg', 'terrace homes cheras kuala lumpur bright', 0),
 (175, 'W-AP-BB001', 'Bukit Bintang City Suites', 'Kuala Lumpur', 'APARTMENT', '567000.00', 150, 1100, NULL, 'ACTIVE', 'W-AP-BB001.jpg', 'luxury high rise apartment bukit bintang skyline', 0),
 (176, 'W-AP-MK002', 'Mont Kiara Skyline Residences', 'Kuala Lumpur', 'APARTMENT', '504000.00', 120, 1000, NULL, 'ACTIVE', 'W-AP-MK002.jpg', 'premium serviced apartment mont kiara exterior', 0),
-(177, 'W-AP-CH003', 'Pangsapuri Cheras Mewah KL', 'Kuala Lumpur', 'APARTMENT', '315000.00', 100, 900, '5200.00', 'ACTIVE', 'W-AP-CH003.jpg', 'affordable apartment building cheras kuala lumpur', 1),
+(177, 'W-AP-CH003', 'Pangsapuri Cheras Mewah KL', 'Kuala Lumpur', 'APARTMENT', '315000.00', 100, 900, NULL, 'ACTIVE', 'W-AP-CH003.jpg', 'affordable apartment building cheras kuala lumpur', 0),
 (178, 'W-CM-BB001', 'Bukit Bintang Trade Centre', 'Kuala Lumpur', 'COMMERCIAL', '2520000.00', 12, 3200, NULL, 'ACTIVE', 'W-CM-BB001.jpg', 'premium commercial shop lot bukit bintang bustling', 0),
 (179, 'W-CM-MK002', 'Mont Kiara Business Boulevard', 'Kuala Lumpur', 'COMMERCIAL', '2205000.00', 15, 3000, NULL, 'ACTIVE', 'W-CM-MK002.jpg', 'modern shop office mont kiara kuala lumpur', 0),
 (180, 'W-CM-CH003', 'Pusat Komersial Cheras KL', 'Kuala Lumpur', 'COMMERCIAL', '1575000.00', 20, 2600, NULL, 'ACTIVE', 'W-CM-CH003.jpg', 'retail commercial space cheras kuala lumpur', 0),
 (181, 'T-PR-TEST001', 'TEST PROPERTY', 'Johor', 'APARTMENT', '390000.00', 20, 1000, NULL, 'ARCHIVED', 'T-PR-TEST001.jpg', 'NA', 0),
-(182, 'W-CM-KC001', 'KLCC TEST', 'Kuala Lumpur', 'COMMERCIAL', '10000000.00', 118, 8000, NULL, 'ACTIVE', 'Custom/W-CM-KC001_20260522113837_3d9cbf2b.jpg', 'NA', 0);
+(182, 'W-CM-KC001', 'KLCC TEST', 'Kuala Lumpur', 'COMMERCIAL', '10000000.00', 118, 8000, NULL, 'ACTIVE', 'Custom/W-CM-KC001_20260522113837_3d9cbf2b.jpg', 'NA', 0),
+(183, 'W-CM-KC002', 'KL TOWER TEST', 'Kuala Lumpur', 'COMMERCIAL', '12000000.00', 56, 5000, NULL, 'ACTIVE', 'Custom/W-CM-KC002_20260526101828_e7950aa5.jpg', 'NA', 0);
 
 -- --------------------------------------------------------
 
@@ -770,13 +774,13 @@ ALTER TABLE `affordable_housing_applications`
 -- 使用表AUTO_INCREMENT `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- 使用表AUTO_INCREMENT `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- 使用表AUTO_INCREMENT `banks`
@@ -788,13 +792,13 @@ ALTER TABLE `banks`
 -- 使用表AUTO_INCREMENT `documents`
 --
 ALTER TABLE `documents`
-  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- 使用表AUTO_INCREMENT `properties`
 --
 ALTER TABLE `properties`
-  MODIFY `property_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
+  MODIFY `property_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=184;
 
 --
 -- 使用表AUTO_INCREMENT `wishlists`
