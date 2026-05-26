@@ -338,36 +338,6 @@ h1, h2, h3, h4, h5, h6 {
 .text-muted {
     color: var(--text-muted) !important;
 }
-.bg-dark .text-muted,
-.bg-black .text-muted,
-.text-bg-dark .text-muted,
-.receipt-card .text-muted,
-.filter-glass .text-muted,
-.gov-housing-section .text-muted,
-.bg-dark small.text-muted,
-.bg-black small.text-muted,
-.receipt-card small.text-muted,
-.filter-glass label {
-    color: rgba(248,250,252,0.78) !important;
-}
-.bg-dark .text-dark:not(.btn):not(.badge):not(.alert),
-.bg-black .text-dark:not(.btn):not(.badge):not(.alert),
-.text-bg-dark .text-dark:not(.btn):not(.badge):not(.alert),
-.receipt-card .text-dark:not(.btn):not(.badge):not(.alert) {
-    color: #f8fafc !important;
-}
-.bg-light .text-light:not(.btn):not(.badge):not(.alert),
-.bg-white .text-light:not(.btn):not(.badge):not(.alert),
-.card:not(.bg-dark):not(.bg-black):not(.receipt-card):not(.estimator-card) .text-light:not(.btn):not(.badge):not(.alert),
-.modal-content:not(.bg-dark):not(.bg-black) .text-light:not(.btn):not(.badge):not(.alert) {
-    color: #1f2937 !important;
-}
-.bg-light .text-white:not(.btn):not(.badge):not(.alert),
-.bg-white .text-white:not(.btn):not(.badge):not(.alert),
-.card:not(.bg-dark):not(.bg-black):not(.receipt-card):not(.estimator-card) .text-white:not(.btn):not(.badge):not(.alert),
-.modal-content:not(.bg-dark):not(.bg-black) .text-white:not(.btn):not(.badge):not(.alert) {
-    color: #111827 !important;
-}
 .card {
     border: 1px solid rgba(15,23,42,0.08);
     border-radius: var(--radius);
