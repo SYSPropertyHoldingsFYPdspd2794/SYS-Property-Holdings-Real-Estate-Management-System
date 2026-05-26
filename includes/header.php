@@ -10,6 +10,7 @@ $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ?
 
 $dashboard_link = $root_prefix . 'login.php';
 $profile_link = $root_prefix . 'login.php';
+$profile_text = 'Profile';
 $wishlist_link = $root_prefix . 'login.php';
 $wishlist_text = 'Wishlist';
 $wishlist_icon = 'fas fa-heart';
@@ -30,6 +31,7 @@ if (isset($_SESSION['role'])) {
     } elseif ($_SESSION['role'] === 'CUSTOMER') {
         $dashboard_link = $root_prefix . 'customer/dashboard.php';
         $profile_link = $root_prefix . 'customer/profile.php';
+        $profile_text = 'Setting';
         $wishlist_link = $root_prefix . 'customer/wishlist.php';
         $wishlist_text = 'Wishlist';
     }
@@ -523,7 +525,7 @@ footer.luxury-footer {
 <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
 <ul class="dropdown-menu dropdown-menu-end">
 <li><a class="dropdown-item" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
-<li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>">Profile</a></li>
+<li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>"><?php echo htmlspecialchars($profile_text); ?></a></li>
 </ul>
 </div>
 <a href="<?php echo htmlspecialchars($root_prefix . 'logout.php'); ?>" class="btn btn-danger">Logout</a>
