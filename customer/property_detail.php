@@ -8,6 +8,7 @@
 include_once '../includes/header.php';
 require_once '../includes/auth_check.php';
 require_once '../includes/property_images.php';
+require_once '../includes/regional_proximity.php';
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
@@ -53,6 +54,8 @@ $banks_result = $conn->query("SELECT bank_name, interest_rate FROM banks ORDER B
 $dbType = strtolower(trim($property['property_type']));
 $baseDir = $root_prefix . "SYS Property Catalog/";
 $finalImg = property_catalog_image_path($property, $root_prefix, '../');
+$proximityAmenities = regional_proximity_amenities($property['state'] ?? '');
+$proximityMapQuery = regional_proximity_map_query($property);
 
 // 1. FLOOR PLAN PATH 
 if ($is_afford || $dbType === 'affordable') {
@@ -382,18 +385,18 @@ $proximityHtml .= '</div>';
             <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card content-card">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom border-secondary border-opacity-25 pb-3 mb-4">
                     <h3 class="luxury-title text-dark m-0"><i class="fas fa-map-marked-alt text-gold me-3"></i> Interactive Regional Proximity</h3>
-                    <span class="badge bg-dark text-gold px-3 py-2 rounded-pill"><i class="fas fa-satellite-dish me-1"></i> 15KM Live Geo-Data</span>
+                    <span class="badge bg-dark text-gold px-3 py-2 rounded-pill"><i class="fas fa-location-dot me-1"></i> Regional Amenities</span>
                 </div>
 
                 <div class="row mt-3 g-4">
                     <div class="col-lg-8">
                         <div id="propertyMap" class="rounded-4 shadow-inner border border-secondary border-opacity-25" style="height: 480px; width: 100%;">
-                            <div class="d-flex h-100 justify-content-center align-items-center bg-light rounded-4">
-                                <div class="text-center text-muted">
-                                    <i class="fas fa-spinner fa-spin fa-3x mb-3 text-gold"></i>
-                                    <p class="fw-bold mb-0">Initializing Satellite Mapping Coordinates...</p>
-                                </div>
-                            </div>
+                            <iframe
+                                title="Map for <?php echo htmlspecialchars($property['project_name']); ?>"
+                                src="https://maps.google.com/maps?q=<?php echo urlencode($proximityMapQuery); ?>&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                class="w-100 h-100 rounded-4 border-0"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
 
@@ -401,13 +404,23 @@ $proximityHtml .= '</div>';
                         <div class="bg-white border rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
                             <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
                                 <h6 class="m-0 fw-bold"><i class="fas fa-location-arrow text-gold me-2"></i> Surrounding Amenities</h6>
-                                <span class="badge bg-light text-dark" id="placesCount">0 Found</span>
+                                <span class="badge bg-light text-dark" id="placesCount"><?php echo count($proximityAmenities); ?> Found</span>
                             </div>
                             <div id="placesList" class="p-0 overflow-auto" style="height: 425px;">
-                                <div class="text-center text-muted py-5 mt-4">
-                                    <i class="fas fa-satellite fa-2x mb-3 text-secondary"></i>
-                                    <p class="small">Scanning 15KM radius for key infrastructure...</p>
-                                </div>
+                                <?php foreach ($proximityAmenities as $amenity): ?>
+                                    <div class="d-flex align-items-center p-3 border-bottom hover-place">
+                                        <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3 border shadow-sm flex-shrink-0" style="width: 45px; height: 45px;">
+                                            <i class="<?php echo htmlspecialchars($amenity['icon']); ?> fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1 overflow-hidden pe-2">
+                                            <h6 class="mb-0 fw-bold text-dark text-truncate" title="<?php echo htmlspecialchars($amenity['name']); ?>"><?php echo htmlspecialchars($amenity['name']); ?></h6>
+                                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;"><?php echo htmlspecialchars($amenity['type']); ?></small>
+                                        </div>
+                                        <div class="text-end flex-shrink-0">
+                                            <span class="badge bg-dark text-gold fw-bold shadow-sm px-2 py-1"><?php echo htmlspecialchars($amenity['distance']); ?></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
@@ -524,123 +537,6 @@ function updateCalc() {
 document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEventListener('input', updateCalc));
 window.onload = updateCalc;
 
-// =======================================================
-// GOOGLE MAPS DYNAMIC PROXIMITY ENGINE
-// =======================================================
-let map;
-let service;
-
-function initMap() {
-    const propertySearchQuery = "<?php echo addslashes($property['project_name'] . ', ' . $property['state'] . ', Malaysia'); ?>";
-    const geocoder = new google.maps.Geocoder();
-
-    geocoder.geocode({ 'address': propertySearchQuery }, function(results, status) {
-        if (status === 'OK') {
-            const propertyLocation = results[0].geometry.location;
-
-            map = new google.maps.Map(document.getElementById('propertyMap'), {
-                center: propertyLocation,
-                zoom: 12,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: true,
-                styles: [
-                    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#747474" }] },
-                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#c9c9c9" }] }
-                ]
-            });
-
-            new google.maps.Marker({
-                map: map,
-                position: propertyLocation,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                title: "<?php echo addslashes($property['project_name']); ?>",
-                animation: google.maps.Animation.DROP
-            });
-
-            const proximityCircle = new google.maps.Circle({
-                strokeColor: '#FFC000',
-                strokeOpacity: 0.6,
-                strokeWeight: 2,
-                fillColor: '#FFC000',
-                fillOpacity: 0.1,
-                map: map,
-                center: propertyLocation,
-                radius: 15000
-            });
-            map.fitBounds(proximityCircle.getBounds());
-
-            const request = {
-                location: propertyLocation,
-                radius: '15000',
-                types: ['shopping_mall', 'hospital', 'school', 'university', 'transit_station']
-            };
-
-            service = new google.maps.places.PlacesService(map);
-            service.nearbySearch(request, function(places, placesStatus) {
-                if (placesStatus === google.maps.places.PlacesServiceStatus.OK) {
-                    renderPlacesList(places, propertyLocation);
-                } else {
-                    document.getElementById('placesList').innerHTML = '<div class="alert alert-warning m-3 small"><i class="fas fa-exclamation-circle me-2"></i>No nearby amenities found within 15KM radius.</div>';
-                }
-            });
-        } else {
-            document.getElementById('propertyMap').innerHTML = '<div class="d-flex h-100 justify-content-center align-items-center bg-light text-muted rounded-4"><p><i class="fas fa-map-marked-alt fa-2x mb-2 d-block text-center"></i>Location coordinates unavailable.</p></div>';
-            document.getElementById('placesList').innerHTML = '<div class="alert alert-secondary m-3 small">Data mapping restricted.</div>';
-        }
-    });
-}
-
-function renderPlacesList(places, propertyLocation) {
-    const listContainer = document.getElementById('placesList');
-    listContainer.innerHTML = '';
-
-    const maxPlaces = Math.min(places.length, 8);
-    document.getElementById('placesCount').innerText = maxPlaces + " Locations";
-
-    places.forEach(place => {
-        place.distanceValue = google.maps.geometry.spherical.computeDistanceBetween(propertyLocation, place.geometry.location);
-    });
-
-    places.sort((a, b) => a.distanceValue - b.distanceValue);
-
-    for (let i = 0; i < maxPlaces; i++) {
-        const place = places[i];
-        const distanceText = (place.distanceValue / 1000).toFixed(1) + ' KM';
-        let iconClass = 'fas fa-map-marker-alt text-secondary';
-        let typeName = 'Amenity';
-
-        if (place.types.includes('shopping_mall')) { iconClass = 'fas fa-shopping-bag text-primary'; typeName = 'Shopping Mall'; }
-        else if (place.types.includes('hospital')) { iconClass = 'fas fa-hospital text-success'; typeName = 'Healthcare'; }
-        else if (place.types.includes('school') || place.types.includes('university')) { iconClass = 'fas fa-graduation-cap text-danger'; typeName = 'Education'; }
-        else if (place.types.includes('transit_station')) { iconClass = 'fas fa-subway text-warning'; typeName = 'Transit'; }
-
-        new google.maps.Marker({
-            map: map,
-            position: place.geometry.location,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            title: place.name
-        });
-
-        const html = `
-            <div class="d-flex align-items-center p-3 border-bottom hover-place">
-                <div class="bg-light rounded-circle d-flex justify-content-center align-items-center me-3 border shadow-sm flex-shrink-0" style="width: 45px; height: 45px;">
-                    <i class="${iconClass} fs-5"></i>
-                </div>
-                <div class="flex-grow-1 overflow-hidden pe-2">
-                    <h6 class="mb-0 fw-bold text-dark text-truncate" title="${place.name}">${place.name}</h6>
-                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">${typeName}</small>
-                </div>
-                <div class="text-end flex-shrink-0">
-                    <span class="badge bg-dark text-gold fw-bold shadow-sm px-2 py-1">${distanceText}</span>
-                </div>
-            </div>
-        `;
-        listContainer.innerHTML += html;
-    }
-}
 </script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry&callback=initMap"></script>
 
 <?php include_once '../includes/footer.php'; ?>
