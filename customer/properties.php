@@ -157,26 +157,26 @@ $result = $stmt->get_result();
                             </form>
                         </div>
                         <div class="card-body p-4 p-xl-5 d-flex flex-column position-relative">
-                            <p class="text-uppercase tracking-wider text-muted mb-2" style="font-size: 0.75rem;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($row['state']); ?></p>
-                            <h4 class="fw-light text-dark text-truncate mb-3 luxury-title"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                            <p class="text-uppercase tracking-wider text-secondary fw-bold mb-2" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($row['state']); ?></p>
+                            <h4 class="text-dark text-truncate mb-3 luxury-title" style="font-weight: 500; line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                             
                             <?php if ($is_affordable): ?>
                                 <p class="text-muted fw-bold small mb-3"><i class="fas fa-id-card text-gold me-2"></i> Income Limit: <span class="text-dark">RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></span></p>
                             <?php endif; ?>
 
                             <div class="mt-auto pt-4 border-top border-light d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="d-block text-muted small text-uppercase tracking-wider" style="font-size: 0.65rem;">Starting Price</span>
-                                    <h5 class="text-dark fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h5>
+                                <div class="pe-2">
+                                    <span class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.7rem;">Starting Price</span>
+                                    <h5 class="text-dark fw-bold mb-0" style="letter-spacing: -0.5px;">RM <?php echo number_format($row['price'], 2); ?></h5>
                                 </div>
                                 <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark rounded-pill px-4 py-2 shadow-sm tracking-wider text-uppercase view-btn" style="font-size: 0.75rem;">View</a>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
-                            <div class="d-flex align-items-center rounded-pill p-2 px-3" style="background-color: rgba(255, 192, 0, 0.15);">
-                                <i class="fas fa-key text-gold me-2"></i>
-                                <small class="text-uppercase tracking-wider fw-bold" style="font-size: 0.65rem; color: #cc9a00;">Availability:</small>
-                                <small class="ms-auto fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? 'SOLD OUT' : $row['total_units'] . ' Units'; ?></small>
+                            <div class="d-flex align-items-center bg-light border rounded-pill p-2 px-3 shadow-sm">
+                                <i class="fas fa-key text-secondary me-2"></i>
+                                <small class="text-uppercase tracking-wider fw-bold text-secondary" style="font-size: 0.7rem;">Availability:</small>
+                                <span class="ms-auto fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>" style="font-size: 0.9rem;"><?php echo $is_sold_out ? 'SOLD OUT' : $row['total_units'] . ' Units'; ?></span>
                             </div>
                         </div>
                     </div>
@@ -208,7 +208,8 @@ $result = $stmt->get_result();
 }
 
 .catalog-subtitle {
-    color: #ddd7cc;
+    color: #f8f9fa;
+    line-height: 1.7;
 }
 
 .filter-glass {

@@ -278,7 +278,7 @@ $proximityHtml .= '</div>';
                         <?php endif; ?>
                     </div>
 
-                    <p class="fs-5 text-muted mb-4 tracking-wider text-uppercase" style="font-size: 0.85rem !important;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
+                    <p class="text-secondary fw-bold mb-4 tracking-wider text-uppercase" style="font-size: 0.9rem !important;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($property['state']); ?></p>
 
                     <?php if ($is_afford): ?>
                         <div class="alert alert-danger border-0 shadow-sm p-4 mb-4" style="background-color: #fff5f5; border-left: 5px solid #dc3545 !important;">
@@ -289,17 +289,17 @@ $proximityHtml .= '</div>';
 
                     <hr class="my-4">
                     <div class="row text-center mb-4">
-                        <div class="col-4 border-end">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Area SQFT</small>
-                            <span class="fs-4 luxury-title text-dark"><?php echo number_format($property['built_up_sqft']); ?></span>
+                        <div class="col-4 border-end px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Area SQFT</small>
+                            <span class="fs-4 fw-bold text-dark"><?php echo number_format($property['built_up_sqft']); ?></span>
                         </div>
-                        <div class="col-4 border-end">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Availability</small>
-                            <span class="fs-4 luxury-title <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
+                        <div class="col-4 border-end px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Availability</small>
+                            <span class="fs-4 fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? '0' : $property['total_units']; ?></span>
                         </div>
-                        <div class="col-4">
-                            <small class="d-block text-muted text-uppercase tracking-wider mb-2" style="font-size: 0.7rem;">Reference</small>
-                            <span class="fs-5 luxury-title text-muted"><?php echo htmlspecialchars($property['property_code']); ?></span>
+                        <div class="col-4 px-2">
+                            <small class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-2" style="font-size: 0.75rem;">Reference</small>
+                            <span class="fs-5 fw-bold text-secondary"><?php echo htmlspecialchars($property['property_code']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -430,6 +430,7 @@ $proximityHtml .= '</div>';
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
     
     .luxury-title { font-family: 'Playfair Display', serif; }
+    p { line-height: 1.65; }
     .tracking-wider { letter-spacing: 0.1em; }
     .text-gold { color: #FFC000 !important; }
     .bg-gold { background-color: #FFC000 !important; }

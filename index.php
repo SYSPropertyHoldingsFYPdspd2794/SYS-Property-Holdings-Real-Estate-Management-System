@@ -25,7 +25,7 @@ include 'includes/header.php';
             <div class="col-lg-8">
                 <div class="section-kicker mb-3">Online to offline real estate</div>
                 <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
-                <p class="lead mb-5 fs-4">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
+                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3">View Catalog</a>
                     <a href="showrooms.php" class="btn btn-outline-light btn-lg px-4 py-3">Find Showrooms</a>
@@ -104,7 +104,7 @@ include 'includes/header.php';
             <div class="col-lg-5 mb-4 mb-lg-0">
                 <div class="section-kicker mb-2">Nationwide support</div>
                 <h2 class="section-title mb-4">Locate Our Offline Showrooms</h2>
-                <p class="lead mb-4">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
+                <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
                 <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
                     <option value="" selected disabled>-- Select a State / Territory --</option>
@@ -155,7 +155,7 @@ include 'includes/header.php';
             <div class="col-lg-8">
                 <div class="section-kicker mb-2">Affordable pathway</div>
                 <h2 class="fw-bold display-6 mb-3 text-white">Government Affordable Housing Initiative</h2>
-                <p class="lead mb-4 text-light">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
+                <p class="fs-5 mb-4 text-white" style="line-height: 1.6;">Partnering with RMMJ and Rumah Selangorku to provide high-quality, subsidized housing for eligible citizens.</p>
                 <ul class="list-unstyled fs-5 mb-4">
                     <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Malaysian Citizen</li>
                     <li class="mb-2 text-light"><i class="fas fa-check-circle text-success me-2"></i> Age 18 and above</li>
