@@ -150,8 +150,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnExecutePurge = document.getElementById('btnExecutePurge');
     if (btnExecutePurge) {
         btnExecutePurge.addEventListener('click', function() {
-            if (confirm('Are you sure you want to permanently delete all expired documents? This action cannot be undone.')) {
-                
+            window.showConfirmModal({
+                title: 'Execute Purge Script',
+                message: 'Are you sure you want to permanently delete all expired documents? This action cannot be undone.',
+                confirmText: 'Execute Purge',
+                confirmClass: 'btn-danger',
+                onConfirm: function () {
                 btnExecutePurge.disabled = true;
                 btnExecutePurge.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Purging...';
                 
@@ -170,7 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         btnExecutePurge.disabled = false;
                         btnExecutePurge.innerHTML = '<i class="fas fa-trash-alt me-2"></i> Execute Purge Script';
                     });
-            }
+                }
+            });
         });
     }
 });

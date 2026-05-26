@@ -5,7 +5,7 @@
  * DESCRIPTION: Customer view. Upgraded Internal Layout, 16-Region Proximity coverage, and SOLD OUT security block bounds.
  */
 
-include_once '../includes/header.php';
+require_once '../includes/db_connect.php';
 require_once '../includes/auth_check.php';
 require_once '../includes/property_images.php';
 require_once '../includes/regional_proximity.php';
@@ -16,6 +16,8 @@ $property_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // WISHLIST TOGGLE LOGIC
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
+    $is_saved = false;
+
     $chk = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
     $chk->bind_param("ii", $account_id, $property_id);
     $chk->execute();
@@ -27,7 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_wishlist'])) {
         $ins = $conn->prepare("INSERT INTO wishlists (customer_id, property_id) VALUES (?, ?)");
         $ins->bind_param("ii", $account_id, $property_id);
         $ins->execute();
+        $is_saved = true;
     }
+
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'saved' => $is_saved,
+            'property_id' => $property_id
+        ]);
+        exit();
+    }
+
     header("Location: property_detail.php?id=" . $property_id);
     exit();
 }
@@ -38,9 +52,12 @@ $stmt->execute();
 $property = $stmt->get_result()->fetch_assoc();
 
 if (!$property) {
+    include_once '../includes/header.php';
     echo "<div class='container my-5 text-center'><h3>Property not found.</h3></div>";
     include_once '../includes/footer.php'; exit();
 }
+
+include_once '../includes/header.php';
 
 $is_wish_stmt = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE customer_id = ? AND property_id = ?");
 $is_wish_stmt->bind_param("ii", $account_id, $property_id);
@@ -266,8 +283,8 @@ $proximityHtml .= '</div>';
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
                             <h2 class="luxury-title fw-light text-dark mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
-                            <form method="POST" class="m-0">
-                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'bg-dark text-white' : 'btn-outline-dark'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; border-color: #212529 !important;">
+                            <form method="POST" class="m-0 wishlist-detail-form">
+                                <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'bg-dark text-white' : 'btn-outline-dark'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm wishlist-detail-btn" style="width: 45px; height: 45px; border-color: #212529 !important;">
                                     <i class="<?php echo $is_wishlisted ? 'fas text-gold' : 'far'; ?> fa-heart fs-5"></i>
                                 </button>
                             </form>
@@ -509,6 +526,10 @@ $proximityHtml .= '</div>';
     .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #FFC000; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(255,192,0,0.5); }
     .hover-place { transition: background-color 0.2s ease; }
     .hover-place:hover { background-color: #f8f5ed; }
+    .wishlist-detail-btn.is-loading {
+        opacity: 0.65;
+        pointer-events: none;
+    }
     #placesList::-webkit-scrollbar { width: 6px; }
     #placesList::-webkit-scrollbar-track { background: #f1f1f1; }
     #placesList::-webkit-scrollbar-thumb { background: #FFC000; border-radius: 10px; }
@@ -538,6 +559,61 @@ function updateCalc() {
 }
 document.querySelectorAll('.form-select, .form-range').forEach(el => el.addEventListener('input', updateCalc));
 window.onload = updateCalc;
+
+const wishlistDetailForm = document.querySelector('.wishlist-detail-form');
+if (wishlistDetailForm) {
+    wishlistDetailForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const button = wishlistDetailForm.querySelector('.wishlist-detail-btn');
+        const icon = button ? button.querySelector('i') : null;
+        const data = new FormData(wishlistDetailForm);
+        data.append('toggle_wishlist', '1');
+
+        if (button) {
+            button.classList.add('is-loading');
+            button.disabled = true;
+        }
+
+        fetch(<?php echo json_encode('property_detail.php?id=' . $property_id); ?>, {
+            method: 'POST',
+            body: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Wishlist update failed');
+            }
+            return response.json();
+        })
+        .then(function (result) {
+            if (!result.success || !button || !icon) {
+                return;
+            }
+
+            if (result.saved) {
+                button.classList.remove('btn-outline-dark');
+                button.classList.add('bg-dark', 'text-white');
+                icon.className = 'fas text-gold fa-heart fs-5';
+            } else {
+                button.classList.remove('bg-dark', 'text-white');
+                button.classList.add('btn-outline-dark');
+                icon.className = 'far fa-heart fs-5';
+            }
+        })
+        .catch(function () {
+            HTMLFormElement.prototype.submit.call(wishlistDetailForm);
+        })
+        .finally(function () {
+            if (button) {
+                button.classList.remove('is-loading');
+                button.disabled = false;
+            }
+        });
+    });
+}
 
 </script>
 

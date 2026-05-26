@@ -62,6 +62,26 @@ if (!isset($root_prefix)) {
     </div>
 </footer>
 
+<div class="modal fade" id="globalConfirmModal" tabindex="-1" aria-labelledby="globalConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger" id="globalConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0 text-dark" id="globalConfirmModalMessage">Are you sure you want to continue?</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger fw-bold" id="globalConfirmModalButton">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 /**
  * password: The string from the input field
@@ -134,5 +154,69 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const confirmModalElement = document.getElementById('globalConfirmModal');
+    const confirmTitle = document.getElementById('globalConfirmModalLabel');
+    const confirmMessage = document.getElementById('globalConfirmModalMessage');
+    const confirmButton = document.getElementById('globalConfirmModalButton');
+    const confirmModal = confirmModalElement ? new bootstrap.Modal(confirmModalElement) : null;
+    let pendingAction = null;
+
+    window.showConfirmModal = function (options) {
+        if (!confirmModal || !confirmTitle || !confirmMessage || !confirmButton) {
+            if (typeof options.onConfirm === 'function') {
+                options.onConfirm();
+            }
+            return;
+        }
+
+        confirmTitle.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>' + (options.title || 'Confirm Action');
+        confirmMessage.textContent = options.message || 'Are you sure you want to continue?';
+        confirmButton.textContent = options.confirmText || 'Confirm';
+        confirmButton.className = 'btn fw-bold ' + (options.confirmClass || 'btn-danger');
+        pendingAction = options.onConfirm || null;
+        confirmModal.show();
+    };
+
+    confirmButton?.addEventListener('click', function () {
+        const action = pendingAction;
+        pendingAction = null;
+        confirmModal?.hide();
+
+        if (typeof action === 'function') {
+            action();
+        }
+    });
+
+    document.querySelectorAll('.confirm-action-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (form.dataset.confirmed === '1') {
+                return;
+            }
+
+            event.preventDefault();
+            const submitter = event.submitter;
+            window.showConfirmModal({
+                title: form.dataset.confirmTitle || 'Confirm Action',
+                message: form.dataset.confirmMessage || 'Are you sure you want to continue?',
+                confirmText: form.dataset.confirmButton || 'Confirm',
+                onConfirm: function () {
+                    if (submitter && submitter.name) {
+                        const hiddenSubmitter = document.createElement('input');
+                        hiddenSubmitter.type = 'hidden';
+                        hiddenSubmitter.name = submitter.name;
+                        hiddenSubmitter.value = submitter.value;
+                        form.appendChild(hiddenSubmitter);
+                    }
+
+                    form.dataset.confirmed = '1';
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>

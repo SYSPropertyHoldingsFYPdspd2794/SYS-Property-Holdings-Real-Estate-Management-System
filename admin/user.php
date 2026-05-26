@@ -353,7 +353,7 @@ include '../includes/header.php';
                                         <button class="btn btn-sm btn-dark fw-bold" data-bs-toggle="modal" data-bs-target="#editModal<?php echo (int)$u['account_id']; ?>">
                                             Edit
                                         </button>
-                                        <form method="POST" class="m-0" onsubmit="return confirm('Remove this account permanently?');">
+                                        <form method="POST" class="m-0 confirm-action-form" data-confirm-title="Remove Account" data-confirm-message="Remove this account permanently?">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="account_id" value="<?php echo (int)$u['account_id']; ?>">
                                             <button type="submit" class="btn btn-sm btn-danger" title="Remove account" <?php echo ((int)$u['account_id'] === (int)($_SESSION['account_id'] ?? 0)) ? 'disabled' : ''; ?>>

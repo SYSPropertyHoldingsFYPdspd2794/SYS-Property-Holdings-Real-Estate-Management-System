@@ -90,7 +90,7 @@ $result = $stmt_apps->get_result();
                                         </a>
                                     </td>
                                     <td>
-                                        <form method="POST" class="d-inline" onsubmit="return confirm('Process this application?');">
+                                        <form method="POST" class="d-inline confirm-action-form" data-confirm-title="Process Application" data-confirm-message="Are you sure you want to process this application?">
                                             <input type="hidden" name="application_id" value="<?php echo $row['application_id']; ?>">
                                             <button type="submit" name="action" value="APPROVE" class="btn btn-sm btn-success">Approve</button>
                                             <button type="submit" name="action" value="REJECT" class="btn btn-sm btn-danger">Reject</button>

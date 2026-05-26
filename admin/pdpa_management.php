@@ -70,7 +70,7 @@ include '../includes/header.php';
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">PDPA Document Management</h2>
-        <form method="POST" onsubmit="return confirm('Are you sure you want to execute the purge script? This action cannot be undone.');">
+        <form method="POST" class="confirm-action-form" data-confirm-title="Execute Purge Script" data-confirm-message="Are you sure you want to execute the purge script? This action cannot be undone.">
             <button type="submit" name="run_purge" class="btn btn-danger btn-lg fw-bold">Execute Purge Script (Cron)</button>
         </form>
     </div>
@@ -133,7 +133,7 @@ include '../includes/header.php';
                             <td>
                                 <?php if (!$doc['is_purged']): ?>
                                     <a href="../<?php echo ltrim($doc['file_path'], '/'); ?>" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to prematurely delete this document? This action cannot be undone.');">
+                                    <form method="POST" class="d-inline confirm-action-form" data-confirm-title="Delete Document" data-confirm-message="Are you sure you want to prematurely delete this document? This action cannot be undone.">
                                         <input type="hidden" name="delete_doc_id" value="<?php echo $doc['document_id']; ?>">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </form>

@@ -347,7 +347,7 @@ document.querySelectorAll('.wishlist-toggle-form').forEach(function (form) {
             button.disabled = true;
         }
 
-        fetch('properties.php<?php echo !empty($_SERVER['QUERY_STRING']) ? '?' . htmlspecialchars($_SERVER['QUERY_STRING'], ENT_QUOTES) : ''; ?>', {
+        fetch(<?php echo json_encode('properties.php' . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '')); ?>, {
             method: 'POST',
             body: data,
             headers: {
