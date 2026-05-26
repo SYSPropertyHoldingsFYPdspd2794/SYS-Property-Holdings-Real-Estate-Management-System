@@ -115,8 +115,8 @@ $result = $stmt->get_result();
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="fw-bold text-white text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h5>
-                            <p class="text-light opacity-75 small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
+                            <h5 class="fw-bold text-dark text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
                                 <p class="text-danger fw-bold small mb-3"><i class="fas fa-id-card me-1"></i> Income Limit: RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></p>
@@ -124,11 +124,11 @@ $result = $stmt->get_result();
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-light px-4 shadow-sm">View Details</a>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
-                        <div class="card-footer bg-transparent border-0 py-3 text-center border-top border-secondary border-opacity-25">
-                            <small class="text-light opacity-75"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-white"><?php echo $row['total_units']; ?></strong></small>
+                        <div class="card-footer border-0 py-3 text-center border-top" style="background-color: rgba(197, 160, 89, 0.15);">
+                            <small style="color: #a8894a; font-weight: 600;"><i class="fas fa-door-open me-1"></i> Available Units: <strong class="text-dark"><?php echo $row['total_units']; ?></strong></small>
                         </div>
                     </div>
                 </div>

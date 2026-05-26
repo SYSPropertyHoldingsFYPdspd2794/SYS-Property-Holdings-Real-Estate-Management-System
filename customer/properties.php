@@ -173,9 +173,9 @@ $result = $stmt->get_result();
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
-                            <div class="d-flex align-items-center bg-light rounded-pill p-2 px-3">
+                            <div class="d-flex align-items-center rounded-pill p-2 px-3" style="background-color: rgba(197, 160, 89, 0.15);">
                                 <i class="fas fa-key text-gold me-2"></i>
-                                <small class="text-muted text-uppercase tracking-wider" style="font-size: 0.65rem;">Availability:</small>
+                                <small class="text-uppercase tracking-wider fw-bold" style="font-size: 0.65rem; color: #a8894a;">Availability:</small>
                                 <small class="ms-auto fw-bold <?php echo $is_sold_out ? 'text-danger' : 'text-dark'; ?>"><?php echo $is_sold_out ? 'SOLD OUT' : $row['total_units'] . ' Units'; ?></small>
                             </div>
                         </div>
