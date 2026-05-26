@@ -402,8 +402,10 @@ $proximityHtml .= '</div>';
 
                     <div class="col-lg-4">
                         <div class="bg-white border rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
-                            <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
-                                <h6 class="m-0 fw-bold"><i class="fas fa-location-arrow text-gold me-2"></i> Surrounding Amenities</h6>
+                            <div class="p-3 d-flex justify-content-between align-items-center gap-3 flex-wrap" style="background: #020617;">
+                                <h6 class="m-0 fw-bold" style="color: #fff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.75);">
+                                    <i class="fas fa-location-arrow text-gold me-2"></i>Surrounding Amenities
+                                </h6>
                                 <span class="badge bg-light text-dark" id="placesCount"><?php echo count($proximityAmenities); ?> Found</span>
                             </div>
                             <div id="placesList" class="p-0 overflow-auto" style="height: 425px;">

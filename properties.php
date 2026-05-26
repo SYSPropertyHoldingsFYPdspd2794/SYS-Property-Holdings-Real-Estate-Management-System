@@ -109,7 +109,7 @@ $result = $stmt->get_result();
                 $finalImg = property_catalog_image_path($row);
                 ?>
                 <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 border-0 overflow-hidden hover-card">
+                    <div class="card h-100 border-0 overflow-hidden hover-card clickable-property-card" role="link" tabindex="0" onclick="window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'" onkeydown="if(event.key === 'Enter'){ window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'; }">
                         <div class="position-relative" style="height: 220px;">
                             <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
@@ -124,7 +124,6 @@ $result = $stmt->get_result();
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-warning text-dark fw-bold px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
                         <div class="card-footer bg-light border-0 py-3 text-center border-top">
@@ -140,5 +139,11 @@ $result = $stmt->get_result();
         ?>
     </div>
 </div>
+
+<style>
+    .clickable-property-card {
+        cursor: pointer;
+    }
+</style>
 
 <?php include_once 'includes/footer.php'; ?>

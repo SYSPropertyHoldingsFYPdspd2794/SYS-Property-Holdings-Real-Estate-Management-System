@@ -143,13 +143,13 @@ $result = $stmt->get_result();
                 $finalImg = property_catalog_image_path($row, $root_prefix, '../');
                 ?>
                 <div class="col-lg-4 col-md-6 mb-5">
-                    <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white text-dark">
+                    <div class="card h-100 border-0 rounded-4 overflow-hidden hover-card bg-white text-dark clickable-property-card" role="link" tabindex="0" onclick="window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'" onkeydown="if(event.key === 'Enter'){ window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'; }">
                         <div class="position-relative overflow-hidden" style="height: 280px;">
                             <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100 image-zoom" style="object-fit: cover;">
                             <div class="image-overlay"></div>
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-4 shadow-sm z-3 text-uppercase"><?php echo $badge_text; ?></span>
                             
-                            <form method="POST" class="position-absolute bottom-0 end-0 m-3 z-3">
+                            <form method="POST" class="position-absolute bottom-0 end-0 m-3 z-3" onclick="event.stopPropagation();">
                                 <input type="hidden" name="property_id" value="<?php echo $row['property_id']; ?>">
                                 <button type="submit" name="toggle_wishlist" class="btn btn-dark bg-opacity-75 text-white rounded-circle shadow-lg p-0 d-flex align-items-center justify-content-center luxury-wishlist-btn" title="Add to Wishlist">
                                     <i class="<?php echo in_array($row['property_id'], $wishlist_array) ? 'fas text-gold' : 'far'; ?> fa-heart fs-6"></i>
@@ -169,7 +169,6 @@ $result = $stmt->get_result();
                                     <span class="d-block text-secondary fw-bold text-uppercase tracking-wider mb-1" style="font-size: 0.7rem;">Starting Price</span>
                                     <h5 class="text-dark fw-bold mb-0" style="letter-spacing: -0.5px;">RM <?php echo number_format($row['price'], 2); ?></h5>
                                 </div>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-warning text-dark fw-bold rounded-pill px-4 py-2 shadow-sm tracking-wider text-uppercase view-btn" style="font-size: 0.75rem;">View Details</a>
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-0 pb-4 pt-0 px-4 px-xl-5">
@@ -201,6 +200,10 @@ $result = $stmt->get_result();
 
 .property-catalog-page {
     color: #f4f1e8;
+}
+
+.clickable-property-card {
+    cursor: pointer;
 }
 
 .catalog-title {
