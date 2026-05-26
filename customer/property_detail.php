@@ -79,7 +79,7 @@ if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
     
     // Linux Web Hosting Strict Case-Sensitivity Scan Guard
-    $checkDir = "../SYS Property Catalog/";
+    $checkDir = $baseDir;
     if (!file_exists($checkDir . "Affordable_Floor_Plan.jpg")) {
         if (file_exists($checkDir . "affordable_floor_plan.jpg")) {
             $floorPlanName = "affordable_floor_plan.jpg";
@@ -95,11 +95,7 @@ if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = ucfirst($dbType) . "_Floor_Plan.jpg";
 }
 
-if ($_SERVER['HTTP_HOST'] === 'localhost:3000' || $_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
-    $finalFloorPlan = $baseDir . $floorPlanName; 
-} else {
-    $finalFloorPlan = "../" . $baseDir . $floorPlanName; 
-}
+$finalFloorPlan = $baseDir . $floorPlanName; 
 
 // ==================================================================
 // SECTION 1: DETAILED INTERNAL LAYOUT SPECIFICATION

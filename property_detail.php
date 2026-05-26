@@ -37,7 +37,7 @@ if ($is_afford || $dbType === 'affordable') {
     $floorPlanName = "Affordable_Floor_Plan.jpg";
     
     // Linux Web Hosting Strict Case-Sensitivity Scan Guard
-    $checkDir = "SYS Property Catalog/";
+    $checkDir = $baseDir;
     if (!file_exists($checkDir . "Affordable_Floor_Plan.jpg")) {
         if (file_exists($checkDir . "affordable_floor_plan.jpg")) {
             $floorPlanName = "affordable_floor_plan.jpg";
