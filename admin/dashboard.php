@@ -69,7 +69,7 @@ include '../includes/header.php';
 
     <div class="row">
         <div class="col-md-8 mb-4">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body p-4">
                     <h4 class="fw-bold mb-4">O2O Regional Lead Distribution</h4>
                     <canvas id="leadsChart" height="150"></canvas>
@@ -77,7 +77,7 @@ include '../includes/header.php';
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body p-4">
                     <h4 class="fw-bold mb-4">Quick Actions</h4>
                     <div class="d-grid gap-3">

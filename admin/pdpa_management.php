@@ -51,9 +51,15 @@ $retention_days = $res && $res->num_rows > 0 ? (int)$res->fetch_assoc()['setting
 
 // Fetch documents
 $query = "
-    SELECT d.*, c.full_name 
+    SELECT d.*, c.full_name,
+           COALESCE(p1.project_name, p2.project_name) AS project_name,
+           COALESCE(p1.state, p2.state) AS property_state
     FROM documents d
     JOIN customers c ON d.customer_id = c.customer_id
+    LEFT JOIN appointments appt ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = appt.appointment_id
+    LEFT JOIN properties p1 ON appt.property_id = p1.property_id
+    LEFT JOIN affordable_housing_applications aha ON d.related_to_type = 'APPLICATION' AND d.related_to_id = aha.application_id
+    LEFT JOIN properties p2 ON aha.property_id = p2.property_id
     ORDER BY d.uploaded_at DESC
 ";
 $documents = $conn->query($query);
@@ -64,7 +70,7 @@ include '../includes/header.php';
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">PDPA Document Management</h2>
-        <form method="POST">
+        <form method="POST" onsubmit="return confirm('Are you sure you want to execute the purge script? This action cannot be undone.');">
             <button type="submit" name="run_purge" class="btn btn-danger btn-lg fw-bold">Execute Purge Script (Cron)</button>
         </form>
     </div>
@@ -86,7 +92,8 @@ include '../includes/header.php';
                             <th>ID</th>
                             <th>Uploaded By</th>
                             <th>Purpose</th>
-                            <th>Document Type</th>
+                            <th>Property Name</th>
+                            <th>STATE</th>
                             <th>Uploaded At</th>
                             <th>Deletion Date</th>
                             <th>Status</th>
@@ -103,17 +110,22 @@ include '../includes/header.php';
                             <td>#<?php echo $doc['document_id']; ?></td>
                             <td><?php echo htmlspecialchars($doc['full_name']); ?></td>
                             <td><span class="badge bg-secondary"><?php echo htmlspecialchars($doc['related_to_type']); ?></span></td>
-                            <td><?php echo htmlspecialchars($doc['document_type']); ?></td>
-                            <td><?php echo date('Y-m-d H:i', $upload_time); ?></td>
+                            <td><?php echo htmlspecialchars($doc['project_name'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($doc['property_state'] ?? 'N/A'); ?></td>
                             <td>
-                                <?php echo date('Y-m-d H:i', $delete_time); ?>
+                                <?php echo date('Y-m-d', $upload_time); ?><br>
+                                <?php echo date('H:i', $upload_time); ?>
+                            </td>
+                            <td>
+                                <?php echo date('Y-m-d', $delete_time); ?><br>
+                                <?php echo date('H:i', $delete_time); ?>
                                 <?php if ($is_expired && !$doc['is_purged']): ?>
-                                    <span class="badge bg-danger">Expired</span>
+                                    <br><span class="badge bg-danger mt-1">Expired</span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($doc['is_purged']): ?>
-                                    <span class="badge bg-success">Purged on <?php echo date('Y-m-d', strtotime($doc['purged_at'])); ?></span>
+                                    <span class="badge bg-secondary">Not Exists</span>
                                 <?php else: ?>
                                     <span class="badge bg-warning text-dark">Active</span>
                                 <?php endif; ?>
