@@ -190,7 +190,7 @@ include_once 'includes/header.php';
                 <div class="row align-items-center mb-5 pb-5 timeline-item reveal-item">
                     <div class="col-lg-5 order-3 order-lg-1 pe-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1541888081622-19e078970e5b?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Construction Site" style="height: 350px; object-fit: cover;">
+                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356f27?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Construction Site" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-hammer fa-2x mb-2 text-info"></i>
                                 <h6 class="fw-bold m-0">Progressive Billing Commences</h6>

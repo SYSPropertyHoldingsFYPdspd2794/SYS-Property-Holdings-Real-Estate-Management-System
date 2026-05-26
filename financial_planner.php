@@ -621,7 +621,7 @@ function addDynamicField() {
             <option value="income">Income</option>
             <option value="expense">Expense</option>
         </select>
-        <input type="text" class="form-control bg-light dynamic-name" placeholder="Item Name (e.g. Side Hustle)">
+        <input type="text" class="form-control bg-light dynamic-name" placeholder="Item Name">
         <div class="input-group">
             <span class="input-group-text bg-light border-0">RM</span>
             <input type="number" class="form-control bg-light border-0 dynamic-amount" value="0" oninput="calculateDSR()">
@@ -687,7 +687,7 @@ function calculateDSR() {
     // Update Text UI
     document.getElementById('dsr-percentage-display').innerText = currentDSR.toFixed(1) + '%';
     document.getElementById('dsr-max-installment').innerText = formatRM(maxSafeInstallment);
-    document.getElementById('dsr-max-price').innerText = formatRM(maxPropPrice);
+    document.getElementById('dsr-max-price').innerText = 'RM ' + Math.round(maxPropPrice).toLocaleString('en-US');
     
     // Fit text for max price
     const maxPriceEl = document.getElementById('dsr-max-price');
