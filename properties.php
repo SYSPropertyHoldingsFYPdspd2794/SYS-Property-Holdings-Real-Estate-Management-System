@@ -115,7 +115,7 @@ $result = $stmt->get_result();
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="fw-bold text-dark text-truncate" style="line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                            <h5 class="fw-bold text-warning text-truncate" style="line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h5>
                             <p class="text-secondary fw-bold small mb-2" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>
@@ -124,7 +124,7 @@ $result = $stmt->get_result();
 
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <h4 class="text-success fw-bold mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
-                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-outline-dark px-4 shadow-sm">View Details</a>
+                                <a href="property_detail.php?id=<?php echo $row['property_id']; ?>" class="btn btn-warning text-dark fw-bold px-4 shadow-sm">View Details</a>
                             </div>
                         </div>
                         <div class="card-footer bg-light border-0 py-3 text-center border-top">
