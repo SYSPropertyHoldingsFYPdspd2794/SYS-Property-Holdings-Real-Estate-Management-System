@@ -151,7 +151,7 @@ $result = $conn->query($query);
                                         <div>
                                             <strong><?php echo htmlspecialchars($log['project_name']); ?></strong>
                                             <small><?php echo htmlspecialchars($log['property_code']); ?></small>
-                                            <span class="badge <?php echo $is_affordable ? 'bg-success' : 'bg-dark'; ?> mt-2">
+                                            <span class="badge <?php echo $is_affordable ? 'bg-success' : 'bg-gold text-dark'; ?> mt-2">
                                                 <?php echo $is_affordable ? 'AFFORDABLE' : htmlspecialchars($log['property_type']); ?>
                                             </span>
                                         </div>
@@ -208,6 +208,7 @@ $result = $conn->query($query);
 <style>
 .interest-timeline-page .tracking-wider { letter-spacing: 0.1em; }
 .interest-timeline-page .text-gold { color: #c5a059 !important; }
+.bg-gold { background-color: #c5a059 !important; }
 .timeline-metric {
     background: #ffffff;
     color: #15191f;

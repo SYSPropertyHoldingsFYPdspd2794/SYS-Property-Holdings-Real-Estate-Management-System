@@ -272,7 +272,7 @@ $proximityHtml .= '</div>';
                         <?php if ($is_sold_out): ?>
                             <span class="badge bg-danger px-4 py-2 text-uppercase tracking-wider shadow-sm text-white rounded-0">SOLD OUT</span>
                         <?php else: ?>
-                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-dark text-gold'; ?> px-4 py-2 text-uppercase tracking-wider shadow-sm rounded-0" style="border: 1px solid rgba(255,255,255,0.2);">
+                            <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-gold text-dark'; ?> px-4 py-2 text-uppercase tracking-wider shadow-sm rounded-0" style="border: 1px solid rgba(255,255,255,0.2);">
                                 <?php echo $is_afford ? 'GOV AFFORDABLE' : htmlspecialchars($property['property_type']); ?>
                             </span>
                         <?php endif; ?>

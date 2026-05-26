@@ -137,7 +137,7 @@ $result = $stmt->get_result();
                     $badge_class = "bg-danger text-white premium-badge";
                 } else {
                     $badge_text = $is_affordable ? "GOV AFFORDABLE" : htmlspecialchars($row['property_type']);
-                    $badge_class = $is_affordable ? "bg-success text-white premium-badge" : "bg-dark text-gold premium-badge";
+                    $badge_class = $is_affordable ? "bg-success text-white premium-badge" : "bg-gold text-dark premium-badge";
                 }
                 
                 $finalImg = property_catalog_image_path($row, $root_prefix, '../');
@@ -275,7 +275,6 @@ $result = $stmt->get_result();
     border: 1px solid rgba(255,255,255,0.2);
 }
 
-.premium-badge.bg-dark,
 .luxury-wishlist-btn {
     background-color: rgba(5,7,10,0.88) !important;
     color: #ffffff !important;
