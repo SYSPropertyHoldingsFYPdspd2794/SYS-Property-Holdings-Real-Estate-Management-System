@@ -360,6 +360,34 @@ include '../includes/header.php';
     </div>
 </div>
 
+<style>
+    /* Force DataTables length menu to be a single inline sentence */
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-weight: normal;
+    }
+    .dataTables_length select {
+        width: auto !important;
+        display: inline-block;
+    }
+    /* Ensure pagination and length menu align properly */
+    .bottom-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .dataTables_paginate {
+        margin: 0 !important;
+    }
+    .dataTables_info {
+        padding-top: 0 !important;
+    }
+</style>
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -367,7 +395,8 @@ include '../includes/header.php';
     $(document).ready(function() {
         const table = $('#affTable').DataTable({
             "order": [[0, "desc"]],
-            "dom": "lrtip"
+            "dom": "<'row'<'col-sm-12'tr>>" +
+                   "<'row mt-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 bottom-controls'pl>>"
         });
 
         $('#filterAffName').on('keyup change', function() {
