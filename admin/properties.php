@@ -287,24 +287,24 @@ include '../includes/header.php';
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="fw-bold">Register Free Market Property Unit</h5>
+                    <h5 class="fw-bold text-dark">Register Free Market Property Unit</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="add">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Unique Structural Code</label>
+                            <label class="form-label fw-bold text-dark">Unique Structural Code</label>
                             <input type="text" name="property_code" class="form-control" placeholder="e.g. J-TR-JB001" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Corporate Project Name</label>
+                            <label class="form-label fw-bold text-dark">Corporate Project Name</label>
                             <input type="text" name="project_name" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">State Domain Allocation</label>
+                            <label class="form-label fw-bold text-dark">State Domain Allocation</label>
                             <select name="state" class="form-select" required>
                                 <option value="Johor">Johor</option>
                                 <option value="Kedah">Kedah</option>
@@ -325,7 +325,7 @@ include '../includes/header.php';
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Layout Core Categorization</label>
+                            <label class="form-label fw-bold text-dark">Layout Core Categorization</label>
                             <select name="property_type" class="form-select" required>
                                 <option value="TERRACE">Terrace</option>
                                 <option value="BUNGALOW">Bungalow</option>
@@ -336,21 +336,21 @@ include '../includes/header.php';
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Valuation Price Base (RM)</label>
+                            <label class="form-label fw-bold text-dark">Valuation Price Base (RM)</label>
                             <input type="number" step="0.01" name="price" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Initial Structural Total Units</label>
+                            <label class="form-label fw-bold text-dark">Initial Structural Total Units</label>
                             <input type="number" name="total_units" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Floor Space Capacity (Sqft)</label>
+                            <label class="form-label fw-bold text-dark">Floor Space Capacity (Sqft)</label>
                             <input type="number" name="built_up_sqft" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Property Photo</label>
+                            <label class="form-label fw-bold text-dark">Property Photo</label>
                             <input type="file" name="property_image" class="form-control" accept="image/jpeg,image/png,image/webp">
                         </div>
                     </div>

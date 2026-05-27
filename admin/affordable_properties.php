@@ -285,24 +285,24 @@ include '../includes/header.php';
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="fw-bold">Deploy Regulated Government Scheme Housing</h5>
+                    <h5 class="fw-bold text-dark">Deploy Regulated Government Scheme Housing</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="add">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Unique Structural Code</label>
+                            <label class="form-label fw-bold text-dark">Unique Structural Code</label>
                             <input type="text" name="property_code" class="form-control" placeholder="e.g. J-AF-JB001" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Government Scheme Project Name</label>
+                            <label class="form-label fw-bold text-dark">Government Scheme Project Name</label>
                             <input type="text" name="project_name" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">State Territory Bound</label>
+                            <label class="form-label fw-bold text-dark">State Territory Bound</label>
                             <select name="state" class="form-select" required>
                                 <option value="Johor">Johor</option>
                                 <option value="Kedah">Kedah</option>
@@ -323,7 +323,7 @@ include '../includes/header.php';
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Layout Core Categorization</label>
+                            <label class="form-label fw-bold text-dark">Layout Core Categorization</label>
                             <select name="property_type" class="form-select" required>
                                 <?php foreach ($property_types as $type_value => $type_label): ?>
                                     <option value="<?php echo htmlspecialchars($type_value); ?>"><?php echo htmlspecialchars($type_label); ?></option>
@@ -333,27 +333,27 @@ include '../includes/header.php';
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Regulated Subsidized Price (RM)</label>
+                            <label class="form-label fw-bold text-dark">Regulated Subsidized Price (RM)</label>
                             <input type="number" step="0.01" name="price" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Applicant Maximum Income Cap (Had Pendapatan)</label>
+                            <label class="form-label fw-bold text-dark">Applicant Maximum Income Cap (Had Pendapatan)</label>
                             <input type="number" step="0.01" name="income_limit_rm" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Total Scheme Allocation Units</label>
+                            <label class="form-label fw-bold text-dark">Total Scheme Allocation Units</label>
                             <input type="number" name="total_units" class="form-control" required>
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Floor Plan Area Space (Sqft)</label>
+                            <label class="form-label fw-bold text-dark">Floor Plan Area Space (Sqft)</label>
                             <input type="number" name="built_up_sqft" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Property Photo</label>
+                            <label class="form-label fw-bold text-dark">Property Photo</label>
                             <input type="file" name="property_image" class="form-control" accept="image/jpeg,image/png,image/webp">
                         </div>
                     </div>
