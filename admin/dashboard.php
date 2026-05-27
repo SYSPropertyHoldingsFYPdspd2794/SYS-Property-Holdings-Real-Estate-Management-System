@@ -138,18 +138,18 @@ include '../includes/header.php';
                             </select>
                         </div>
                     </div>
-                    <canvas id="leadsChart" height="120"></canvas>
+                    <canvas id="leadsChart" height="250"></canvas>
                     <div class="mt-4 pt-3 border-top d-flex justify-content-around text-center" id="realTimeStats">
                         <div>
-                            <h6 class="text-muted mb-1">Applied for Appointments</h6>
+                            <h6 class="text-muted mb-1" id="appliedLabel">Applied for Appointments</h6>
                             <h4 class="fw-bold text-dark mb-0" id="statApplied">0</h4>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-1">Waiting for Assignment</h6>
+                            <h6 class="text-muted mb-1" id="waitingLabel">Waiting for Assignment</h6>
                             <h4 class="fw-bold text-primary mb-0" id="statWaiting">0</h4>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-1">Received Assignment</h6>
+                            <h6 class="text-muted mb-1" id="assignedLabel">Received Assignment</h6>
                             <h4 class="fw-bold text-success mb-0" id="statAssigned">0</h4>
                         </div>
                     </div>
@@ -215,7 +215,9 @@ include '../includes/header.php';
     });
 
     function loadChartData() {
-        const month = document.getElementById('filterMonth').value;
+        const monthSelect = document.getElementById('filterMonth');
+        const month = monthSelect.value;
+        const monthText = monthSelect.options[monthSelect.selectedIndex].text;
         const year = document.getElementById('filterYear').value;
 
         fetch(`dashboard.php?ajax_chart=1&month=${month}&year=${year}`)
@@ -225,6 +227,11 @@ include '../includes/header.php';
                 document.getElementById('statApplied').textContent = data.stats.applied;
                 document.getElementById('statWaiting').textContent = data.stats.waiting;
                 document.getElementById('statAssigned').textContent = data.stats.assigned;
+
+                // Update labels
+                document.getElementById('appliedLabel').textContent = `Applied for Appointments (${monthText} ${year})`;
+                document.getElementById('waitingLabel').textContent = `Waiting for Assignment (${monthText} ${year})`;
+                document.getElementById('assignedLabel').textContent = `Received Assignment (${monthText} ${year})`;
 
                 // Update chart
                 leadsChart.data.labels = data.chart.labels;
