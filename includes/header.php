@@ -337,21 +337,11 @@ footer.luxury-footer {
 </head>
 <body>
 <nav class="navbar navbar-expand navbar-dark bg-dark sticky-top shadow-sm py-2">
-<div class="container flex-wrap justify-content-center justify-content-lg-between gap-2">
-<a class="navbar-brand fw-bold" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
-<div class="d-flex flex-grow-1 align-items-center justify-content-center justify-content-lg-between flex-wrap" id="navbarNav">
-<ul class="navbar-nav mx-auto mx-lg-0 flex-row flex-wrap justify-content-center gap-2">
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-1"></i>Financial Planner</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
-</ul>
-<div class="d-flex align-items-center justify-content-center flex-wrap gap-2 mt-2 mt-lg-0">
+<div class="container flex-column align-items-stretch gap-2">
+<div class="d-flex w-100 justify-content-between align-items-center">
+<a class="navbar-brand fw-bold m-0" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
+<div class="d-flex align-items-center gap-2">
 <?php if (isset($_SESSION['account_id'])):?>
-<a href="<?php echo htmlspecialchars($wishlist_link); ?>" class="nav-link text-white fw-bold px-2 me-1"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> text-warning me-1"></i><span class="d-none d-sm-inline"><?php echo htmlspecialchars($wishlist_text); ?></span></a>
 <div class="dropdown">
 <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
 <ul class="dropdown-menu dropdown-menu-end">
@@ -364,6 +354,20 @@ footer.luxury-footer {
 <a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary shadow-sm">Sign In</a>
 <?php endif;?>
 </div>
+</div>
+<div class="w-100" id="navbarNav">
+<ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-1"></i>Financial Planner</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
+<?php if (isset($_SESSION['account_id'])):?>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-1"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
+<?php endif;?>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
+</ul>
 </div>
 </div>
 </nav>
