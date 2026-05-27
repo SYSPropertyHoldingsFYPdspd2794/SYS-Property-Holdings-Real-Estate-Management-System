@@ -14,6 +14,7 @@ $profile_text = 'Profile';
 $wishlist_link = $root_prefix . 'login.php';
 $wishlist_text = 'Wishlist';
 $wishlist_icon = 'fas fa-heart';
+$catalog_nav_link = $root_prefix . 'login.php';
 
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'ADMIN') {
@@ -23,6 +24,7 @@ if (isset($_SESSION['role'])) {
         $wishlist_link = $root_prefix . 'admin/interest_timeline.php'; 
         $wishlist_text = 'Interest Timeline';
         $wishlist_icon = 'fas fa-chart-line';
+        $catalog_nav_link = $root_prefix . 'properties.php';
     } elseif ($_SESSION['role'] === 'STAFF') {
         $dashboard_link = $root_prefix . 'staff/dashboard.php';
         $profile_link = $root_prefix . 'staff/profile.php';
@@ -30,12 +32,14 @@ if (isset($_SESSION['role'])) {
         $wishlist_link = $root_prefix . 'staff/state_inventory.php';
         $wishlist_text = 'State Inventory';
         $wishlist_icon = 'fas fa-map-location-dot';
+        $catalog_nav_link = $root_prefix . 'properties.php';
     } elseif ($_SESSION['role'] === 'CUSTOMER') {
         $dashboard_link = $root_prefix . 'customer/dashboard.php';
         $profile_link = $root_prefix . 'customer/profile.php';
         $profile_text = 'Setting';
         $wishlist_link = $root_prefix . 'customer/wishlist.php';
         $wishlist_text = 'Wishlist';
+        $catalog_nav_link = $root_prefix . 'customer/properties.php';
     }
 }
 ?>
@@ -357,7 +361,7 @@ footer.luxury-footer {
 </div>
 <div class="w-100" id="navbarNav">
 <ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>">Catalog</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
