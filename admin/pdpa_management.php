@@ -53,7 +53,9 @@ $retention_days = $res && $res->num_rows > 0 ? (int)$res->fetch_assoc()['setting
 $query = "
     SELECT d.*, c.full_name,
            COALESCE(p1.project_name, p2.project_name) AS project_name,
-           COALESCE(p1.state, p2.state) AS property_state
+           COALESCE(p1.state, p2.state) AS property_state,
+           COALESCE(appt.status, aha.status) AS entity_status,
+           appt.appointment_date
     FROM documents d
     JOIN customers c ON d.customer_id = c.customer_id
     LEFT JOIN appointments appt ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = appt.appointment_id
@@ -80,7 +82,7 @@ include '../includes/header.php';
     <?php endif; ?>
     
     <div class="alert alert-warning">
-        <strong>PDPA Policy:</strong> All sensitive documents are set to be automatically purged after <strong><?php echo $retention_days; ?> days</strong>.
+        <strong>PDPA Policy:</strong> Sensitive documents are safely retained while the related request is active. Once the status becomes <strong>COMPLETED, CANCELLED, NO SHOW, REJECTED or WINNER</strong>, they will be purged after <strong><?php echo $retention_days; ?> days</strong>.
     </div>
 
     <div class="card shadow-sm border-0">
@@ -102,9 +104,17 @@ include '../includes/header.php';
                     </thead>
                     <tbody>
                         <?php while ($doc = $documents->fetch_assoc()): 
+                            $entity_status = strtoupper($doc['entity_status'] ?? 'UNKNOWN');
+                            $is_terminal = in_array($entity_status, ['COMPLETED', 'CANCELLED', 'NO_SHOW', 'REJECTED', 'WINNER']);
+                            
+                            $base_time = strtotime($doc['uploaded_at']);
+                            if ($doc['related_to_type'] === 'APPOINTMENT' && !empty($doc['appointment_date']) && in_array($entity_status, ['COMPLETED', 'NO_SHOW'])) {
+                                $base_time = strtotime($doc['appointment_date']);
+                            }
+                            
                             $upload_time = strtotime($doc['uploaded_at']);
-                            $delete_time = strtotime($doc['uploaded_at'] . " + $retention_days days");
-                            $is_expired = time() >= $delete_time;
+                            $delete_time = strtotime("+$retention_days days", $base_time);
+                            $is_expired = $is_terminal && (time() >= $delete_time);
                         ?>
                         <tr>
                             <td>#<?php echo $doc['document_id']; ?></td>
@@ -117,10 +127,15 @@ include '../includes/header.php';
                                 <?php echo date('H:i', $upload_time); ?>
                             </td>
                             <td>
-                                <?php echo date('Y-m-d', $delete_time); ?><br>
-                                <?php echo date('H:i', $delete_time); ?>
-                                <?php if ($is_expired && !$doc['is_purged']): ?>
-                                    <br><span class="badge bg-danger mt-1">Expired</span>
+                                <?php if (!$is_terminal && !$doc['is_purged']): ?>
+                                    <span class="badge bg-success mb-1">Paused</span><br>
+                                    <small class="text-muted">Status: <?php echo htmlspecialchars($entity_status); ?></small>
+                                <?php else: ?>
+                                    <?php echo date('Y-m-d', $delete_time); ?><br>
+                                    <?php echo date('H:i', $delete_time); ?>
+                                    <?php if ($is_expired && !$doc['is_purged']): ?>
+                                        <br><span class="badge bg-danger mt-1">Expired</span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </td>
                             <td>

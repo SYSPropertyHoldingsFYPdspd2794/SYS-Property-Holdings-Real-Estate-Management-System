@@ -37,7 +37,15 @@ while ($row = $res->fetch_assoc()) {
 
 // Fetch expired documents violating PDPA retention policy
 $retention_days = (int) ($settings['DATA_RETENTION_DAYS']['setting_value'] ?? 7);
-$stmt_expired = $conn->prepare("SELECT document_id, document_type, file_path, uploaded_at FROM documents WHERE is_purged = FALSE AND uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY)");
+$stmt_expired = $conn->prepare("
+    SELECT d.document_id, d.document_type, d.file_path, d.uploaded_at 
+    FROM documents d
+    LEFT JOIN appointments appt ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = appt.appointment_id
+    LEFT JOIN affordable_housing_applications aha ON d.related_to_type = 'APPLICATION' AND d.related_to_id = aha.application_id
+    WHERE d.is_purged = FALSE 
+    AND COALESCE(appt.status, aha.status) IN ('COMPLETED', 'CANCELLED', 'NO_SHOW', 'REJECTED', 'WINNER')
+    AND d.uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY)
+");
 $stmt_expired->bind_param("i", $retention_days);
 $stmt_expired->execute();
 $expired_docs_res = $stmt_expired->get_result();
