@@ -5,6 +5,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include_once __DIR__ . '/db_connect.php';
 
+// 設定 PHP 與 MySQL 為馬來西亞時間 (GMT+8)
+date_default_timezone_set('Asia/Kuala_Lumpur');
+if (isset($conn)) {
+    $conn->query("SET time_zone = '+08:00'");
+}
+
 $current_folder = basename(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])));
 $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
 

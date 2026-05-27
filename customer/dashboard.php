@@ -5,6 +5,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
     exit();
 }
 include '../includes/db_connect.php';
+include_once '../includes/property_images.php';
 
 $account_id = $_SESSION['account_id'];
 
@@ -25,15 +26,33 @@ $app_count = $conn->query("SELECT COUNT(*) FROM affordable_housing_applications 
 $rate_res = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
 $base_rate = $rate_res && $rate_res->num_rows > 0 ? $rate_res->fetch_assoc()['setting_value'] : '3.85';
 
-// 為您推薦 (根據月收入推薦符合資格的可負擔房屋，或是普通房產)
-$rec_stmt = $conn->prepare("
+$rec_state = isset($_GET['rec_state']) ? trim($_GET['rec_state']) : '';
+
+// 獲取活躍的州別，供 Filter 使用
+$state_res = $conn->query("SELECT DISTINCT state FROM properties WHERE status = 'ACTIVE' ORDER BY state ASC");
+$active_states = [];
+while ($row = $state_res->fetch_assoc()) {
+    $active_states[] = $row['state'];
+}
+
+// 為您推薦 (根據月收入推薦符合資格的可負擔房屋，或是普通房產，並支援州別篩選)
+$rec_sql = "
     SELECT property_id, project_name, state, property_type, price, image_filename, is_affordable 
     FROM properties 
     WHERE status = 'ACTIVE' 
     AND ((is_affordable = 1 AND income_limit_rm >= ?) OR (is_affordable = 0))
-    ORDER BY property_id DESC LIMIT 4
-");
-$rec_stmt->bind_param("d", $monthly_income);
+";
+if (!empty($rec_state)) {
+    $rec_sql .= " AND state = ?";
+}
+$rec_sql .= " ORDER BY (is_affordable = 1 AND income_limit_rm >= ?) DESC, property_id DESC LIMIT 4";
+
+$rec_stmt = $conn->prepare($rec_sql);
+if (!empty($rec_state)) {
+    $rec_stmt->bind_param("dsd", $monthly_income, $rec_state, $monthly_income);
+} else {
+    $rec_stmt->bind_param("dd", $monthly_income, $monthly_income);
+}
 $rec_stmt->execute();
 $recommendations = $rec_stmt->get_result();
 
@@ -105,20 +124,32 @@ include '../includes/header.php';
     <div class="row g-4">
         <!-- Recommendations -->
         <div class="col-lg-8">
-            <div class="d-flex justify-content-between align-items-end mb-3">
-                <h4 class="fw-bold m-0"><i class="fas fa-star text-warning me-2"></i>Recommended For You</h4>
-                <a href="../properties.php" class="btn btn-sm btn-outline-light text-white rounded-pill fw-bold">View More</a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="fw-bold m-0"><i class="fas fa-star text-warning me-2"></i>Recommended For You</h4>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light rounded-pill px-3 d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Filter by State">
+                            <i class="fas fa-filter text-warning"></i>
+                            <span class="fw-bold"><?php echo empty($rec_state) ? 'Filter Region' : htmlspecialchars($rec_state); ?></span>
+                            <i class="fas fa-chevron-down opacity-75" style="font-size: 0.7em;"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow-sm border-0 rounded-3" style="max-height: 300px; overflow-y: auto;">
+                            <li><a class="dropdown-item fw-bold <?php echo empty($rec_state) ? 'active' : ''; ?>" href="dashboard.php">All Regions</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <?php foreach ($active_states as $st): ?>
+                                <li><a class="dropdown-item <?php echo $rec_state === $st ? 'active bg-primary text-white' : ''; ?>" href="dashboard.php?rec_state=<?php echo urlencode($st); ?>"><?php echo htmlspecialchars($st); ?></a></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </div>
+                <a href="properties.php" class="btn btn-sm btn-outline-light text-white rounded-pill fw-bold">View More</a>
             </div>
             
             <div class="row g-3">
                 <?php if ($recommendations->num_rows > 0): ?>
                     <?php while ($prop = $recommendations->fetch_assoc()): ?>
                         <?php 
-                        // 處理圖片路徑
-                        $img_path = '../SYS Property Catalog/' . htmlspecialchars($prop['image_filename']);
-                        if (strpos($prop['image_filename'], 'Custom/') === 0) {
-                            $img_path = '../storage/property_images/' . htmlspecialchars($prop['image_filename']);
-                        }
+                        $img_path = property_catalog_image_path($prop, '../', '../');
                         ?>
                         <div class="col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100 hover-card overflow-hidden">
@@ -130,7 +161,7 @@ include '../includes/header.php';
                                     <h6 class="fw-bold text-dark text-truncate mb-1"><?php echo htmlspecialchars($prop['project_name']); ?></h6>
                                     <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($prop['state']); ?></p>
                                     <h5 class="text-success fw-bold m-0">RM <?php echo number_format($prop['price'], 2); ?></h5>
-                                    <a href="../property_detail.php?id=<?php echo $prop['property_id']; ?>" class="stretched-link"></a>
+                                    <a href="property_detail.php?id=<?php echo $prop['property_id']; ?>" class="stretched-link"></a>
                                 </div>
                             </div>
                         </div>
