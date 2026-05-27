@@ -115,7 +115,7 @@ $result = $stmt->get_result();
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
-                            <h5 class="fw-bold text-warning text-truncate" style="line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                            <h5 class="fw-bold text-warning" style="line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h5>
                             <p class="text-secondary fw-bold small mb-2" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-danger me-1"></i> <?php echo htmlspecialchars($row['state']); ?></p>
                             
                             <?php if ($is_affordable): ?>

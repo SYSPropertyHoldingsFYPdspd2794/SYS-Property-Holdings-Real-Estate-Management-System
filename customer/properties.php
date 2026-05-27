@@ -174,7 +174,7 @@ include_once '../includes/header.php';
                         </div>
                         <div class="card-body p-4 p-xl-5 d-flex flex-column position-relative">
                             <p class="text-uppercase tracking-wider text-secondary fw-bold mb-2" style="font-size: 0.8rem;"><i class="fas fa-map-marker-alt text-gold me-2"></i> <?php echo htmlspecialchars($row['state']); ?></p>
-                            <h4 class="text-warning text-truncate mb-3 luxury-title" style="font-weight: 500; line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
+                            <h4 class="text-warning mb-3 luxury-title" style="font-weight: 500; line-height: 1.4;"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                             
                             <?php if ($is_affordable): ?>
                                 <p class="text-muted fw-bold small mb-3"><i class="fas fa-id-card text-gold me-2"></i> Income Limit: <span class="text-dark">RM <?php echo number_format($row['income_limit_rm'] ?? 0); ?></span></p>
