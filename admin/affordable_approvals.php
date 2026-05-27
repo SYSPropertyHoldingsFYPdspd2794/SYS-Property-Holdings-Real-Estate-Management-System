@@ -53,7 +53,7 @@ include '../includes/header.php';
         <div class="col-xl-6 col-lg-7">
             <div class="card shadow-sm border-0 h-100 rounded-4">
                 <div class="card-header bg-dark text-white p-4 rounded-top-4">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-filter text-warning me-2"></i>Cascading Regional Pipeline Filter</h5>
+                    <h5 class="fw-bold mb-0"><i class="fas fa-filter text-warning me-2"></i>Housing Project Filter</h5>
                 </div>
                 <div class="card-body p-4">
                     <div class="row g-3">
