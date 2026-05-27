@@ -72,7 +72,7 @@ include_once '../includes/header.php';
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <span class="badge bg-primary mb-2 align-self-start"><?php echo htmlspecialchars($row['property_type']); ?></span>
-                            <h5 class="fw-bold fs-5 text-warning text-truncate" title="<?php echo htmlspecialchars($row['project_name']); ?>"><?php echo htmlspecialchars($row['project_name']); ?></h5>
+                        <h5 class="fw-bold fs-5 text-warning" title="<?php echo htmlspecialchars($row['project_name']); ?>"><?php echo htmlspecialchars($row['project_name']); ?></h5>
                             <p class="text-muted small mb-3"><i class="fas fa-map-marker-alt me-1 text-danger"></i><?php echo htmlspecialchars($row['state']); ?></p>
                             <h4 class="text-success fw-bold mt-auto mb-0">RM <?php echo number_format($row['price'], 2); ?></h4>
                         </div>
