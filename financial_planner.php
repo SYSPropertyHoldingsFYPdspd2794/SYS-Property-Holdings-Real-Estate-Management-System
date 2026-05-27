@@ -222,8 +222,8 @@ include_once 'includes/header.php';
 
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0 text-white"><i class="fas fa-chart-area text-warning me-2"></i> 30-Year Wealth Accumulation Projection</h5>
-                    <select id="rb-tenure" class="form-select form-select-sm w-auto bg-dark text-white border-secondary">
+                    <h5 class="fw-bold m-0 text-white"><i class="fas fa-chart-area text-warning me-2"></i> <span id="projection-years-display">30</span>-Year Wealth Accumulation Projection</h5>
+                    <select id="rb-tenure" class="form-select form-select-sm w-auto bg-primary text-white border-0 fw-bold shadow-sm">
                         <option value="10">10 Year Projection</option>
                         <option value="20">20 Year Projection</option>
                         <option value="30" selected>30 Year Projection</option>
@@ -340,7 +340,7 @@ include_once 'includes/header.php';
                         <div class="mt-auto bg-white bg-opacity-10 p-4 rounded-4 border border-secondary border-opacity-25">
                             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary border-opacity-25 pb-3">
                                 <div>
-                                    <span class="d-block text-light fw-bold">Max Safe Housing Installment</span>
+                                    <span class="d-block text-dark fw-bold">Max Safe Housing Installment</span>
                                     <small class="text-muted tiny">Remaining buffer before hitting DSR limit</small>
                                 </div>
                                 <div class="text-end fw-bold text-info fs-5" id="dsr-max-installment">RM 0.00</div>
@@ -542,6 +542,8 @@ function calculateRentVsBuy() {
     }
 
     // Update displays
+    const displaySpan = document.getElementById('projection-years-display');
+    if (displaySpan) displaySpan.innerText = tenureYears;
     document.getElementById('rb-sunk-cost').innerText = formatRM(sunkCostData[sunkCostData.length - 1]);
     document.getElementById('rb-net-equity').innerText = formatRM(netEquityData[netEquityData.length - 1]);
 
