@@ -96,7 +96,7 @@ include '../includes/header.php';
                             <th>Purpose</th>
                             <th>Property Name</th>
                             <th>STATE</th>
-                            <th>Uploaded At</th>
+                            <th>Upload At</th>
                             <th>Deletion Date</th>
                             <th>Status</th>
                             <th>Actions</th>
