@@ -237,7 +237,7 @@ include '../includes/header.php';
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-info fw-bold text-dark">Save Policies</button>
+                                                <button type="submit" class="btn btn-info fw-bold text-dark">Save Changes</button>
                                             </div>
                                         </form>
                                     </div>
@@ -285,7 +285,7 @@ include '../includes/header.php';
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="fw-bold text-dark">Deploy Regulated Government Scheme Housing</h5>
+                    <h5 class="fw-bold text-dark">New Scheme Registration</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -360,7 +360,7 @@ include '../includes/header.php';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-info fw-bold text-dark">Publish Scheme Asset</button>
+                    <button type="submit" class="btn btn-info fw-bold text-dark">Publish Scheme</button>
                 </div>
             </form>
         </div>
