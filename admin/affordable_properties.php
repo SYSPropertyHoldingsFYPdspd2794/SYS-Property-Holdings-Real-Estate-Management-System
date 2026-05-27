@@ -337,7 +337,7 @@ include '../includes/header.php';
                             <input type="number" step="0.01" name="price" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark">Applicant Maximum Income Cap (Had Pendapatan)</label>
+                            <label class="form-label fw-bold text-dark">Applicant Maximum Income Cap</label>
                             <input type="number" step="0.01" name="income_limit_rm" class="form-control" required>
                         </div>
                     </div>
