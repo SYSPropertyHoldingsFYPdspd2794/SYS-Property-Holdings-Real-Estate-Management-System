@@ -82,7 +82,16 @@ include '../includes/header.php';
     <?php endif; ?>
     
     <div class="alert alert-warning">
-        <strong>PDPA Policy:</strong> Sensitive documents are safely retained while the related request is active. Once the status becomes <strong>COMPLETED, CANCELLED, NO SHOW, REJECTED or WINNER</strong>, they will be purged after <strong><?php echo $retention_days; ?> days</strong>.
+        <div class="text-center">
+            <strong>PDPA POLICY</strong><br>
+            Sensitive documents are securely retained while the relevant request is active.<br>
+            These documents will be deleted 7 days after the status changes.
+        </div>
+        <br>
+        <div class="text-start">
+            Appointments: COMPLETED / CANCELLED / NO SHOW<br>
+            Requests: REJECTED / WON
+        </div>
     </div>
 
     <div class="card shadow-sm border-0">
@@ -98,8 +107,8 @@ include '../includes/header.php';
                             <th>STATE</th>
                             <th>Upload At</th>
                             <th>Deletion Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th style="width: 80px;">Status</th>
+                            <th style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,22 +136,22 @@ include '../includes/header.php';
                                 <?php echo date('H:i', $upload_time); ?>
                             </td>
                             <td>
-                                <?php if (!$is_terminal && !$doc['is_purged']): ?>
-                                    <span class="badge bg-success mb-1">Paused</span><br>
-                                    <small class="text-muted">Status: <?php echo htmlspecialchars($entity_status); ?></small>
+                                <?php if (!$is_terminal): ?>
+                                    <?php echo htmlspecialchars($entity_status); ?>
                                 <?php else: ?>
                                     <?php echo date('Y-m-d', $delete_time); ?><br>
                                     <?php echo date('H:i', $delete_time); ?>
-                                    <?php if ($is_expired && !$doc['is_purged']): ?>
-                                        <br><span class="badge bg-danger mt-1">Expired</span>
-                                    <?php endif; ?>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($doc['is_purged']): ?>
-                                    <span class="badge bg-secondary">Not Exists</span>
+                                    <span class="badge bg-secondary">Not Found</span>
+                                <?php elseif ($is_expired): ?>
+                                    <span class="badge bg-danger">Expired</span>
+                                <?php elseif ($is_terminal): ?>
+                                    <span class="badge bg-warning text-dark">Countdown</span>
                                 <?php else: ?>
-                                    <span class="badge bg-warning text-dark">Active</span>
+                                    <span class="badge bg-success">Active</span>
                                 <?php endif; ?>
                             </td>
                             <td>
