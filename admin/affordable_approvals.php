@@ -74,7 +74,7 @@ include '../includes/header.php';
                         </div>
                         <div class="col-12 text-end pt-2">
                             <button type="button" id="executePipelineFilterBtn" class="btn btn-dark fw-bold px-4 rounded-pill shadow-sm">
-                                <i class="fas fa-search me-1"></i>Confirm Filter
+                                <i class="fas fa-search me-1"></i>Apply Filters
                             </button>
                         </div>
                     </div>
