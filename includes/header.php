@@ -342,25 +342,6 @@ footer.luxury-footer {
 <div class="d-flex flex-grow-1 align-items-center justify-content-center justify-content-lg-between flex-wrap" id="navbarNav">
 <ul class="navbar-nav mx-auto mx-lg-0 flex-row flex-wrap justify-content-center gap-2">
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-building me-1"></i>Properties
-        </a>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-2"></i>Government Housing</a></li>
-            <li><a class="dropdown-item" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-2"></i>Showrooms</a></li>
-        </ul>
-    </li>
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-toolbox me-1"></i>Tools
-        </a>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-2"></i>Buying Journey</a></li>
-            <li><a class="dropdown-item" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-2"></i>Financial Planner</a></li>
-            <li><a class="dropdown-item" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-2"></i>Bank Rates</a></li>
-        </ul>
-    </li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
