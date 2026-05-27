@@ -103,7 +103,7 @@ include 'includes/header.php';
         <div class="row align-items-center g-5">
             <div class="col-lg-5 mb-4 mb-lg-0">
                 <div class="section-kicker mb-2">Nationwide support</div>
-                <h2 class="section-title mb-4">Locate Our Offline Showrooms</h2>
+                <h2 class="section-title text-dark fw-bold mb-4">Locate Our Offline Showrooms</h2>
                 <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
                 <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
@@ -175,7 +175,7 @@ include 'includes/header.php';
 <section class="my-5 py-5 text-center bg-white">
     <div class="container">
     <div class="section-kicker mb-2">How it works</div>
-    <h2 class="section-title mb-5">Your O2O Property Journey</h2>
+    <h2 class="section-title text-dark fw-bold mb-5">Your O2O Property Journey</h2>
     <div class="row justify-content-center g-4">
         <div class="col-md-3 col-sm-6 mb-4">
             <i class="fas fa-laptop-house step-icon"></i>
@@ -201,7 +201,7 @@ include 'includes/header.php';
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
             <div>
                 <div class="section-kicker mb-2">Ready to explore</div>
-                <h2 class="section-title mb-0">Featured Active Projects</h2>
+                <h2 class="section-title text-dark fw-bold mb-0">Featured Active Projects</h2>
             </div>
             <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-dark">View All <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
