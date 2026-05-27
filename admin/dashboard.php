@@ -138,7 +138,7 @@ include '../includes/header.php';
                             </select>
                         </div>
                     </div>
-                    <canvas id="leadsChart" height="180"></canvas>
+                    <canvas id="leadsChart" height="150"></canvas>
                     <div class="mt-4 pt-3 border-top d-flex justify-content-around text-center" id="realTimeStats">
                         <div>
                             <h6 class="text-muted mb-1" id="appliedLabel">Applied for Appointments</h6>
