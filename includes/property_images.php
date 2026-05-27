@@ -24,16 +24,23 @@ function property_catalog_image_path(array $property, string $url_prefix = '', s
     }
 
     $state_name = ucwords(strtolower($raw_state));
-    $folder = 'Apartment/';
-    if ($db_type === 'commercial') {
-        $folder = 'Commercial/';
-    } elseif ($db_type === 'terrace') {
-        $folder = 'Terrace/';
-    } elseif ($db_type === 'bungalow') {
-        $folder = 'Bungalow/';
+    $is_affordable = isset($property['is_affordable']) && (int)$property['is_affordable'] === 1;
+
+    if ($is_affordable) {
+        $folder = 'Affordable/';
+        $file_name = 'Affordable - ' . $state_name;
+    } else {
+        $folder = 'Apartment/';
+        if ($db_type === 'commercial') {
+            $folder = 'Commercial/';
+        } elseif ($db_type === 'terrace') {
+            $folder = 'Terrace/';
+        } elseif ($db_type === 'bungalow') {
+            $folder = 'Bungalow/';
+        }
+        $file_name = ucfirst($db_type) . ' - ' . $state_name;
     }
 
-    $file_name = ucfirst($db_type) . ' - ' . $state_name;
     foreach (['jpg', 'jpeg', 'png', 'webp'] as $ext) {
         $relative_path = $folder . $file_name . '.' . $ext;
         if (file_exists($base_path . $relative_path)) {
