@@ -336,12 +336,11 @@ footer.luxury-footer {
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-<div class="container">
+<nav class="navbar navbar-expand navbar-dark bg-dark sticky-top shadow-sm py-2">
+<div class="container flex-wrap justify-content-center justify-content-lg-between gap-2">
 <a class="navbar-brand fw-bold" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
-<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-<div class="collapse navbar-collapse" id="navbarNav">
-<ul class="navbar-nav me-auto">
+<div class="d-flex flex-grow-1 align-items-center justify-content-center justify-content-lg-between flex-wrap" id="navbarNav">
+<ul class="navbar-nav mx-auto mx-lg-0 flex-row flex-wrap justify-content-center gap-2">
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">Home</a></li>
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -364,14 +363,14 @@ footer.luxury-footer {
     </li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
 </ul>
-<div class="d-flex">
+<div class="d-flex align-items-center justify-content-center flex-wrap gap-2 mt-2 mt-lg-0">
 <?php if (isset($_SESSION['account_id'])):?>
-<div class="dropdown me-2">
+<a href="<?php echo htmlspecialchars($wishlist_link); ?>" class="nav-link text-white fw-bold px-2 me-1"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> text-warning me-1"></i><span class="d-none d-sm-inline"><?php echo htmlspecialchars($wishlist_text); ?></span></a>
+<div class="dropdown">
 <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
 <ul class="dropdown-menu dropdown-menu-end">
 <li><a class="dropdown-item" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
 <li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>"><?php echo htmlspecialchars($profile_text); ?></a></li>
-<li><a class="dropdown-item" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-2"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
 </ul>
 </div>
 <a href="<?php echo htmlspecialchars($root_prefix . 'logout.php'); ?>" class="btn btn-danger">Logout</a>
