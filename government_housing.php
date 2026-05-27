@@ -20,7 +20,7 @@ include_once 'includes/header.php';
             <p class="text-muted small mt-3 fw-bold"><i class="fas fa-search-plus me-1"></i> Standard 3-Bedroom Layout Specification</p>
         </div>
         <div class="col-lg-7 px-lg-5">
-            <h3 class="fw-bold mb-4"><i class="fas fa-clipboard-list text-primary me-2"></i> Application Requirements</h3>
+            <h3 class="fw-bold mb-4" style="color: black;"><i class="fas fa-clipboard-list text-primary me-2"></i> Application Requirements</h3>
             <p class="text-muted mb-4">To ensure fair distribution, all applications are subject to strict verification based on Ministry guidelines. We only collect basic data for the initial O2O pre-check.</p>
             
             <ul class="list-group list-group-flush fs-5">
@@ -97,33 +97,33 @@ include_once 'includes/header.php';
     </div>
 
     <div class="bg-light rounded-4 p-4 p-lg-5 text-center shadow-sm">
-        <h3 class="fw-bold mb-5">The Safe O2O Application Process</h3>
+        <h3 class="fw-bold mb-5" style="color: black;">The Safe O2O Application Process</h3>
         <div class="row g-4 position-relative">
             <div class="col-md-3">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-bottom border-primary border-4">
                     <i class="fas fa-laptop-house fa-3x text-primary mb-3"></i>
-                    <h6 class="fw-bold">1. Online Intake</h6>
+                    <h6 class="fw-bold" style="color: black;">1. Online Intake</h6>
                     <p class="small text-muted">Submit basic income details through our secure portal.</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-bottom border-primary border-4">
                     <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
-                    <h6 class="fw-bold">2. Staff Review</h6>
+                    <h6 class="fw-bold" style="color: black;">2. Staff Review</h6>
                     <p class="small text-muted">Our regional staff verifies your bracket status offline.</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-bottom border-success border-4">
                     <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
-                    <h6 class="fw-bold">3. Mobile Alert</h6>
+                    <h6 class="fw-bold" style="color: black;">3. Mobile Alert</h6>
                     <p class="small text-muted">Qualified applicants receive an official WhatsApp notification.</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-bottom border-warning border-4">
                     <i class="fas fa-key fa-3x text-warning mb-3"></i>
-                    <h6 class="fw-bold">4. Offline Handover</h6>
+                    <h6 class="fw-bold" style="color: black;">4. Offline Handover</h6>
                     <p class="small text-muted">Visit the office for Contract Signing and key collection.</p>
                 </div>
             </div>
