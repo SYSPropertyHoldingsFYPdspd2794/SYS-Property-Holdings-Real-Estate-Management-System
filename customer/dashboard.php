@@ -146,7 +146,7 @@ include '../includes/header.php';
             </div>
             
             <div class="row g-3">
-                <?php if ($recommendations->num_rows > 0): ?>
+                <?php if ($recommendations->num_rows > 0): ?>   
                     <?php while ($prop = $recommendations->fetch_assoc()): ?>
                         <?php 
                         $img_path = property_catalog_image_path($prop, '../', '../');
