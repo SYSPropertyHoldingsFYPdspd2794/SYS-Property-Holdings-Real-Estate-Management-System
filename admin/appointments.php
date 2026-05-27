@@ -28,7 +28,7 @@ include '../includes/header.php';
 <div class="container mt-5">
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <h4 class="fw-bold mb-4">Global Leads & Appointment Masterlist</h4>
+            <h4 class="fw-bold mb-4">Appointment Queue</h4>
             <div class="table-responsive">
                 <table id="assignTable" class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
@@ -71,7 +71,7 @@ include '../includes/header.php';
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Assign Regional Representative</h5>
+                                                <h5 class="fw-bold text-dark">Assign Representative</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
