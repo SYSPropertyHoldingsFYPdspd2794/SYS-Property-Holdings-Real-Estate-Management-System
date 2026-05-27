@@ -361,7 +361,6 @@ footer.luxury-footer {
 </div>
 <div class="w-100" id="navbarNav">
 <ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>">Catalog</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>"><i class="fas fa-building me-1"></i>Catalog</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
