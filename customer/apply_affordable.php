@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($error !== '') {
         $is_duplicate = strpos($error, 'Duplicate Application') !== false;
-        $msg_suffix = $is_duplicate ? '' : ' If your declared monthly income is incorrect, please update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting again.';
+        $msg_suffix = $is_duplicate ? '' : ' If your declared monthly income is incorrect, please update it in your <a href="#" class="text-primary fw-bold text-decoration-underline" data-bs-target="#incomeProfileWarningModal" data-bs-toggle="modal" data-bs-dismiss="modal">Profile</a> before submitting again.';
         $application_modal = [
             'status' => 'non_qualified',
             'title' => $is_duplicate ? 'Application Denied' : 'Non Qualified Application',
@@ -148,7 +148,7 @@ include '../includes/header.php';
                         <div class="mb-4">
                             <label class="form-label fw-bold">Declared Monthly Income (RM)</label>
                             <input type="text" class="form-control form-control-lg bg-light" value="<?php echo number_format($user_income, 2); ?>" readonly>
-                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting.</small>
+                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="#" class="text-primary fw-bold text-decoration-underline" data-bs-target="#incomeProfileWarningModal" data-bs-toggle="modal">Profile</a> before submitting.</small>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border border-primary">
                             <label class="form-label fw-bold"><i class="fas fa-file-pdf text-danger me-2"></i>Income Declaration / EPF Abstract *</label>
@@ -184,7 +184,7 @@ include '../includes/header.php';
                         <a href="dashboard.php" class="btn btn-success fw-bold">View Dashboard</a>
                         <a href="track_status.php?success=application_submitted" class="btn btn-outline-dark fw-bold">Track Status</a>
                     <?php else: ?>
-                        <a href="profile.php" class="btn btn-danger fw-bold income-profile-warning-link">Update Profile</a>
+                        <a href="#" class="btn btn-danger fw-bold" data-bs-target="#incomeProfileWarningModal" data-bs-toggle="modal" data-bs-dismiss="modal">Update Profile</a>
                         <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Review Application</button>
                     <?php endif; ?>
                 </div>
@@ -216,17 +216,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const resultModalElement = document.getElementById('applicationResultModal');
     if (resultModalElement) {
         new bootstrap.Modal(resultModalElement).show();
-    }
-
-    const warningModalElement = document.getElementById('incomeProfileWarningModal');
-    if (warningModalElement) {
-        const warningModal = new bootstrap.Modal(warningModalElement);
-        document.querySelectorAll('.income-profile-warning-link').forEach(function (profileLink) {
-            profileLink.addEventListener('click', function (event) {
-                event.preventDefault();
-                warningModal.show();
-            });
-        });
     }
 });
 </script>
