@@ -124,7 +124,7 @@ $result = $conn->query($query);
                         <th>Specs</th>
                         <th>Units</th>
                         <th>Status</th>
-                        <th>Heat</th>
+                        <th>Total</th>
                         <th></th>
                     </tr>
                 </thead>
