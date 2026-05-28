@@ -466,7 +466,7 @@ include '../includes/header.php';
                 <?php endif; ?>
 
                 <div class="text-center mt-5 pt-3 border-top border-dashed">
-                    <a href="track_status.php" class="btn btn-sm btn-link text-decoration-none text-muted fw-bold"><i class="fas fa-arrow-left me-2"></i>Back to Tracker Matrix</a>
+                    <a href="track_status.php<?php echo $type === 'housing' ? '?tab=housing' : ''; ?>" class="btn btn-sm btn-link text-decoration-none text-muted fw-bold"><i class="fas fa-arrow-left me-2"></i>Back to Tracker Matrix</a>
                 </div>
             </div>
 

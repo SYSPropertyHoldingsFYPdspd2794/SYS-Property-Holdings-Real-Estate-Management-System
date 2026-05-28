@@ -77,6 +77,11 @@ if (isset($_GET['delete_msg'])) {
 
 $success_msg = isset($_GET['success']) ? trim($_GET['success']) : '';
 
+$active_tab = 'appt';
+if ((isset($_GET['tab']) && $_GET['tab'] === 'housing') || $success_msg === 'application_submitted') {
+    $active_tab = 'housing';
+}
+
 $appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? ORDER BY a.appointment_date DESC");
 $appt_stmt->bind_param("i", $account_id);
 $appt_stmt->execute();
@@ -108,13 +113,13 @@ include '../includes/header.php';
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
         <ul class="nav nav-pills" id="trackerTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active px-4 py-3 fw-bold fs-5 shadow-sm me-3 rounded-pill" id="appt-tab" data-bs-toggle="pill" data-bs-target="#appt" type="button" role="tab"><i class="far fa-calendar-alt me-2"></i>Showroom Appointments</button>
+                <button class="nav-link <?php echo $active_tab === 'appt' ? 'active' : ''; ?> px-4 py-3 fw-bold fs-5 shadow-sm me-3 rounded-pill" id="appt-tab" data-bs-toggle="pill" data-bs-target="#appt" type="button" role="tab"><i class="far fa-calendar-alt me-2"></i>Showroom Appointments</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link px-4 py-3 fw-bold fs-5 shadow-sm rounded-pill" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab"><i class="fas fa-home me-2"></i>Housing Applications</button>
+                <button class="nav-link <?php echo $active_tab === 'housing' ? 'active' : ''; ?> px-4 py-3 fw-bold fs-5 shadow-sm rounded-pill" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab"><i class="fas fa-home me-2"></i>Housing Applications</button>
             </li>
         </ul>
-        <a href="properties.php" id="dynamicPlusBtn" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Browse Properties Catalog">
+        <a href="<?php echo $active_tab === 'housing' ? 'properties.php?filter_type=AFFORDABLE' : 'properties.php'; ?>" id="dynamicPlusBtn" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Browse Properties Catalog">
             <i class="fas fa-plus"></i>
         </a>
     </div>
@@ -123,7 +128,7 @@ include '../includes/header.php';
         <input type="hidden" name="action_type" value="delete_appointments">
         <div class="tab-content" id="trackerTabsContent">
             
-            <div class="tab-pane fade show active" id="appt" role="tabpanel">
+            <div class="tab-pane fade <?php echo $active_tab === 'appt' ? 'show active' : ''; ?>" id="appt" role="tabpanel">
                 <div class="mb-3 d-flex justify-content-end">
                     <button type="button" id="deleteSelectedAppointmentsBtn" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm" disabled>
                         <i class="fas fa-trash-alt me-1"></i>Delete Selected
@@ -178,7 +183,7 @@ include '../includes/header.php';
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="housing" role="tabpanel">
+            <div class="tab-pane fade <?php echo $active_tab === 'housing' ? 'show active' : ''; ?>" id="housing" role="tabpanel">
                 <div class="row">
                     <?php if ($applications->num_rows > 0): ?>
                         <?php while ($row = $applications->fetch_assoc()): ?>
