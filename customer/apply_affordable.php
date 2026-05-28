@@ -41,7 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $property_data = $prop_res->fetch_assoc();
         $income_limit = (float)($property_data['income_limit_rm'] ?? 0);
 
-        if ($user_income > $income_limit && $income_limit > 0) {
+        $dup_check = $conn->prepare("SELECT status FROM affordable_housing_applications WHERE customer_id = ? AND property_id = ? AND status IN ('PENDING_REVIEW', 'APPROVED_FOR_DRAW', 'WINNER')");
+        $dup_check->bind_param("ii", $account_id, $prop_id);
+        $dup_check->execute();
+        
+        if ($dup_check->get_result()->num_rows > 0) {
+            $error = "Duplicate Application: You already have an active or approved application for this property scheme. You cannot apply again unless your previous application was rejected.";
+        } elseif ($user_income > $income_limit && $income_limit > 0) {
             $error = "Application Rejected: Your declared monthly income (RM " . number_format($user_income, 2) . ") exceeds the maximum threshold for this subsidized unit.";
         } elseif (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
             $error = "Mandatory income declaration document is missing or corrupted.";
@@ -100,10 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($error !== '') {
+        $is_duplicate = strpos($error, 'Duplicate Application') !== false;
+        $msg_suffix = $is_duplicate ? '' : ' If your declared monthly income is incorrect, please update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting again.';
         $application_modal = [
             'status' => 'non_qualified',
-            'title' => 'Non Qualified Application',
-            'message' => htmlspecialchars($error) . ' If your declared monthly income is incorrect, please update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting again.',
+            'title' => $is_duplicate ? 'Application Denied' : 'Non Qualified Application',
+            'message' => htmlspecialchars($error) . $msg_suffix,
         ];
     }
 }
