@@ -7,7 +7,7 @@
 
 include_once 'includes/header.php';
 
-$sql = "SELECT bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY interest_rate ASC";
+$sql = "SELECT bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY CASE WHEN UPPER(TRIM(bank_name)) = 'BASE INTEREST RATE' THEN 0 ELSE 1 END, interest_rate ASC";
 $result = $conn->query($sql);
 ?>
 
@@ -33,6 +33,22 @@ $result = $conn->query($sql);
                 $rate = number_format($row['interest_rate'], 2);
                 
                 $bankNameRaw = strtolower(trim($row['bank_name']));
+                
+                if ($bankNameRaw === 'base interest rate') {
+                    ?>
+                    <div class="col-12 mb-3">
+                        <div class="card border-warning shadow-sm" style="background: rgba(33, 37, 41, 0.95);">
+                            <div class="card-body p-4 text-center">
+                                <h4 class="fw-bold text-warning mb-2"><i class="fas fa-landmark me-2"></i><?php echo $bankName; ?></h4>
+                                <h2 class="display-4 fw-bold text-white mb-0"><?php echo $rate; ?>%</h2>
+                                <p class="text-light small mt-2 mb-0">National Benchmark Rate &bull; As of <?php echo htmlspecialchars($row['effective_quarter'] ?? 'Q1') . ' ' . htmlspecialchars($row['effective_year'] ?? '2026'); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                    continue;
+                }
+                
                 $logoUrl = "";
                 $websiteUrl = "#";
 

@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rates'])) {
 }
 
 // Fetch current rates
-$sql = "SELECT bank_id, bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY CASE WHEN bank_name = 'BASE INTEREST RATE' THEN 0 ELSE 1 END, interest_rate ASC";
+$sql = "SELECT bank_id, bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY CASE WHEN UPPER(TRIM(bank_name)) = 'BASE INTEREST RATE' THEN 0 ELSE 1 END, interest_rate ASC";
 $result = $conn->query($sql);
 $banks = [];
 if ($result && $result->num_rows > 0) {
@@ -88,7 +88,7 @@ include '../includes/header.php';
                         </thead>
                         <tbody>
                             <?php foreach ($banks as $bank): 
-                                $is_base = ($bank['bank_name'] === 'BASE INTEREST RATE');
+                                $is_base = (strtoupper(trim($bank['bank_name'])) === 'BASE INTEREST RATE');
                                 $row_bg = $is_base ? 'background: rgba(33, 37, 41, 0.95);' : 'background: transparent;';
                                 $name_class = $is_base ? 'text-warning' : 'text-dark';
                                 $name_style = $is_base ? '' : 'color: #000000 !important;';
