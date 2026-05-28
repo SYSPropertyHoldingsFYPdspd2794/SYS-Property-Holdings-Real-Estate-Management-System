@@ -28,7 +28,7 @@ include '../includes/header.php';
 <div class="container mt-5">
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <h4 class="fw-bold mb-4">Appointment Queue</h4>
+            <h4 class="fw-bold mb-4">Appointment Assignments</h4>
             <div class="table-responsive">
                 <table id="assignTable" class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
