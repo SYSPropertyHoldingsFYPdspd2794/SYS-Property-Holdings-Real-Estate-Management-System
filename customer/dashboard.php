@@ -22,9 +22,9 @@ $wishlist_count = $conn->query("SELECT COUNT(*) FROM wishlists WHERE customer_id
 $appt_count = $conn->query("SELECT COUNT(*) FROM appointments WHERE customer_id = $account_id AND status IN ('REQUESTED', 'ASSIGNED')")->fetch_row()[0];
 $app_count = $conn->query("SELECT COUNT(*) FROM affordable_housing_applications WHERE customer_id = $account_id AND status IN ('PENDING_REVIEW', 'APPROVED_FOR_DRAW')")->fetch_row()[0];
 
-// 獲取系統基準利率
-$rate_res = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'BASE_INTEREST_RATE'");
-$base_rate = $rate_res && $rate_res->num_rows > 0 ? $rate_res->fetch_assoc()['setting_value'] : '3.85';
+// 獲取系統基準利率 (BASE INTEREST RATE from banks table)
+$rate_res = $conn->query("SELECT interest_rate FROM banks WHERE bank_name = 'BASE INTEREST RATE'");
+$base_rate = $rate_res && $rate_res->num_rows > 0 ? number_format($rate_res->fetch_assoc()['interest_rate'], 2) : '2.75';
 
 $rec_state = isset($_GET['rec_state']) ? trim($_GET['rec_state']) : '';
 
@@ -182,10 +182,9 @@ include '../includes/header.php';
             
             <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light border-start border-primary border-4">
                 <div class="card-body p-4">
-                    <h6 class="fw-bold text-dark"><i class="fas fa-percent text-primary me-2"></i>Current Interest Rate</h6>
+                    <h6 class="fw-bold text-dark"><i class="fas fa-percent text-primary me-2"></i>Current Base Interest Rate</h6>
                     <div class="display-5 fw-bold text-primary mb-2"><?php echo htmlspecialchars($base_rate); ?>%</div>
-                    <p class="text-muted small mb-3">Based on standard national base rates. Use our calculator to estimate your monthly commitments.</p>
-                    <a href="../financial_planner.php" class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm">Loan Calculator</a>
+                    <p class="text-muted small mb-3">This represents the current Malaysian Federal Base Rate. Use our calculator to estimate your monthly commitments based on this rate.</p>
                 </div>
             </div>
 
@@ -193,9 +192,11 @@ include '../includes/header.php';
                 <div class="card-body p-4">
                     <h6 class="fw-bold text-dark mb-3"><i class="fas fa-compass text-info me-2"></i>Explore</h6>
                     <div class="d-grid gap-2">
+                        <a href="profile.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-user-edit me-2 text-muted"></i>Update My Profile</a>
                         <a href="../showrooms.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-map-marked-alt me-2 text-muted"></i>Find Showrooms</a>
                         <a href="../bank_rates.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-university me-2 text-muted"></i>Compare Bank Rates</a>
-                        <a href="profile.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-user-edit me-2 text-muted"></i>Update My Profile</a>
+                        <a href="../financial_planner.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-calculator me-2 text-muted"></i>Financial Planner</a>
+                        <a href="../buying_journey.php" class="btn btn-outline-dark text-start rounded-pill fw-bold"><i class="fas fa-route me-2 text-muted"></i>Buying Journey</a>
                     </div>
                 </div>
             </div>

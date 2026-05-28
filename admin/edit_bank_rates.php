@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_rates'])) {
 }
 
 // Fetch current rates
-$sql = "SELECT bank_id, bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY interest_rate ASC";
+$sql = "SELECT bank_id, bank_name, interest_rate, effective_quarter, effective_year FROM banks ORDER BY CASE WHEN bank_name = 'BASE INTEREST RATE' THEN 0 ELSE 1 END, interest_rate ASC";
 $result = $conn->query($sql);
 $banks = [];
 if ($result && $result->num_rows > 0) {
@@ -87,25 +87,30 @@ include '../includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($banks as $bank): ?>
-                                <tr>
-                                    <td class="fw-bold border-bottom border-secondary text-white" style="background: transparent;">
-                                        <span class="text-white" style="color: #ffffff !important;"><?php echo htmlspecialchars($bank['bank_name']); ?></span>
+                            <?php foreach ($banks as $bank): 
+                                $is_base = ($bank['bank_name'] === 'BASE INTEREST RATE');
+                                $row_bg = $is_base ? 'background: rgba(33, 37, 41, 0.95);' : 'background: transparent;';
+                                $name_class = $is_base ? 'text-warning' : 'text-dark';
+                                $name_style = $is_base ? '' : 'color: #000000 !important;';
+                            ?>
+                                <tr style="<?php echo $row_bg; ?>">
+                                    <td class="fw-bold border-bottom border-secondary text-white" style="<?php echo $row_bg; ?>">
+                                        <span class="<?php echo $name_class; ?>" style="<?php echo $name_style; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?></span>
                                     </td>
-                                    <td class="border-bottom border-secondary" style="background: transparent;">
+                                    <td class="border-bottom border-secondary" style="<?php echo $row_bg; ?>">
                                         <div class="input-group" style="max-width: 180px;">
-                                            <input type="number" step="0.01" min="0" max="100" class="form-control" name="rates[<?php echo $bank['bank_id']; ?>][rate]" value="<?php echo htmlspecialchars($bank['interest_rate']); ?>" required>
-                                            <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                            <input type="number" step="0.01" min="0" max="100" class="form-control <?php echo $is_base ? 'bg-dark text-white border-warning' : ''; ?>" name="rates[<?php echo $bank['bank_id']; ?>][rate]" value="<?php echo htmlspecialchars($bank['interest_rate']); ?>" required>
+                                            <span class="input-group-text <?php echo $is_base ? 'bg-warning text-dark border-warning' : ''; ?>"><i class="fas fa-percent"></i></span>
                                         </div>
                                     </td>
-                                    <td class="border-bottom border-secondary" style="background: transparent;">
+                                    <td class="border-bottom border-secondary" style="<?php echo $row_bg; ?>">
                                         <div class="d-flex gap-2" style="max-width: 250px;">
-                                            <select class="form-select form-select-sm" name="rates[<?php echo $bank['bank_id']; ?>][quarter]">
+                                            <select class="form-select form-select-sm <?php echo $is_base ? 'bg-dark text-white border-secondary' : ''; ?>" name="rates[<?php echo $bank['bank_id']; ?>][quarter]">
                                                 <?php foreach(['Q1','Q2','Q3','Q4'] as $q): ?>
                                                     <option value="<?php echo $q; ?>" <?php echo ($bank['effective_quarter'] === $q) ? 'selected' : ''; ?>><?php echo $q; ?></option>
                                                 <?php endforeach; ?>
                                             </select>
-                                            <select class="form-select form-select-sm" name="rates[<?php echo $bank['bank_id']; ?>][year]">
+                                            <select class="form-select form-select-sm <?php echo $is_base ? 'bg-dark text-white border-secondary' : ''; ?>" name="rates[<?php echo $bank['bank_id']; ?>][year]">
                                                 <?php 
                                                     $current_year = date('Y');
                                                     for($y = $current_year - 2; $y <= $current_year + 2; $y++): 
