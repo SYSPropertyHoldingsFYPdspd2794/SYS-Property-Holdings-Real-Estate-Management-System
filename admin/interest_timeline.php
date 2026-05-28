@@ -74,7 +74,7 @@ $result = $conn->query($query);
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
         <div>
             <p class="text-uppercase tracking-wider text-gold mb-2 small">Admin Market Signal</p>
-            <h2 class="fw-bold m-0 text-white">Interest Timeline</h2>
+            <h2 class="fw-bold m-0 text-white">Property Demand Analytics</h2>
             <p class="text-light opacity-75 mt-2 mb-0">
                 Every wishlist action is listed below so you can spot which properties are getting hot.
             </p>
@@ -116,7 +116,7 @@ $result = $conn->query($query);
             <table class="table align-middle interest-grid mb-0">
                 <thead>
                     <tr>
-                        <th>Moment</th>
+                        <th>Time</th>
                         <th>Customer</th>
                         <th>Property</th>
                         <th>Location</th>
