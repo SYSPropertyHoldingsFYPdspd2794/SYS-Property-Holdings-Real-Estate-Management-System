@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： sql102.infinityfree.com
--- 生成日期： 2026-05-26 13:26:16
+-- 生成日期： 2026-05-27 21:22:41
 -- 服务器版本： 11.4.11-MariaDB
 -- PHP 版本： 7.2.22
 
@@ -138,7 +138,7 @@ INSERT INTO `affordable_housing_applications` (`application_id`, `customer_id`, 
 (2, 39, 7, 'PENDING_REVIEW', NULL, '2026-05-02 09:15:00'),
 (3, 40, 8, 'APPROVED_FOR_DRAW', 3, '2026-05-03 10:45:00'),
 (4, 41, 20, 'APPROVED_FOR_DRAW', 5, '2026-05-04 11:20:00'),
-(6, 51, 57, 'APPROVED_FOR_DRAW', 46, '2026-05-16 12:00:58'),
+(6, 51, 57, 'WINNER', 46, '2026-05-16 12:00:58'),
 (7, 51, 177, 'PENDING_REVIEW', NULL, '2026-05-18 17:49:20'),
 (8, 51, 57, 'REJECTED', 46, '2026-05-19 01:09:00'),
 (10, 51, 93, 'PENDING_REVIEW', NULL, '2026-05-22 08:58:55');
@@ -226,7 +226,9 @@ INSERT INTO `audit_logs` (`log_id`, `account_id`, `action_type`, `entity_type`, 
 (15, 54, 'LEAD_ASSIGNED', 'appointment_id', 30, '2026-05-25 00:20:36'),
 (16, NULL, 'DOCUMENT_PURGED', 'document_id', 30, '2026-05-26 08:31:58'),
 (17, NULL, 'DOCUMENT_PURGED', 'document_id', 28, '2026-05-26 08:33:35'),
-(18, NULL, 'DOCUMENT_PURGED', 'document_id', 32, '2026-05-26 08:39:02');
+(18, NULL, 'DOCUMENT_PURGED', 'document_id', 32, '2026-05-26 08:39:02'),
+(19, NULL, 'DOCUMENT_PURGED', 'document_id', 8, '2026-05-26 15:06:30'),
+(20, 54, 'LUCKY_DRAW_EXECUTED', 'application_id', 6, '2026-05-27 03:41:36');
 
 -- --------------------------------------------------------
 
@@ -254,7 +256,8 @@ INSERT INTO `banks` (`bank_id`, `bank_name`, `interest_rate`, `effective_quarter
 (5, 'Hong Leong Bank', '3.39', 'Q1', 2026),
 (6, 'AmBank', '3.50', 'Q1', 2026),
 (7, 'UOB Bank', '3.42', 'Q1', 2026),
-(8, 'Affin Bank', '3.75', 'Q1', 2026);
+(8, 'Affin Bank', '3.75', 'Q1', 2026),
+(9, 'BASE INTEREST RATE', '2.75', 'Q1', 2026);
 
 -- --------------------------------------------------------
 
@@ -291,7 +294,7 @@ INSERT INTO `customers` (`customer_id`, `full_name`, `phone_number`, `marital_st
 (44, 'Priya a/p Subramaniam', '019-1234567', 'MARRIED', 1, 'IT Specialist', '6800.00', NULL),
 (45, 'Hafizuddin', '019-7654321', 'SINGLE', 0, 'Sales', '3800.00', NULL),
 (46, 'Chong Mei Ling', '011-9876543', 'MARRIED', 2, 'Doctor', '12000.00', NULL),
-(47, 'testcus', '012-9876543', 'SINGLE', 0, 'Student', '11000.00', '/storage/profile_images/customer_47_5993a459f668b573.jpg'),
+(47, 'testcus', '012-9876543', 'SINGLE', 0, 'Student', '3000.00', '/storage/profile_images/customer_47_5993a459f668b573.jpg'),
 (49, 'test', '1111', 'SINGLE', 0, 'Student', '0.00', NULL),
 (50, 'KHAIRUNNISA KAMAL', '017283783893', 'SINGLE', 1, 'teacher', '4500.00', NULL),
 (51, 'WIN', '017', 'SINGLE', 0, 'Student', '8000.00', NULL),
@@ -328,7 +331,7 @@ INSERT INTO `documents` (`document_id`, `customer_id`, `related_to_type`, `relat
 (4, 41, 'APPLICATION', 4, 'EPF_STATEMENT_SUMMARY', '/uploads/app_4_1715000003.pdf', '2026-05-07 15:09:47', 0, NULL),
 (6, 33, 'APPOINTMENT', 1, 'PAYSLIP_SUMMARY', '/uploads/appt_1_1715000005.pdf', '2026-05-07 15:09:47', 0, NULL),
 (7, 34, 'APPOINTMENT', 2, 'PAYSLIP_SUMMARY', '/uploads/appt_2_1715000006.pdf', '2026-05-07 15:09:47', 0, NULL),
-(8, 35, 'APPOINTMENT', 3, 'PAYSLIP_SUMMARY', '/uploads/appt_3_1715000007.pdf', '2026-05-07 15:09:47', 0, NULL),
+(8, 35, 'APPOINTMENT', 3, 'PAYSLIP_SUMMARY', '/uploads/appt_3_1715000007.pdf', '2026-05-07 15:09:47', 1, '2026-05-26 15:06:30'),
 (10, 51, 'APPLICATION', 6, 'EPF_STATEMENT_SUMMARY', '/storage/docs/app_6_1778958058.pdf', '2026-05-16 12:00:58', 0, NULL),
 (11, 51, 'APPOINTMENT', 16, 'PAYSLIP_SUMMARY', '/storage/docs/appt_16_1779084239.pdf', '2026-05-17 23:03:59', 0, NULL),
 (12, 51, 'APPOINTMENT', 18, 'PAYSLIP_SUMMARY', '/storage/docs/appt_18_1779084779.pdf', '2026-05-17 23:12:58', 0, NULL),
@@ -663,8 +666,7 @@ INSERT INTO `wishlists` (`wishlist_id`, `customer_id`, `property_id`, `created_a
 (15, 40, 15, '2026-05-07 15:09:47'),
 (16, 40, 16, '2026-05-07 15:09:47'),
 (17, 41, 17, '2026-05-07 15:09:47'),
-(18, 41, 18, '2026-05-07 15:09:47'),
-(25, 51, 52, '2026-05-19 00:53:36');
+(18, 41, 18, '2026-05-07 15:09:47');
 
 --
 -- 转储表的索引
@@ -780,13 +782,13 @@ ALTER TABLE `appointments`
 -- 使用表AUTO_INCREMENT `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- 使用表AUTO_INCREMENT `banks`
 --
 ALTER TABLE `banks`
-  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- 使用表AUTO_INCREMENT `documents`
@@ -804,7 +806,7 @@ ALTER TABLE `properties`
 -- 使用表AUTO_INCREMENT `wishlists`
 --
 ALTER TABLE `wishlists`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- 限制导出的表
