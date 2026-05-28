@@ -75,20 +75,18 @@ include '../includes/header.php';
     <!-- Action Required KPI Cards -->
     <div class="row g-4 mb-5">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card bg-primary bg-opacity-10 border-start border-primary border-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary bg-opacity-10 border-start border-primary border-4">
                 <div class="card-body p-4">
                     <h6 class="fw-bold text-primary text-uppercase mb-3"><i class="fas fa-user-clock me-2"></i>New Leads Assigned</h6>
                     <h2 class="fw-bold text-white m-0"><?php echo $new_leads_count; ?></h2>
-                    <a href="appointments.php" class="stretched-link"></a>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 hover-card bg-warning bg-opacity-10 border-start border-warning border-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-warning bg-opacity-10 border-start border-warning border-4">
                 <div class="card-body p-4">
                     <h6 class="fw-bold text-warning text-uppercase mb-3" style="color: #b78a00 !important;"><i class="fas fa-file-signature me-2"></i>Pending Reviews</h6>
                     <h2 class="fw-bold text-white m-0"><?php echo $pending_verifications; ?></h2>
-                    <a href="verifications.php" class="stretched-link"></a>
                 </div>
             </div>
         </div>
@@ -103,9 +101,8 @@ include '../includes/header.php';
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-4 h-100 bg-info bg-opacity-10 border-start border-info border-4">
                 <div class="card-body p-4">
-                    <h6 class="fw-bold text-info text-uppercase mb-3" style="color: #0b8e88 !important;"><i class="fas fa-building me-2"></i>State Inventory</h6>
-                    <h4 class="fw-bold text-white mb-0"><?php echo number_format($state_units); ?> <small class="text-muted fs-6">units</small></h4>
-                    <p class="text-muted small m-0">Across <?php echo $state_projects; ?> active projects</p>
+                    <h6 class="fw-bold text-info text-uppercase mb-3" style="color: #0b8e88 !important;"><i class="fas fa-building me-2"></i>Total Project</h6>
+                    <h4 class="fw-bold text-white mb-0"><?php echo number_format($state_units); ?> <small class="text-muted fs-6">projects</small></h4>
                 </div>
             </div>
         </div>
@@ -184,7 +181,7 @@ include '../includes/header.php';
                             <i class="fas fa-chevron-right text-muted small"></i>
                         </a>
                         <a href="verifications.php" class="list-group-item list-group-item-action bg-light border-0 rounded-3 p-3 fw-bold text-dark d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-file-signature text-success me-3"></i>Document Verifications</span>
+                            <span><i class="fas fa-file-signature text-success me-3"></i>Application Review</span>
                             <i class="fas fa-chevron-right text-muted small"></i>
                         </a>
                         <a href="state_inventory.php" class="list-group-item list-group-item-action bg-light border-0 rounded-3 p-3 fw-bold text-dark d-flex justify-content-between align-items-center">
