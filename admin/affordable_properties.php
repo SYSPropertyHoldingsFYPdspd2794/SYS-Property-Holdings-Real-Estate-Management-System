@@ -180,10 +180,10 @@ include '../includes/header.php';
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Modify Affordable Property Information</h5>
+                                                <h5 class="fw-bold text-dark">Modify Affordable Property Information</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div class="modal-body text-dark">
                                                 <input type="hidden" name="action" value="edit">
                                                 <input type="hidden" name="property_id" value="<?php echo $p['property_id']; ?>">
                                                 <div class="row g-3 mb-3">
@@ -249,10 +249,10 @@ include '../includes/header.php';
                                     <div class="modal-content">
                                         <form method="POST">
                                             <div class="modal-header">
-                                                <h5 class="fw-bold">Archive Regulated Housing Unit</h5>
+                                                <h5 class="fw-bold text-dark">Archive Regulated Housing Unit</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div class="modal-body text-dark">
                                                 <input type="hidden" name="action" value="archive">
                                                 <input type="hidden" name="property_id" value="<?php echo $p['property_id']; ?>">
                                                 <div class="mb-3">
@@ -288,7 +288,7 @@ include '../includes/header.php';
                     <h5 class="fw-bold text-dark">New Scheme Registration</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-dark">
                     <input type="hidden" name="action" value="add">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">

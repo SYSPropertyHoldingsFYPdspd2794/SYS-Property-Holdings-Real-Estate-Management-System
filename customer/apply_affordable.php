@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['affordable_application_result'] = [
                             'status' => 'qualified',
                             'title' => 'Qualified Application',
-                            'message' => 'Your affordable housing application for ' . $property_data['project_name'] . ' has been submitted for review. Your declared monthly income is within the current income limit and your financial document was received.',
+                            'message' => 'Your affordable housing application for ' . htmlspecialchars($property_data['project_name']) . ' has been submitted for review. Your declared monthly income is within the current income limit and your financial document was received.',
                         ];
                         header("Location: apply_affordable.php?result=qualified");
                         exit();
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $application_modal = [
             'status' => 'non_qualified',
             'title' => 'Non Qualified Application',
-            'message' => $error . ' If your declared monthly income is incorrect, please update it in your Profile before submitting again.',
+            'message' => htmlspecialchars($error) . ' If your declared monthly income is incorrect, please update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting again.',
         ];
     }
 }
@@ -140,7 +140,7 @@ include '../includes/header.php';
                         <div class="mb-4">
                             <label class="form-label fw-bold">Declared Monthly Income (RM)</label>
                             <input type="text" class="form-control form-control-lg bg-light" value="<?php echo number_format($user_income, 2); ?>" readonly>
-                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="profile.php" class="fw-bold text-decoration-none income-profile-warning-link">Profile</a> before submitting.</small>
+                            <small class="text-danger mt-2 d-block"><i class="fas fa-exclamation-circle me-1"></i>If this value is incorrect, you must update it in your <a href="profile.php" class="text-primary fw-bold text-decoration-underline income-profile-warning-link">Profile</a> before submitting.</small>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border border-primary">
                             <label class="form-label fw-bold"><i class="fas fa-file-pdf text-danger me-2"></i>Income Declaration / EPF Abstract *</label>
@@ -158,7 +158,7 @@ include '../includes/header.php';
 <?php if ($application_modal !== null): ?>
     <?php
         $is_qualified = ($application_modal['status'] ?? '') === 'qualified';
-        $modal_header_class = $is_qualified ? 'bg-success text-white' : 'bg-danger text-white';
+        $modal_header_class = $is_qualified ? 'bg-success text-dark' : 'bg-danger text-dark';
         $modal_icon = $is_qualified ? 'fa-check-circle' : 'fa-exclamation-triangle';
     ?>
     <div class="modal fade" id="applicationResultModal" tabindex="-1" aria-hidden="true">
@@ -166,10 +166,10 @@ include '../includes/header.php';
             <div class="modal-content border-0 shadow">
                 <div class="modal-header <?php echo $modal_header_class; ?>">
                     <h5 class="modal-title fw-bold"><i class="fas <?php echo $modal_icon; ?> me-2"></i><?php echo htmlspecialchars($application_modal['title']); ?></h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <p class="mb-0"><?php echo htmlspecialchars($application_modal['message']); ?></p>
+                <div class="modal-body p-4 text-dark">
+                    <p class="mb-0"><?php echo $application_modal['message']; ?></p>
                 </div>
                 <div class="modal-footer">
                     <?php if ($is_qualified): ?>
@@ -192,7 +192,7 @@ include '../includes/header.php';
                 <h5 class="modal-title fw-bold"><i class="fas fa-scale-balanced me-2"></i>Income Declaration Notice</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-4 text-dark">
                 <p class="mb-0">Your monthly income must be accurate and supported by your financial documents. False or misleading income information may cause rejection, cancellation of approval, and possible legal action for fraud.</p>
             </div>
             <div class="modal-footer">
