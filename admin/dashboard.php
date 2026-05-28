@@ -10,7 +10,6 @@ if (isset($_GET['ajax_chart'])) {
 
     // Stats
     $stmt = $conn->prepare("SELECT 
-        COUNT(*) as applied,
         SUM(CASE WHEN status = 'REQUESTED' THEN 1 ELSE 0 END) as waiting,
         SUM(CASE WHEN assigned_staff_id IS NOT NULL THEN 1 ELSE 0 END) as assigned
         FROM appointments
@@ -42,7 +41,7 @@ if (isset($_GET['ajax_chart'])) {
 
     echo json_encode([
         'stats' => [
-            'applied' => (int)$stats['applied'],
+            'applied' => (int)$stats['waiting'] + (int)$stats['assigned'],
             'waiting' => (int)$stats['waiting'],
             'assigned' => (int)$stats['assigned']
         ],
