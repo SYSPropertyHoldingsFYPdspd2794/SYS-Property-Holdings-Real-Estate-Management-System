@@ -185,7 +185,7 @@ include '../includes/header.php';
                         <a href="track_status.php?success=application_submitted" class="btn btn-outline-dark fw-bold">Track Status</a>
                     <?php else: ?>
                         <a href="#" class="btn btn-danger fw-bold" data-bs-target="#incomeProfileWarningModal" data-bs-toggle="modal" data-bs-dismiss="modal">Update Profile</a>
-                        <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Review Application</button>
+                        <button type="button" id="reviewAppBtn" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Review Application</button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -215,7 +215,15 @@ include '../includes/header.php';
 document.addEventListener('DOMContentLoaded', function () {
     const resultModalElement = document.getElementById('applicationResultModal');
     if (resultModalElement) {
-        new bootstrap.Modal(resultModalElement).show();
+        const resultModal = new bootstrap.Modal(resultModalElement);
+        resultModal.show();
+        
+        const reviewAppBtn = document.getElementById('reviewAppBtn');
+        if (reviewAppBtn) {
+            reviewAppBtn.addEventListener('click', function () {
+                resultModal.hide();
+            });
+        }
     }
 });
 </script>
