@@ -387,7 +387,7 @@ include '../includes/header.php';
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label fw-bold">New Password</label>
-                                                        <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current password">
+                                                        <input type="password" name="password" class="form-control" placeholder="Enter the new password">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label fw-bold">Role</label>

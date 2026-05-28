@@ -137,7 +137,7 @@ include '../includes/header.php';
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold mb-0">Standard Property Inventory Masterlist</h4>
+                <h4 class="fw-bold mb-0">Standard Property Inventory</h4>
                 <div>
                     <a href="affordable_properties.php" class="btn btn-info fw-bold me-2">Manage Affordable House</a>
                     <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addPropModal">Add New Property</button>
@@ -239,7 +239,7 @@ include '../includes/header.php';
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary fw-bold">Commit Changes</button>
+                                                <button type="submit" class="btn btn-primary fw-bold">Update Details</button>
                                             </div>
                                         </form>
                                     </div>
@@ -287,7 +287,7 @@ include '../includes/header.php';
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h5 class="fw-bold text-dark">Register Free Market Property Unit</h5>
+                    <h5 class="fw-bold text-dark">Register New Property Unit</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-dark">
@@ -357,7 +357,7 @@ include '../includes/header.php';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary fw-bold">Deploy Asset Record</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Register Property</button>
                 </div>
             </form>
         </div>

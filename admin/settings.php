@@ -66,7 +66,7 @@ include '../includes/header.php';
             <!-- Global System Settings Card -->
             <div class="card shadow border-0">
                 <div class="card-header bg-dark text-white p-4">
-                    <h3 class="fw-bold m-0"><i class="fas fa-cogs me-2"></i>Global System Settings</h3>
+                    <h3 class="fw-bold m-0"><i class="fas fa-cogs me-2"></i>System Settings</h3>
                 </div>
                 <div class="card-body p-5">
                     <form method="POST">
@@ -89,7 +89,7 @@ include '../includes/header.php';
                                 <i class="fas fa-user-shield me-1"></i> Go to Profile Page
                             </a>
                             <button type="submit" name="save_config" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
-                                Save Configuration
+                                Save Settings
                             </button>
                         </div>
                     </form>
@@ -109,7 +109,7 @@ include '../includes/header.php';
                             <i class="fas fa-trash-alt me-2"></i> Execute Purge Script
                         </button>
                     <?php else: ?>
-                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i> Fully Compliant</span>
+                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i> Secured </span>
                     <?php endif; ?>
                 </div>
                 <div class="card-body p-4">
@@ -140,7 +140,7 @@ include '../includes/header.php';
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="4" class="text-center py-4 text-muted">
-                                            No expired documents found. The system is compliant.
+                                            No expired documents found. Everything is up to date.
                                         </td>
                                     </tr>
                                 <?php endif; ?>
