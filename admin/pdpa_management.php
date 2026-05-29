@@ -90,7 +90,7 @@ include '../includes/header.php';
         <br>
         <div class="text-start">
             Appointments: COMPLETED / CANCELLED / NO SHOW<br>
-            Requests: REJECTED / WON
+            Applications: REJECTED / WON
         </div>
     </div>
 
