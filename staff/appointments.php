@@ -122,7 +122,7 @@ $appointment_modals = '';
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Staff Remarks</label>
+                                                    <label class="form-label fw-bold text-black">Staff Remarks</label>
                                                     <textarea name="staff_remarks" class="form-control" rows="4"><?php echo htmlspecialchars($row['staff_remarks'] ?? ''); ?></textarea>
                                                 </div>
                                             </div>
