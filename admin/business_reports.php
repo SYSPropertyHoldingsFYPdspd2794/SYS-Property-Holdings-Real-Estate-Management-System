@@ -124,17 +124,85 @@ if (in_array('demographics', $reports_to_run)) {
 
 // --- PROCESS OPERATIONS ---
 if (in_array('operations', $reports_to_run)) {
-    $res = $conn->query("SELECT status, COUNT(*) as count FROM appointments WHERE " . getDateCondition('appointment_date', $selected_month, $selected_year) . " GROUP BY status");
-    $status_data = []; $status_labels = [];
-    while ($row = $res->fetch_assoc()) { $status_labels[] = $row['status']; $status_data[] = (int)$row['count']; }
-    $charts['appointment_status'] = ['labels' => $status_labels, 'data' => $status_data];
-
-    $res = $conn->query("SELECT service_type, COUNT(*) as count FROM appointments WHERE " . getDateCondition('appointment_date', $selected_month, $selected_year) . " GROUP BY service_type");
-    $serv_data = []; $serv_labels = [];
-    while ($row = $res->fetch_assoc()) { $serv_labels[] = str_replace('_', ' ', $row['service_type']); $serv_data[] = (int)$row['count']; }
-    $charts['service_type'] = ['labels' => $serv_labels, 'data' => $serv_data];
+    // 1. Appointment Status Breakdown By State (Stacked Bar)
+    $res = $conn->query("
+        SELECT p.state, a.status, COUNT(a.appointment_id) as count 
+        FROM appointments a 
+        JOIN properties p ON a.property_id = p.property_id 
+        WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . " 
+        GROUP BY p.state, a.status
+    ");
+    $appt_state_status = [];
+    $all_appt_states = [];
+    while ($row = $res->fetch_assoc()) {
+        $st = $row['state'];
+        $status = $row['status'];
+        if (!in_array($st, $all_appt_states)) $all_appt_states[] = $st;
+        if (!isset($appt_state_status[$st])) $appt_state_status[$st] = [];
+        $appt_state_status[$st][$status] = (int)$row['count'];
+    }
     
-    $res = $conn->query("SELECT c.full_name, p.project_name, a.appointment_date, a.status FROM appointments a JOIN customers c ON a.customer_id = c.customer_id JOIN properties p ON a.property_id = p.property_id WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . " ORDER BY a.appointment_date DESC LIMIT 20");
+    $charts['appt_status_by_state'] = ['labels' => $all_appt_states, 'datasets' => []];
+    $status_types = ['COMPLETED', 'ASSIGNED', 'REQUESTED', 'CANCELLED', 'NO_SHOW'];
+    $status_colors = ['#198754', '#0d6efd', '#0dcaf0', '#dc3545', '#ffc107']; // Green, Blue, Cyan, Red, Yellow
+    
+    foreach ($status_types as $idx => $stype) {
+        $ds_data = [];
+        foreach ($all_appt_states as $st) {
+            $ds_data[] = $appt_state_status[$st][$stype] ?? 0;
+        }
+        $charts['appt_status_by_state']['datasets'][] = [
+            'label' => str_replace('_', ' ', $stype),
+            'data' => $ds_data,
+            'backgroundColor' => $status_colors[$idx]
+        ];
+    }
+
+    // 2. Service Type Demand by State (Stacked Bar or Grouped)
+    $res = $conn->query("
+        SELECT p.state, a.service_type, COUNT(a.appointment_id) as count 
+        FROM appointments a 
+        JOIN properties p ON a.property_id = p.property_id 
+        WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . " 
+        GROUP BY p.state, a.service_type
+    ");
+    $appt_state_service = [];
+    $all_srv_states = [];
+    $all_services = [];
+    while ($row = $res->fetch_assoc()) {
+        $st = $row['state'];
+        $srv = str_replace('_', ' ', $row['service_type']);
+        if (!in_array($st, $all_srv_states)) $all_srv_states[] = $st;
+        if (!in_array($srv, $all_services)) $all_services[] = $srv;
+        if (!isset($appt_state_service[$st])) $appt_state_service[$st] = [];
+        $appt_state_service[$st][$srv] = (int)$row['count'];
+    }
+
+    $charts['appt_service_by_state'] = ['labels' => $all_srv_states, 'datasets' => []];
+    $service_colors = ['#6f42c1', '#fd7e14', '#20c997', '#d63384'];
+    foreach ($all_services as $idx => $srv) {
+        $ds_data = [];
+        foreach ($all_srv_states as $st) {
+            $ds_data[] = $appt_state_service[$st][$srv] ?? 0;
+        }
+        $charts['appt_service_by_state']['datasets'][] = [
+            'label' => $srv,
+            'data' => $ds_data,
+            'backgroundColor' => $service_colors[$idx % count($service_colors)]
+        ];
+    }
+    
+    // 3. High-Risk Appointments Table (Cancelled/No Show vs Completed)
+    $res = $conn->query("
+        SELECT c.full_name as customer_name, p.project_name, p.state, a.appointment_date, a.status, a.service_type, s.full_name as staff_name
+        FROM appointments a 
+        JOIN customers c ON a.customer_id = c.customer_id 
+        JOIN properties p ON a.property_id = p.property_id 
+        LEFT JOIN staff s ON a.assigned_staff_id = s.staff_id
+        WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . " 
+        ORDER BY a.appointment_date DESC 
+        LIMIT 50
+    ");
     $metrics['appt_list'] = [];
     while($row = $res->fetch_assoc()) { $metrics['appt_list'][] = $row; }
 }
@@ -642,48 +710,67 @@ include '../includes/header.php';
 
             <?php if (in_array('operations', $reports_to_run)): ?>
                 <?php if ($report_type === 'all'): ?><h3 class="fw-bold mt-5 mb-4 border-bottom pb-2" style="page-break-before: always;">Operations & Sales</h3><?php endif; ?>
+                
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Appointment Status Breakdown</h4>
-                                <?php if(empty($charts['appointment_status']['data'])): ?>
+                                <h4 class="fw-bold mb-3">Health of Operations: Appointment Status by State</h4>
+                                <p class="text-muted mb-4 d-print-none">Identify which regions have the highest No-Show or Cancellation rates to optimize staff deployment.</p>
+                                <?php if(empty($charts['appt_status_by_state']['datasets'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
-                                    <div style="position: relative; height: 300px; width: 100%;">
-                                        <canvas id="appStatusChart"></canvas>
+                                    <div style="position: relative; height: 350px; width: 100%;">
+                                        <canvas id="apptStatusStateChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+                
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Service Type Demand</h4>
-                                <?php if(empty($charts['service_type']['data'])): ?>
+                                <h4 class="fw-bold mb-3">Service Type Demand across Regions</h4>
+                                <p class="text-muted mb-4 d-print-none">Breaks down what services (e.g. Site Visit, Virtual Tour) are popular in each State.</p>
+                                <?php if(empty($charts['appt_service_by_state']['datasets'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
-                                    <div style="position: relative; height: 250px; width: 100%;">
-                                        <canvas id="serviceTypeChart"></canvas>
+                                    <div style="position: relative; height: 350px; width: 100%;">
+                                        <canvas id="apptServiceStateChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <!-- Data Table for Export -->
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-dark text-white"><h5 class="m-0 py-1"><i class="bi bi-list-columns me-2"></i>Detailed Record: Recent Appointments</h5></div>
+                    <div class="card-header bg-dark text-white"><h5 class="m-0 py-1"><i class="bi bi-calendar3-range me-2 text-info"></i>Detailed Appointments Log</h5></div>
                     <div class="card-body p-0 table-responsive">
-                        <table class="table print-table mb-0 table-striped">
-                            <thead><tr><th>Customer Name</th><th>Property Project</th><th>Appointment Date</th><th>Status</th></tr></thead>
+                        <table class="table print-table mb-0 table-hover table-striped">
+                            <thead><tr><th>Customer Name</th><th>Project (State)</th><th>Service Type</th><th>Assigned Staff</th><th>Date</th><th>Status</th></tr></thead>
                             <tbody>
-                                <?php if(empty($metrics['appt_list'])): ?><tr><td colspan="4" class="text-center">No recent records</td></tr><?php endif; ?>
+                                <?php if(empty($metrics['appt_list'])): ?><tr><td colspan="6" class="text-center">No recent records</td></tr><?php endif; ?>
                                 <?php foreach($metrics['appt_list'] as $appt): ?>
-                                    <tr><td><?= htmlspecialchars($appt['full_name']) ?></td><td><?= htmlspecialchars($appt['project_name']) ?></td><td><?= htmlspecialchars($appt['appointment_date']) ?></td><td><?= htmlspecialchars($appt['status']) ?></td></tr>
+                                    <?php 
+                                        $badge = 'bg-secondary';
+                                        if($appt['status'] == 'COMPLETED') $badge = 'bg-success';
+                                        if($appt['status'] == 'CANCELLED') $badge = 'bg-danger';
+                                        if($appt['status'] == 'NO_SHOW') $badge = 'bg-warning text-dark';
+                                        if($appt['status'] == 'ASSIGNED') $badge = 'bg-primary';
+                                    ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($appt['customer_name']) ?></td>
+                                        <td><?= htmlspecialchars($appt['project_name']) ?> <span class="text-muted" style="font-size:0.85em;">(<?= htmlspecialchars($appt['state']) ?>)</span></td>
+                                        <td><?= htmlspecialchars(str_replace('_', ' ', $appt['service_type'])) ?></td>
+                                        <td><?= htmlspecialchars($appt['staff_name'] ?? 'Unassigned') ?></td>
+                                        <td><?= htmlspecialchars($appt['appointment_date']) ?></td>
+                                        <td><span class="badge <?= $badge ?>"><?= htmlspecialchars($appt['status']) ?></span></td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -993,32 +1080,43 @@ include '../includes/header.php';
     <?php endif; ?>
 
     <?php if (in_array('operations', $reports_to_run)): ?>
-        <?php if(!empty($charts['appointment_status']['data'])): ?>
-        new Chart(document.getElementById('appStatusChart').getContext('2d'), {
+        <?php if(!empty($charts['appt_status_by_state']['datasets'])): ?>
+        new Chart(document.getElementById('apptStatusStateChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?= json_encode($charts['appointment_status']['labels']) ?>,
-                datasets: [{
-                    data: <?= json_encode($charts['appointment_status']['data']) ?>,
-                    backgroundColor: getColors(<?= count($charts['appointment_status']['data']) ?>)
-                }]
+                labels: <?= json_encode($charts['appt_status_by_state']['labels']) ?>,
+                datasets: <?= json_encode($charts['appt_status_by_state']['datasets']) ?>
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true }, 
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } 
+                },
+                plugins: { legend: { position: 'right' } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
 
-        <?php if(!empty($charts['service_type']['data'])): ?>
-        new Chart(document.getElementById('serviceTypeChart').getContext('2d'), {
+        <?php if(!empty($charts['appt_service_by_state']['datasets'])): ?>
+        new Chart(document.getElementById('apptServiceStateChart').getContext('2d'), {
             type: 'bar',
-            indexAxis: 'y',
             data: {
-                labels: <?= json_encode($charts['service_type']['labels']) ?>,
-                datasets: [{
-                    data: <?= json_encode($charts['service_type']['data']) ?>,
-                    backgroundColor: ['#0d6efd', '#20c997']
-                }]
+                labels: <?= json_encode($charts['appt_service_by_state']['labels']) ?>,
+                datasets: <?= json_encode($charts['appt_service_by_state']['datasets']) ?>
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: false }, 
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } } 
+                },
+                plugins: { legend: { position: 'top' } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
     <?php endif; ?>
