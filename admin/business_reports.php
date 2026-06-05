@@ -262,6 +262,23 @@ if (in_array('affordable', $reports_to_run)) {
         $color_idx++;
     }
 
+    // Chart 3: Top 5 Popular Affordable Housing Projects (Month/Year Filtered)
+    $res = $conn->query("
+        SELECT p.project_name, COUNT(a.application_id) as count 
+        FROM affordable_housing_applications a 
+        JOIN properties p ON a.property_id = p.property_id 
+        WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " 
+        GROUP BY p.property_id 
+        ORDER BY count DESC 
+        LIMIT 5
+    ");
+    $hot_proj_labels = []; $hot_proj_data = [];
+    while ($row = $res->fetch_assoc()) { 
+        $hot_proj_labels[] = $row['project_name']; 
+        $hot_proj_data[] = (int)$row['count']; 
+    }
+    $charts['hot_affordable_projects'] = ['labels' => $hot_proj_labels, 'data' => $hot_proj_data];
+
     // Chart 2: Cumulative applications per state (No month/year filter)
     $res = $conn->query("
         SELECT p.state, COUNT(a.application_id) as count 
@@ -756,6 +773,23 @@ include '../includes/header.php';
                     </div>
                 </div>
                 
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-4">
+                                <h4 class="fw-bold mb-3">Top 5 Popular Affordable Housing Projects (Filtered by Month & Year)</h4>
+                                <?php if(empty($charts['hot_affordable_projects']['data'])): ?>
+                                    <p class="text-muted text-center my-5">No data available.</p>
+                                <?php else: ?>
+                                    <div style="position: relative; height: 350px; width: 100%;">
+                                        <canvas id="affHotProjectsChart"></canvas>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Data Table for Export -->
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-dark text-white"><h5 class="m-0 py-1"><i class="bi bi-list-columns me-2"></i>Detailed Record: Applications</h5></div>
