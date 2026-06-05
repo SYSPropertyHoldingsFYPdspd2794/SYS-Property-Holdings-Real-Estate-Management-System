@@ -8,6 +8,7 @@ protect_admin_page('ADMIN', $conn);
 $selected_month = isset($_GET['month']) ? (int)$_GET['month'] : date('n');
 $selected_year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $report_type = isset($_GET['report']) ? $_GET['report'] : 'engagement';
+$selected_state = isset($_GET['state']) ? $_GET['state'] : 'all';
 $auto_print = isset($_GET['print']) && $_GET['print'] == '1';
 
 // Determine which reports to render
@@ -209,11 +210,17 @@ if (in_array('operations', $reports_to_run)) {
 
 // --- PROCESS STAFF ---
 if (in_array('staff', $reports_to_run)) {
+    $state_condition = "";
+    if ($selected_state !== 'all') {
+        $state_condition = " AND p.state = '" . $conn->real_escape_string($selected_state) . "'";
+    }
+    
     $res = $conn->query("
         SELECT s.staff_id, s.full_name, a.status, COUNT(a.appointment_id) as count 
         FROM appointments a 
         JOIN staff s ON a.assigned_staff_id = s.staff_id 
-        WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . " 
+        JOIN properties p ON a.property_id = p.property_id
+        WHERE " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . $state_condition . " 
         GROUP BY s.staff_id, a.status 
     ");
     $staff_raw = [];
@@ -487,6 +494,31 @@ include '../includes/header.php';
         <div class="d-flex align-items-center gap-2">
             <form class="d-flex align-items-center gap-2 m-0" method="GET" action="business_reports.php">
                 <input type="hidden" name="report" value="<?= htmlspecialchars($report_type) ?>">
+                <?php if ($report_type === 'staff' || $report_type === 'all'): ?>
+                <select name="state" class="form-select shadow-sm" style="width: auto;">
+                    <option value="all" <?= $selected_state == 'all' ? 'selected' : '' ?>>All States</option>
+                    <optgroup label="States">
+                        <option value="Johor" <?= $selected_state == 'Johor' ? 'selected' : '' ?>>Johor</option>
+                        <option value="Kedah" <?= $selected_state == 'Kedah' ? 'selected' : '' ?>>Kedah</option>
+                        <option value="Kelantan" <?= $selected_state == 'Kelantan' ? 'selected' : '' ?>>Kelantan</option>
+                        <option value="Melaka" <?= $selected_state == 'Melaka' ? 'selected' : '' ?>>Melaka</option>
+                        <option value="Negeri Sembilan" <?= $selected_state == 'Negeri Sembilan' ? 'selected' : '' ?>>Negeri Sembilan</option>
+                        <option value="Pahang" <?= $selected_state == 'Pahang' ? 'selected' : '' ?>>Pahang</option>
+                        <option value="Perak" <?= $selected_state == 'Perak' ? 'selected' : '' ?>>Perak</option>
+                        <option value="Perlis" <?= $selected_state == 'Perlis' ? 'selected' : '' ?>>Perlis</option>
+                        <option value="Pulau Pinang" <?= $selected_state == 'Pulau Pinang' ? 'selected' : '' ?>>Pulau Pinang</option>
+                        <option value="Sabah" <?= $selected_state == 'Sabah' ? 'selected' : '' ?>>Sabah</option>
+                        <option value="Sarawak" <?= $selected_state == 'Sarawak' ? 'selected' : '' ?>>Sarawak</option>
+                        <option value="Selangor" <?= $selected_state == 'Selangor' ? 'selected' : '' ?>>Selangor</option>
+                        <option value="Terengganu" <?= $selected_state == 'Terengganu' ? 'selected' : '' ?>>Terengganu</option>
+                    </optgroup>
+                    <optgroup label="Federal Territories">
+                        <option value="Kuala Lumpur" <?= $selected_state == 'Kuala Lumpur' ? 'selected' : '' ?>>Kuala Lumpur</option>
+                        <option value="Labuan" <?= $selected_state == 'Labuan' ? 'selected' : '' ?>>Labuan</option>
+                        <option value="Putrajaya" <?= $selected_state == 'Putrajaya' ? 'selected' : '' ?>>Putrajaya</option>
+                    </optgroup>
+                </select>
+                <?php endif; ?>
                 <select name="month" class="form-select shadow-sm" style="width: auto;">
                     <?php for($m=1; $m<=12; ++$m): ?>
                         <option value="<?= $m ?>" <?= $m == $selected_month ? 'selected' : '' ?>><?= date('F', mktime(0, 0, 0, $m, 1)) ?></option>
@@ -734,7 +766,6 @@ include '../includes/header.php';
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
                                 <h4 class="fw-bold mb-3">Service Type Demand across Regions</h4>
-                                <p class="text-muted mb-4 d-print-none">Breaks down what services (e.g. Site Visit, Virtual Tour) are popular in each State.</p>
                                 <?php if(empty($charts['appt_service_by_state']['datasets'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
