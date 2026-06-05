@@ -113,8 +113,8 @@ $appointment_modals = '';
                                                 <input type="hidden" name="action" value="update">
                                                 <input type="hidden" name="appointment_id" value="<?php echo (int)$row['appointment_id']; ?>">
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold">Status</label>
-                                                    <select name="status" class="form-select" required>
+                                                    <label class="form-label fw-bold text-black">Status</label>
+                                                    <select name="status" class="form-select text-black" required>
                                                         <option value="ASSIGNED" <?php echo $row['status'] === 'ASSIGNED' ? 'selected' : ''; ?>>Assigned</option>
                                                         <option value="COMPLETED" <?php echo $row['status'] === 'COMPLETED' ? 'selected' : ''; ?>>Completed</option>
                                                         <option value="CANCELLED" <?php echo $row['status'] === 'CANCELLED' ? 'selected' : ''; ?>>Cancelled</option>

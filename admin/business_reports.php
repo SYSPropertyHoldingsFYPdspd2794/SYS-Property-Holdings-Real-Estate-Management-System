@@ -413,7 +413,7 @@ include '../includes/header.php';
                 <!-- Single Report Export Button -->
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Engagement Report to PDF
                         </button>
                     </div>
