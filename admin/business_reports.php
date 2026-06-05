@@ -212,21 +212,61 @@ if (in_array('pricing', $reports_to_run)) {
 
 // --- PROCESS AFFORDABLE ---
 if (in_array('affordable', $reports_to_run)) {
-    $res = $conn->query("SELECT status, COUNT(*) as count FROM affordable_housing_applications WHERE " . getDateCondition('application_date', $selected_month, $selected_year) . " GROUP BY status");
-    $app_status_data = []; $app_status_labels = [];
-    while ($row = $res->fetch_assoc()) { $app_status_labels[] = str_replace('_', ' ', $row['status']); $app_status_data[] = (int)$row['count']; }
-    $charts['application_status'] = ['labels' => $app_status_labels, 'data' => $app_status_data];
+    // Chart 1: Stacked Bar Chart for Status vs State (Month/Year Filtered)
+    $res = $conn->query("
+        SELECT p.state, a.status, COUNT(*) as count 
+        FROM affordable_housing_applications a 
+        JOIN properties p ON a.property_id = p.property_id 
+        WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " 
+        GROUP BY p.state, a.status
+    ");
+    $stacked_data = [];
+    $all_states = [];
+    while ($row = $res->fetch_assoc()) {
+        $state = $row['state'];
+        $status = $row['status'];
+        
+        if ($status === 'PENDING_REVIEW') $status_label = 'Pending Review';
+        elseif ($status === 'APPROVED_FOR_DRAW') $status_label = 'Accept';
+        elseif ($status === 'REJECTED') $status_label = 'Reject';
+        elseif ($status === 'WINNER') $status_label = 'Winner';
+        else $status_label = $status;
 
-    $res = $conn->query("SELECT p.project_name, COUNT(a.application_id) as count FROM affordable_housing_applications a JOIN properties p ON a.property_id = p.property_id WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " GROUP BY p.property_id ORDER BY count DESC LIMIT 5");
-    $hot_aff_props = [];
-    while ($row = $res->fetch_assoc()) { $hot_aff_props[] = $row; }
-    $metrics['hot_affordable_properties'] = $hot_aff_props;
+        if (!in_array($state, $all_states)) {
+            $all_states[] = $state;
+        }
 
+        if (!isset($stacked_data[$state])) {
+            $stacked_data[$state] = ['Pending Review' => 0, 'Accept' => 0, 'Reject' => 0, 'Winner' => 0];
+        }
+        $stacked_data[$state][$status_label] += (int)$row['count'];
+    }
+
+    $charts['aff_stacked'] = [
+        'labels' => ['Pending Review', 'Accept', 'Reject', 'Winner'],
+        'datasets' => []
+    ];
+    $state_colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6610f2', '#6f42c1', '#d63384', '#fd7e14', '#20c997'];
+    $color_idx = 0;
+    foreach ($all_states as $state) {
+        $charts['aff_stacked']['datasets'][] = [
+            'label' => $state,
+            'data' => [
+                $stacked_data[$state]['Pending Review'] ?? 0,
+                $stacked_data[$state]['Accept'] ?? 0,
+                $stacked_data[$state]['Reject'] ?? 0,
+                $stacked_data[$state]['Winner'] ?? 0
+            ],
+            'backgroundColor' => $state_colors[$color_idx % count($state_colors)]
+        ];
+        $color_idx++;
+    }
+
+    // Chart 2: Cumulative applications per state (No month/year filter)
     $res = $conn->query("
         SELECT p.state, COUNT(a.application_id) as count 
         FROM affordable_housing_applications a 
         JOIN properties p ON a.property_id = p.property_id 
-        WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " 
         GROUP BY p.state 
         ORDER BY count DESC
     ");
@@ -235,9 +275,19 @@ if (in_array('affordable', $reports_to_run)) {
         $aff_state_labels[] = $row['state']; 
         $aff_state_data[] = (int)$row['count']; 
     }
-    $charts['affordable_states'] = ['labels' => $aff_state_labels, 'data' => $aff_state_data];
+    $charts['affordable_states_cumulative'] = ['labels' => $aff_state_labels, 'data' => $aff_state_data];
     
-    $res = $conn->query("SELECT c.full_name, p.project_name, a.application_date, a.status FROM affordable_housing_applications a JOIN customers c ON a.customer_id = c.customer_id JOIN properties p ON a.property_id = p.property_id WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " ORDER BY a.application_date DESC LIMIT 20");
+    // Bottom part: Table data
+    $res = $conn->query("
+        SELECT c.full_name, p.project_name, p.state, a.application_date, s.full_name as reviewed_by
+        FROM affordable_housing_applications a 
+        JOIN customers c ON a.customer_id = c.customer_id 
+        JOIN properties p ON a.property_id = p.property_id 
+        LEFT JOIN staff s ON a.reviewed_by_staff_id = s.staff_id
+        WHERE " . getDateCondition('a.application_date', $selected_month, $selected_year) . " 
+        ORDER BY a.application_date DESC 
+        LIMIT 50
+    ");
     $metrics['aff_list'] = [];
     while($row = $res->fetch_assoc()) { $metrics['aff_list'][] = $row; }
 }
@@ -671,32 +721,34 @@ include '../includes/header.php';
 
             <?php if (in_array('affordable', $reports_to_run)): ?>
                 <?php if ($report_type === 'all'): ?><h3 class="fw-bold mt-5 mb-4 border-bottom pb-2" style="page-break-before: always;">Special Programs: Affordable Housing</h3><?php endif; ?>
+                
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Applicant Distribution By State</h4>
-                                <?php if(empty($charts['affordable_states']['data'])): ?>
+                                <h4 class="fw-bold mb-3">Application Status by State (Filtered by Month & Year)</h4>
+                                <?php if(empty($charts['aff_stacked']['datasets'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
                                     <div style="position: relative; height: 350px; width: 100%;">
-                                        <canvas id="affStatesChart"></canvas>
+                                        <canvas id="affStackedChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Affordable Housing Application Status</h4>
-                                <?php if(empty($charts['application_status']['data'])): ?>
-                                    <p class="text-muted text-center my-5">No data for this period.</p>
+                                <h4 class="fw-bold mb-3">Total Applicants By State (Cumulative)</h4>
+                                <?php if(empty($charts['affordable_states_cumulative']['data'])): ?>
+                                    <p class="text-muted text-center my-5">No data available.</p>
                                 <?php else: ?>
-                                    <div style="position: relative; height: 300px; width: 100%;">
-                                        <canvas id="affStatusChart"></canvas>
+                                    <div style="position: relative; height: 350px; width: 100%;">
+                                        <canvas id="affStatesCumulativeChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -709,11 +761,17 @@ include '../includes/header.php';
                     <div class="card-header bg-dark text-white"><h5 class="m-0 py-1"><i class="bi bi-list-columns me-2"></i>Detailed Record: Applications</h5></div>
                     <div class="card-body p-0 table-responsive">
                         <table class="table print-table mb-0 table-striped">
-                            <thead><tr><th>Customer Name</th><th>Property Project</th><th>Application Date</th><th>Status</th></tr></thead>
+                            <thead><tr><th>Application Date</th><th>Applicant Name</th><th>Affordable House Name</th><th>State</th><th>Reviewed By</th></tr></thead>
                             <tbody>
-                                <?php if(empty($metrics['aff_list'])): ?><tr><td colspan="4" class="text-center">No records</td></tr><?php endif; ?>
+                                <?php if(empty($metrics['aff_list'])): ?><tr><td colspan="5" class="text-center">No records</td></tr><?php endif; ?>
                                 <?php foreach($metrics['aff_list'] as $app): ?>
-                                    <tr><td><?= htmlspecialchars($app['full_name']) ?></td><td><?= htmlspecialchars($app['project_name']) ?></td><td><?= htmlspecialchars($app['application_date']) ?></td><td><?= htmlspecialchars($app['status']) ?></td></tr>
+                                    <tr>
+                                        <td><?= htmlspecialchars($app['application_date']) ?></td>
+                                        <td><?= htmlspecialchars($app['full_name']) ?></td>
+                                        <td><?= htmlspecialchars($app['project_name']) ?></td>
+                                        <td><?= htmlspecialchars($app['state']) ?></td>
+                                        <td><?= htmlspecialchars($app['reviewed_by'] ?? 'Pending Review') ?></td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -901,31 +959,44 @@ include '../includes/header.php';
     <?php endif; ?>
         
     <?php if (in_array('affordable', $reports_to_run)): ?>
-        <?php if(!empty($charts['affordable_states']['data'])): ?>
-        new Chart(document.getElementById('affStatesChart').getContext('2d'), {
+        <?php if(!empty($charts['aff_stacked']['datasets'])): ?>
+        new Chart(document.getElementById('affStackedChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?= json_encode($charts['affordable_states']['labels']) ?>,
-                datasets: [{
-                    data: <?= json_encode($charts['affordable_states']['data']) ?>,
-                    backgroundColor: '#6f42c1'
-                }]
+                labels: <?= json_encode($charts['aff_stacked']['labels']) ?>,
+                datasets: <?= json_encode($charts['aff_stacked']['datasets']) ?>
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true }, 
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } 
+                },
+                plugins: { legend: { position: 'right' } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
 
-        <?php if(!empty($charts['application_status']['data'])): ?>
-        new Chart(document.getElementById('affStatusChart').getContext('2d'), {
+        <?php if(!empty($charts['affordable_states_cumulative']['data'])): ?>
+        new Chart(document.getElementById('affStatesCumulativeChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?= json_encode($charts['application_status']['labels']) ?>,
+                labels: <?= json_encode($charts['affordable_states_cumulative']['labels']) ?>,
                 datasets: [{
-                    data: <?= json_encode($charts['application_status']['data']) ?>,
-                    backgroundColor: ['#ffc107', '#198754', '#dc3545', '#0dcaf0']
+                    label: 'Applicants',
+                    data: <?= json_encode($charts['affordable_states_cumulative']['data']) ?>,
+                    backgroundColor: '#6f42c1'
                 }]
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                plugins: { legend: { display: false } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
     <?php endif; ?>
