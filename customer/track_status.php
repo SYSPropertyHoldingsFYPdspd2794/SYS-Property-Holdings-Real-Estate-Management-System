@@ -301,6 +301,13 @@ include '../includes/header.php';
     .timeline-line { position: absolute; top: 20px; left: 5%; width: 90%; height: 4px; background-color: #e9ecef; z-index: 1; }
     .step-icon { width: 45px; height: 45px; border-radius: 50%; background-color: #fff; border: 3px solid #e9ecef; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 16px; transition: all 0.3s ease; }
     .tiny-time { font-size: 11px; margin-top: 2px; display: block; }
+    .appointment-delete-check {
+        border: 2px solid #000;
+    }
+    .appointment-delete-check:checked {
+        background-color: #000;
+        border-color: #000;
+    }
     @media (max-width: 767.98px) {
         .step-icon { margin: 0; display: inline-flex; }
         .timeline-step { padding-left: 60px; text-align: left !important; width: 100%; }
@@ -308,7 +315,7 @@ include '../includes/header.php';
     }
 </style>
 
-<script { sandbox: 'allow-scripts' }>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const plusBtn = document.getElementById('dynamicPlusBtn');
     const apptTab = document.getElementById('appt-tab');
@@ -349,21 +356,43 @@ if (deleteSelectedAppointmentsBtn && deleteAppointmentsForm) {
             return;
         }
 
-        Swal.fire({
-            icon: 'warning',
-            title: 'Delete Appointment?',
-            text: 'Are you sure you want to delete the selected cancelled or expired appointment' + (selectedCount === 1 ? '?' : 's?'),
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete',
-            cancelButtonText: 'No',
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                deleteAppointmentsForm.submit();
-            }
-        });
+        const message = 'Are you sure you want to delete the selected cancelled or expired appointment' + (selectedCount === 1 ? '?' : 's?');
+
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Delete Appointment?',
+                text: message,
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'No',
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteAppointmentsForm.submit();
+                }
+            });
+            return;
+        }
+
+        if (window.showConfirmModal) {
+            window.showConfirmModal({
+                title: 'Delete Appointment?',
+                message: message,
+                confirmText: 'Yes, delete',
+                confirmClass: 'btn-danger',
+                onConfirm: function () {
+                    deleteAppointmentsForm.submit();
+                }
+            });
+            return;
+        }
+
+        if (window.confirm(message)) {
+            deleteAppointmentsForm.submit();
+        }
     });
 }
 </script>
