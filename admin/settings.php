@@ -43,10 +43,23 @@ $stmt_expired = $conn->prepare("
     LEFT JOIN appointments appt ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = appt.appointment_id
     LEFT JOIN affordable_housing_applications aha ON d.related_to_type = 'APPLICATION' AND d.related_to_id = aha.application_id
     WHERE d.is_purged = FALSE 
-    AND COALESCE(appt.status, aha.status) IN ('COMPLETED', 'CANCELLED', 'NO_SHOW', 'REJECTED', 'WINNER')
-    AND d.uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY)
+    AND (
+        (
+            d.related_to_type = 'APPOINTMENT'
+            AND (
+                (appt.status IN ('COMPLETED', 'NO_SHOW') AND TIMESTAMP(appt.appointment_date, appt.appointment_time) <= DATE_SUB(NOW(), INTERVAL ? DAY))
+                OR (appt.status = 'CANCELLED' AND d.uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY))
+                OR (appt.status IN ('REQUESTED', 'ASSIGNED') AND TIMESTAMP(appt.appointment_date, appt.appointment_time) <= DATE_SUB(NOW(), INTERVAL ? DAY))
+            )
+        )
+        OR (
+            d.related_to_type = 'APPLICATION'
+            AND aha.status IN ('REJECTED', 'WINNER')
+            AND d.uploaded_at <= DATE_SUB(NOW(), INTERVAL ? DAY)
+        )
+    )
 ");
-$stmt_expired->bind_param("i", $retention_days);
+$stmt_expired->bind_param("iiii", $retention_days, $retention_days, $retention_days, $retention_days);
 $stmt_expired->execute();
 $expired_docs_res = $stmt_expired->get_result();
 $expired_docs = [];

@@ -16,6 +16,8 @@ $account_id = $_SESSION['account_id'];
 $delete_message = '';
 $delete_error = '';
 
+$conn->query("ALTER TABLE appointments ADD COLUMN IF NOT EXISTS customer_deleted_at DATETIME DEFAULT NULL");
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action_type'] ?? '') === 'delete_appointments') {
     $selected_ids = array_values(array_unique(array_filter(array_map('intval', $_POST['appointment_ids'] ?? []), function ($id) {
         return $id > 0;
@@ -28,23 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action_type'] ?? '') === '
 
     $conn->begin_transaction();
     try {
-        $delete_docs_stmt = $conn->prepare("DELETE d FROM documents d
-                                            JOIN appointments a ON d.related_to_type = 'APPOINTMENT' && d.related_to_id = a.appointment_id
-                                            WHERE a.customer_id = ? && a.appointment_id = ?
-                                            AND (a.status = 'CANCELLED' OR a.status = 'NO_SHOW')");
-
-        $delete_appt_stmt = $conn->prepare("DELETE FROM appointments 
-                                            WHERE customer_id = ? && appointment_id = ? 
-                                            AND (status = 'CANCELLED' OR status = 'NO_SHOW')");
+        $hide_appt_stmt = $conn->prepare("UPDATE appointments
+                                           SET customer_deleted_at = NOW()
+                                           WHERE customer_id = ? && appointment_id = ?
+                                           AND customer_deleted_at IS NULL
+                                           AND (
+                                               status IN ('CANCELLED', 'NO_SHOW')
+                                               OR (status IN ('REQUESTED', 'ASSIGNED') AND TIMESTAMP(appointment_date, appointment_time) <= NOW())
+                                           )");
 
         $deleted_count = 0;
         foreach ($selected_ids as $appt_id) {
-            $delete_docs_stmt->bind_param("ii", $account_id, $appt_id);
-            $delete_docs_stmt->execute();
-
-            $delete_appt_stmt->bind_param("ii", $account_id, $appt_id);
-            $delete_appt_stmt->execute();
-            if ($delete_appt_stmt->affected_rows > 0) {
+            $hide_appt_stmt->bind_param("ii", $account_id, $appt_id);
+            $hide_appt_stmt->execute();
+            if ($hide_appt_stmt->affected_rows > 0) {
                 $deleted_count++;
             }
         }
@@ -82,7 +81,7 @@ if ((isset($_GET['tab']) && $_GET['tab'] === 'housing') || $success_msg === 'app
     $active_tab = 'housing';
 }
 
-$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? ORDER BY a.appointment_date DESC");
+$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? AND a.customer_deleted_at IS NULL ORDER BY a.appointment_date DESC");
 $appt_stmt->bind_param("i", $account_id);
 $appt_stmt->execute();
 $appointments = $appt_stmt->get_result();
@@ -142,19 +141,24 @@ include '../includes/header.php';
                                     <div class="card-body p-4 d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center gap-2" style="max-width: 70%;">
-                                                <?php if (in_array($row['status'], ['CANCELLED', 'COMPLETED', 'NO_SHOW'], true)): ?>
+                                                <?php
+                                                    $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $row['appointment_date'] . ' ' . $row['appointment_time']);
+                                                    $isExpiredAppointment = in_array($row['status'], ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime && $appointmentDateTime <= new DateTime();
+                                                    $displayStatus = $isExpiredAppointment ? 'EXPIRED' : $row['status'];
+                                                ?>
+                                                <?php if (in_array($row['status'], ['CANCELLED', 'NO_SHOW'], true) || $isExpiredAppointment): ?>
                                                     <input type="checkbox" name="appointment_ids[]" value="<?php echo $row['appointment_id']; ?>" class="form-check-input appointment-delete-check me-1 flex-shrink-0">
                                                 <?php endif; ?>
                                                 <h4 class="fw-bold m-0 text-truncate"><?php echo htmlspecialchars($row['project_name']); ?></h4>
                                             </div>
                                             <?php
                                                 $bg = 'secondary';
-                                                if ($row['status'] === 'REQUESTED' || $row['status'] === 'PENDING') $bg = 'warning text-dark';
-                                                if ($row['status'] === 'ASSIGNED') $bg = 'primary';
-                                                if ($row['status'] === 'COMPLETED') $bg = 'success';
-                                                if ($row['status'] === 'CANCELLED' || $row['status'] === 'NO_SHOW') $bg = 'danger';
+                                                if ($displayStatus === 'REQUESTED' || $displayStatus === 'PENDING') $bg = 'warning text-dark';
+                                                if ($displayStatus === 'ASSIGNED') $bg = 'primary';
+                                                if ($displayStatus === 'COMPLETED') $bg = 'success';
+                                                if (in_array($displayStatus, ['CANCELLED', 'NO_SHOW', 'EXPIRED'], true)) $bg = 'danger';
                                             ?>
-                                            <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($row['status']); ?></span>
+                                            <span class="badge bg-<?php echo $bg; ?> fs-6 px-3 py-2 shadow-sm"><?php echo htmlspecialchars($displayStatus); ?></span>
                                         </div>
                                         <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type'])); ?></p>
                                         <p class="text-muted fs-5 mb-3"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>

@@ -8,6 +8,7 @@ include '../includes/db_connect.php';
 include_once '../includes/property_images.php';
 
 $account_id = $_SESSION['account_id'];
+$conn->query("ALTER TABLE appointments ADD COLUMN IF NOT EXISTS customer_deleted_at DATETIME DEFAULT NULL");
 
 // 獲取客戶資料
 $cust_stmt = $conn->prepare("SELECT full_name, monthly_income FROM customers WHERE customer_id = ?");
@@ -19,7 +20,7 @@ $first_name = explode(' ', trim($customer['full_name']))[0];
 
 // 快速狀態統計
 $wishlist_count = $conn->query("SELECT COUNT(*) FROM wishlists WHERE customer_id = $account_id")->fetch_row()[0];
-$appt_count = $conn->query("SELECT COUNT(*) FROM appointments WHERE customer_id = $account_id AND status IN ('REQUESTED', 'ASSIGNED')")->fetch_row()[0];
+$appt_count = $conn->query("SELECT COUNT(*) FROM appointments WHERE customer_id = $account_id AND status IN ('REQUESTED', 'ASSIGNED') AND TIMESTAMP(appointment_date, appointment_time) > NOW() AND customer_deleted_at IS NULL")->fetch_row()[0];
 $app_count = $conn->query("SELECT COUNT(*) FROM affordable_housing_applications WHERE customer_id = $account_id AND status IN ('PENDING_REVIEW', 'APPROVED_FOR_DRAW')")->fetch_row()[0];
 
 // 獲取系統基準利率 (BASE INTEREST RATE from banks table)

@@ -158,7 +158,8 @@ CREATE TABLE `appointments` (
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
   `status` enum('REQUESTED','ASSIGNED','COMPLETED','NO_SHOW','CANCELLED') NOT NULL DEFAULT 'REQUESTED',
-  `staff_remarks` text DEFAULT NULL
+  `staff_remarks` text DEFAULT NULL,
+  `customer_deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

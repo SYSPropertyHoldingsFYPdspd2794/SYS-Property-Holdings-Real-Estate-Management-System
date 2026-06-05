@@ -91,8 +91,12 @@ $appointment_modals = '';
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php $bg = ($row['status'] === 'ASSIGNED') ? 'primary' : (($row['status'] === 'COMPLETED') ? 'success' : 'danger'); ?>
-                                    <span class="badge bg-<?php echo $bg; ?>"><?php echo htmlspecialchars($row['status']); ?></span>
+                                    <?php
+                                        $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $row['appointment_date'] . ' ' . $row['appointment_time']);
+                                        $displayStatus = ($row['status'] === 'ASSIGNED' && $appointmentDateTime && $appointmentDateTime <= new DateTime()) ? 'EXPIRED' : $row['status'];
+                                        $bg = ($displayStatus === 'ASSIGNED') ? 'primary' : (($displayStatus === 'COMPLETED') ? 'success' : 'danger');
+                                    ?>
+                                    <span class="badge bg-<?php echo $bg; ?>"><?php echo htmlspecialchars($displayStatus); ?></span>
                                 </td>
                                 <td>
                                     <?php if ($row['status'] === 'ASSIGNED'): ?>

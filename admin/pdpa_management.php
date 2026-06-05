@@ -55,7 +55,8 @@ $query = "
            COALESCE(p1.project_name, p2.project_name) AS project_name,
            COALESCE(p1.state, p2.state) AS property_state,
            COALESCE(appt.status, aha.status) AS entity_status,
-           appt.appointment_date
+           appt.appointment_date,
+           appt.appointment_time
     FROM documents d
     JOIN customers c ON d.customer_id = c.customer_id
     LEFT JOIN appointments appt ON d.related_to_type = 'APPOINTMENT' AND d.related_to_id = appt.appointment_id
@@ -89,7 +90,7 @@ include '../includes/header.php';
         </div>
         <br>
         <div class="text-start">
-            Appointments: COMPLETED / CANCELLED / NO SHOW<br>
+            Appointments: COMPLETED / CANCELLED / NO SHOW / EXPIRED<br>
             Applications: REJECTED / WON
         </div>
     </div>
@@ -114,11 +115,20 @@ include '../includes/header.php';
                     <tbody>
                         <?php while ($doc = $documents->fetch_assoc()): 
                             $entity_status = strtoupper($doc['entity_status'] ?? 'UNKNOWN');
-                            $is_terminal = in_array($entity_status, ['COMPLETED', 'CANCELLED', 'NO_SHOW', 'REJECTED', 'WINNER']);
+                            $appointment_time = !empty($doc['appointment_time']) ? $doc['appointment_time'] : '00:00:00';
+                            $appointment_timestamp = !empty($doc['appointment_date']) ? strtotime($doc['appointment_date'] . ' ' . $appointment_time) : false;
+                            $is_appointment_expired = $doc['related_to_type'] === 'APPOINTMENT'
+                                && in_array($entity_status, ['REQUESTED', 'ASSIGNED'], true)
+                                && $appointment_timestamp
+                                && $appointment_timestamp <= time();
+                            if ($is_appointment_expired) {
+                                $entity_status = 'EXPIRED';
+                            }
+                            $is_terminal = in_array($entity_status, ['COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED', 'REJECTED', 'WINNER']);
                             
                             $base_time = strtotime($doc['uploaded_at']);
-                            if ($doc['related_to_type'] === 'APPOINTMENT' && !empty($doc['appointment_date']) && in_array($entity_status, ['COMPLETED', 'NO_SHOW'])) {
-                                $base_time = strtotime($doc['appointment_date']);
+                            if ($doc['related_to_type'] === 'APPOINTMENT' && $appointment_timestamp && in_array($entity_status, ['COMPLETED', 'NO_SHOW', 'EXPIRED'])) {
+                                $base_time = $appointment_timestamp;
                             }
                             
                             $upload_time = strtotime($doc['uploaded_at']);
