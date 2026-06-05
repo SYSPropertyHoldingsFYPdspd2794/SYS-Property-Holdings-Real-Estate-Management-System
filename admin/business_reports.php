@@ -179,15 +179,82 @@ if (in_array('staff', $reports_to_run)) {
 
 // --- PROCESS MARKET ---
 if (in_array('market', $reports_to_run)) {
-    $res = $conn->query("SELECT p.property_type, COUNT(w.wishlist_id) as count FROM wishlists w JOIN properties p ON w.property_id = p.property_id WHERE " . getDateCondition('w.created_at', $selected_month, $selected_year) . " GROUP BY p.property_type ORDER BY count DESC");
-    $ptype_data = []; $ptype_labels = [];
-    while ($row = $res->fetch_assoc()) { $ptype_labels[] = $row['property_type']; $ptype_data[] = (int)$row['count']; }
-    $charts['property_types'] = ['labels' => $ptype_labels, 'data' => $ptype_data];
+    // 1. Demand Conversion: Wishlists vs Appointments per Property Type
+    $res = $conn->query("
+        SELECT p.property_type, 
+               COUNT(DISTINCT w.wishlist_id) as wishlist_count,
+               COUNT(DISTINCT a.appointment_id) as appointment_count
+        FROM properties p 
+        LEFT JOIN wishlists w ON p.property_id = w.property_id AND " . getDateCondition('w.created_at', $selected_month, $selected_year) . "
+        LEFT JOIN appointments a ON p.property_id = a.property_id AND " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . "
+        GROUP BY p.property_type
+        HAVING wishlist_count > 0 OR appointment_count > 0
+        ORDER BY wishlist_count DESC
+    ");
+    $market_types_labels = [];
+    $market_wishlist_data = [];
+    $market_appt_data = [];
+    while ($row = $res->fetch_assoc()) {
+        $market_types_labels[] = $row['property_type'];
+        $market_wishlist_data[] = (int)$row['wishlist_count'];
+        $market_appt_data[] = (int)$row['appointment_count'];
+    }
+    $charts['market_conversion'] = [
+        'labels' => $market_types_labels,
+        'wishlist' => $market_wishlist_data,
+        'appointment' => $market_appt_data
+    ];
 
-    $res = $conn->query("SELECT p.state, COUNT(w.wishlist_id) as count FROM wishlists w JOIN properties p ON w.property_id = p.property_id WHERE " . getDateCondition('w.created_at', $selected_month, $selected_year) . " GROUP BY p.state ORDER BY count DESC");
-    $state_data = []; $state_labels = [];
-    while ($row = $res->fetch_assoc()) { $state_labels[] = $row['state']; $state_data[] = (int)$row['count']; }
-    $charts['top_states'] = ['labels' => $state_labels, 'data' => $state_data];
+    // 2. Regional Hotspots: Stacked Bar showing Property Types demand per State
+    $res = $conn->query("
+        SELECT p.state, p.property_type, COUNT(w.wishlist_id) as count 
+        FROM wishlists w 
+        JOIN properties p ON w.property_id = p.property_id 
+        WHERE " . getDateCondition('w.created_at', $selected_month, $selected_year) . " 
+        GROUP BY p.state, p.property_type
+    ");
+    $state_type_data = [];
+    $all_m_states = [];
+    $all_m_types = [];
+    while ($row = $res->fetch_assoc()) {
+        $st = $row['state'];
+        $pt = $row['property_type'];
+        if (!in_array($st, $all_m_states)) $all_m_states[] = $st;
+        if (!in_array($pt, $all_m_types)) $all_m_types[] = $pt;
+        if (!isset($state_type_data[$st])) $state_type_data[$st] = [];
+        $state_type_data[$st][$pt] = (int)$row['count'];
+    }
+    $charts['regional_hotspots'] = ['labels' => $all_m_states, 'datasets' => []];
+    $market_colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1'];
+    $mc_idx = 0;
+    foreach ($all_m_types as $type) {
+        $ds_data = [];
+        foreach ($all_m_states as $st) {
+            $ds_data[] = $state_type_data[$st][$type] ?? 0;
+        }
+        $charts['regional_hotspots']['datasets'][] = [
+            'label' => $type,
+            'data' => $ds_data,
+            'backgroundColor' => $market_colors[$mc_idx % count($market_colors)]
+        ];
+        $mc_idx++;
+    }
+
+    // 3. Trending Properties Table (Leaderboard)
+    $res = $conn->query("
+        SELECT p.project_name, p.property_type, p.state, p.price,
+               COUNT(DISTINCT w.wishlist_id) as total_wishlists,
+               COUNT(DISTINCT a.appointment_id) as total_appointments
+        FROM properties p
+        LEFT JOIN wishlists w ON p.property_id = w.property_id AND " . getDateCondition('w.created_at', $selected_month, $selected_year) . "
+        LEFT JOIN appointments a ON p.property_id = a.property_id AND " . getDateCondition('a.appointment_date', $selected_month, $selected_year) . "
+        GROUP BY p.property_id
+        HAVING total_wishlists > 0 OR total_appointments > 0
+        ORDER BY total_wishlists DESC, total_appointments DESC
+        LIMIT 20
+    ");
+    $metrics['trending_properties'] = [];
+    while($row = $res->fetch_assoc()) { $metrics['trending_properties'][] = $row; }
 }
 
 // --- PROCESS PRICING ---
@@ -666,36 +733,65 @@ include '../includes/header.php';
 
             <?php if (in_array('market', $reports_to_run)): ?>
                 <?php if ($report_type === 'all'): ?><h3 class="fw-bold mt-5 mb-4 border-bottom pb-2" style="page-break-before: always;">Market Intelligence</h3><?php endif; ?>
+                
+                <!-- Chart 1: Demand Conversion -->
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Top Property Types</h4>
-                                <?php if(empty($charts['property_types']['data'])): ?>
+                                <h4 class="fw-bold mb-3">Interest vs Action (Wishlists & Appointments by Type)</h4>
+                                <p class="text-muted mb-4 d-print-none">Compares raw interest (wishlists) against actual actions (appointments) to calculate conversion effectiveness.</p>
+                                <?php if(empty($charts['market_conversion']['labels'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
                                     <div style="position: relative; height: 350px; width: 100%;">
-                                        <canvas id="propTypeChart"></canvas>
+                                        <canvas id="marketConversionChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Chart 2: Regional Hotspots -->
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3">Regional Interest (Top States)</h4>
-                                <?php if(empty($charts['top_states']['data'])): ?>
+                                <h4 class="fw-bold mb-3">Regional Hotspots (Property Type Demand per State)</h4>
+                                <p class="text-muted mb-4 d-print-none">Shows what type of properties are trending in different geographical regions.</p>
+                                <?php if(empty($charts['regional_hotspots']['datasets'])): ?>
                                     <p class="text-muted text-center my-5">No data for this period.</p>
                                 <?php else: ?>
-                                    <div style="position: relative; height: 350px; width: 100%;">
-                                        <canvas id="statesChart"></canvas>
+                                    <div style="position: relative; height: 400px; width: 100%;">
+                                        <canvas id="regionalHotspotsChart"></canvas>
                                     </div>
                                 <?php endif; ?>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Data Table -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-dark text-white"><h5 class="m-0 py-1"><i class="bi bi-star-fill me-2 text-warning"></i>Trending Properties Leaderboard</h5></div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table print-table mb-0 table-hover table-striped">
+                            <thead><tr><th>Project Name</th><th>Type</th><th>State</th><th>Price (RM)</th><th>Wishlists <i class="bi bi-heart-fill text-danger"></i></th><th>Appointments <i class="bi bi-calendar-check-fill text-success"></i></th></tr></thead>
+                            <tbody>
+                                <?php if(empty($metrics['trending_properties'])): ?><tr><td colspan="6" class="text-center">No trending properties this month</td></tr><?php endif; ?>
+                                <?php foreach($metrics['trending_properties'] as $prop): ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($prop['project_name']) ?></td>
+                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($prop['property_type']) ?></span></td>
+                                        <td><?= htmlspecialchars($prop['state']) ?></td>
+                                        <td><?= number_format($prop['price'], 2) ?></td>
+                                        <td class="fw-bold text-danger"><?= $prop['total_wishlists'] ?></td>
+                                        <td class="fw-bold text-success"><?= $prop['total_appointments'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -951,31 +1047,53 @@ include '../includes/header.php';
     <?php endif; ?>
 
     <?php if (in_array('market', $reports_to_run)): ?>
-        <?php if(!empty($charts['property_types']['data'])): ?>
-        new Chart(document.getElementById('propTypeChart').getContext('2d'), {
+        <?php if(!empty($charts['market_conversion']['labels'])): ?>
+        new Chart(document.getElementById('marketConversionChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?= json_encode($charts['property_types']['labels']) ?>,
-                datasets: [{
-                    data: <?= json_encode($charts['property_types']['data']) ?>,
-                    backgroundColor: getColors(<?= count($charts['property_types']['data']) ?>)
-                }]
+                labels: <?= json_encode($charts['market_conversion']['labels']) ?>,
+                datasets: [
+                    {
+                        label: 'Wishlists (Interest)',
+                        data: <?= json_encode($charts['market_conversion']['wishlist']) ?>,
+                        backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Appointments (Action)',
+                        data: <?= json_encode($charts['market_conversion']['appointment']) ?>,
+                        backgroundColor: 'rgba(25, 135, 84, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                plugins: { legend: { position: 'top' } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
 
-        <?php if(!empty($charts['top_states']['data'])): ?>
-        new Chart(document.getElementById('statesChart').getContext('2d'), {
+        <?php if(!empty($charts['regional_hotspots']['datasets'])): ?>
+        new Chart(document.getElementById('regionalHotspotsChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?= json_encode($charts['top_states']['labels']) ?>,
-                datasets: [{
-                    data: <?= json_encode($charts['top_states']['data']) ?>,
-                    backgroundColor: '#0dcaf0'
-                }]
+                labels: <?= json_encode($charts['regional_hotspots']['labels']) ?>,
+                datasets: <?= json_encode($charts['regional_hotspots']['datasets']) ?>
             },
-            options: barOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { 
+                    x: { stacked: true }, 
+                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } 
+                },
+                plugins: { legend: { position: 'right' } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
         });
         <?php endif; ?>
     <?php endif; ?>
