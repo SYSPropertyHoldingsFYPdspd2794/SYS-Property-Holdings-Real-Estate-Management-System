@@ -14,6 +14,7 @@ include '../includes/db_connect.php';
 include_once '../includes/functions.php';
 
 $account_id = $_SESSION['account_id'];
+$conn->query("ALTER TABLE appointments ADD COLUMN IF NOT EXISTS customer_deleted_at DATETIME DEFAULT NULL");
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $error = '';
@@ -74,7 +75,7 @@ function document_meta_for_type($type) {
 // BACKEND DATA FETCH WITH EXTENDED APPLICANT PROFILE MATRICES
 $data = null;
 if ($type === 'appointment') {
-    $stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, p.price, p.property_code FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.appointment_id = ? AND a.customer_id = ?");
+    $stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, p.price, p.property_code FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.appointment_id = ? AND a.customer_id = ? AND a.customer_deleted_at IS NULL");
     $stmt->bind_param("ii", $id, $account_id);
     $stmt->execute();
     $data = $stmt->get_result()->fetch_assoc();
@@ -96,6 +97,13 @@ if (!$data) {
 
 // STATE VALIDATION AND LOCK SECURITY SETUPS
 $current_status = $data['status'];
+$appointmentDateTime = null;
+if ($type === 'appointment') {
+    $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['appointment_date'] . ' ' . $data['appointment_time']);
+    if (in_array($current_status, ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime && $appointmentDateTime <= new DateTime()) {
+        $current_status = 'EXPIRED';
+    }
+}
 $allow_document_adjustment = false;
 
 if ($type === 'appointment') {
@@ -281,11 +289,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
     }
 }
 
-$appointmentDateTime = null;
 $canCancelAppointment = false;
 $canRescheduleAppointment = false;
 if ($type === 'appointment') {
-    $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['appointment_date'] . ' ' . $data['appointment_time']);
     $canCancelAppointment = in_array($current_status, ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime && $appointmentDateTime > new DateTime();
     $canRescheduleAppointment = $canCancelAppointment;
 }
@@ -301,7 +307,7 @@ if ($current_related_type) {
 
 $canManageDocument = true;
 if ($type === 'appointment') {
-    $canManageDocument = in_array($data['status'], ['REQUESTED', 'ASSIGNED'], true);
+    $canManageDocument = in_array($current_status, ['REQUESTED', 'ASSIGNED'], true);
 }
 
 include '../includes/header.php';
@@ -392,7 +398,7 @@ include '../includes/header.php';
                             if (in_array($current_status, ['REQUESTED', 'PENDING', 'PENDING_REVIEW'])) $badge = 'warning text-dark';
                             if (in_array($current_status, ['ASSIGNED', 'APPROVED_FOR_DRAW'])) $badge = 'primary';
                             if (in_array($current_status, ['COMPLETED', 'WINNER'])) $badge = 'success';
-                            if (in_array($current_status, ['CANCELLED', 'REJECTED', 'NO_SHOW'])) $badge = 'danger';
+                            if (in_array($current_status, ['CANCELLED', 'REJECTED', 'NO_SHOW', 'EXPIRED'])) $badge = 'danger';
                         ?>
                         <span class="badge bg-<?php echo $badge; ?> fs-6 px-3 py-2 text-uppercase"><?php echo htmlspecialchars(str_replace('_', ' ', $current_status)); ?></span>
                     </div>
