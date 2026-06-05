@@ -1033,6 +1033,27 @@ include '../includes/header.php';
             }
         });
         <?php endif; ?>
+
+        <?php if(!empty($charts['hot_affordable_projects']['data'])): ?>
+        new Chart(document.getElementById('affHotProjectsChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($charts['hot_affordable_projects']['labels']) ?>,
+                datasets: [{
+                    label: 'Applications',
+                    data: <?= json_encode($charts['hot_affordable_projects']['data']) ?>,
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                plugins: { legend: { display: false } },
+                animation: { duration: <?= $auto_print ? 0 : 1000 ?> }
+            }
+        });
+        <?php endif; ?>
     <?php endif; ?>
 
     // Auto trigger print if requested via URL
