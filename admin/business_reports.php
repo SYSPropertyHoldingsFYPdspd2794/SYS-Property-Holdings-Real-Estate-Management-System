@@ -317,17 +317,21 @@ include '../includes/header.php';
 <!-- Print Styles for Exporting Reports -->
 <style>
 @media print {
-    body { background-color: #fff !important; }
+    @page { size: A4 portrait; margin: 0.5cm; }
+    body { background-color: #fff !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
     .sidebar-heading, .list-group, form, .btn, header, footer, .navbar, .d-print-none { display: none !important; }
     .col-md-3, .col-lg-2 { display: none !important; } 
-    .col-md-9, .col-lg-10 { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; }
-    .card { border: none !important; box-shadow: none !important; margin-bottom: 2rem !important; }
-    .card-header, .card-body { padding: 0 !important; }
-    canvas { max-height: 450px !important; page-break-inside: avoid; }
-    .container-fluid { padding: 0 15px !important; margin: 0 !important; }
+    .col-md-9, .col-lg-10 { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; padding: 0 !important; margin: 0 !important; }
+    .card { border: none !important; box-shadow: none !important; margin-bottom: 2rem !important; width: 100% !important; }
+    .card-header, .card-body { padding: 0 !important; width: 100% !important; }
+    canvas { max-width: 100% !important; height: auto !important; max-height: 400px !important; page-break-inside: avoid; }
+    .container-fluid { padding: 0 !important; margin: 0 !important; width: 100% !important; }
+    .row { display: block !important; width: 100% !important; margin: 0 !important; }
+    .col-12, .col-md-4, .col-md-6 { display: block !important; width: 100% !important; max-width: 100% !important; flex: none !important; padding: 0 !important; }
+    .table-responsive { overflow: visible !important; width: 100% !important; }
     .print-title { display: block !important; text-align: center; margin-bottom: 20px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
-    .print-table { width: 100% !important; border-collapse: collapse !important; font-size: 12px; }
-    .print-table th, .print-table td { border: 1px solid #ddd !important; padding: 8px !important; text-align: left !important; }
+    .print-table { width: 100% !important; border-collapse: collapse !important; font-size: 11px; table-layout: fixed; word-wrap: break-word; }
+    .print-table th, .print-table td { border: 1px solid #ddd !important; padding: 6px !important; text-align: left !important; white-space: normal !important; overflow-wrap: break-word; }
     .print-table th { background-color: #f8f9fa !important; font-weight: bold !important; }
 }
 .print-title { display: none; }
