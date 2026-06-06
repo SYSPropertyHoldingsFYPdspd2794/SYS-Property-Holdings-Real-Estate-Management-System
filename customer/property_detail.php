@@ -325,7 +325,7 @@ $proximityHtml .= '</div>';
         <div class="col-md-5 mb-4">
             <div class="card shadow-lg border-0 h-100 bg-dark text-white rounded-4 estimator-card">
                 <div class="card-header text-white p-4 border-0 rounded-top-4 estimator-header">
-                    <h5 class="fw-light text-uppercase tracking-wider mb-0 text-gold"><i class="fas fa-calculator me-2"></i>Financial Concierge</h5>
+                    <h5 class="fw-light text-uppercase tracking-wider mb-0 text-gold"><i class="fas fa-calculator me-2"></i>Financial Calculator</h5>
                 </div>
                 <div class="card-body p-4 p-lg-5 d-flex flex-column">
                     <h3 class="text-white fw-light mb-4 border-bottom border-secondary border-opacity-50 pb-4 luxury-title">RM <?php echo number_format($property['price'], 2); ?></h3>
