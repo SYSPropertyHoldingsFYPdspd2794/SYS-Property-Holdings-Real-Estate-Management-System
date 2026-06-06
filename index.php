@@ -14,6 +14,7 @@ if (isset($_SESSION['role'])) {
         $catalog_link = 'properties.php';
         $apply_link = 'properties.php';
     }
+}
 
 include 'includes/header.php';
 ?>
