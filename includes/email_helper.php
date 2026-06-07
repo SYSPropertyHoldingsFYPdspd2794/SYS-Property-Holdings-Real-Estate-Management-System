@@ -125,4 +125,21 @@ function send_registration_otp($to_email, $full_name, $otp) {
 
     return smtp_send_mail($to_email, $subject, $message, $config);
 }
+
+function send_password_reset_otp($to_email, $role, $otp) {
+    $config_path = __DIR__ . '/mail_config.php';
+    if (!file_exists($config_path)) {
+        return false;
+    }
+
+    $config = require $config_path;
+    $role_label = ucfirst(strtolower((string)$role));
+    $subject = 'SYS Property Holdings Password Reset OTP';
+    $message = "Hi {$role_label},\n\n";
+    $message .= "Your SYS Property Holdings password reset verification code is: {$otp}\n\n";
+    $message .= "This code will expire in 10 minutes. If you did not request a password reset, please ignore this email.\n\n";
+    $message .= "Regards,\nSYS Property Holdings";
+
+    return smtp_send_mail($to_email, $subject, $message, $config);
+}
 ?>
