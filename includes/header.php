@@ -122,6 +122,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     padding: 0.62rem 0.72rem !important;
     white-space: nowrap;
+    color: var(--luxury-white) !important;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link.active {
@@ -349,12 +350,12 @@ footer.luxury-footer {
 <nav class="navbar navbar-expand navbar-dark bg-dark sticky-top shadow-sm py-2">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
-<a class="navbar-brand fw-bold m-0" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
+<a class="navbar-brand fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
 <div class="d-flex align-items-center gap-2">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">
-<button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
-<ul class="dropdown-menu dropdown-menu-end">
+<button class="btn btn-outline-light dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
+<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
 <li><a class="dropdown-item" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
 <li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>"><?php echo htmlspecialchars($profile_text); ?></a></li>
 </ul>

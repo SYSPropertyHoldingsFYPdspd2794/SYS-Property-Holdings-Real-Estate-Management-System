@@ -161,17 +161,17 @@ if ($is_afford) {
         </div>
 
         <div class="col-md-5 mb-4">
-            <div class="card shadow-sm border-0 h-100 bg-light">
-                <div class="card-header bg-dark text-white p-4">
-                    <h4 class="fw-bold mb-0"><i class="fas fa-calculator me-2 text-warning"></i>Payment Estimator</h4>
+            <div class="card shadow-lg border-0 h-100 bg-dark text-white rounded-4 estimator-card">
+                <div class="card-header text-white p-4 border-0 rounded-top-4 estimator-header">
+                    <h5 class="fw-light text-uppercase tracking-wider mb-0 text-gold"><i class="fas fa-calculator me-2"></i>Payment Estimator</h5>
                 </div>
                 <div class="card-body p-4 p-lg-5 d-flex flex-column">
-                    <h3 class="text-success fw-bold mb-4 border-bottom pb-3">Price: RM <?php echo number_format($property['price'], 2); ?></h3>
+                    <h3 class="text-white fw-light mb-4 border-bottom border-secondary border-opacity-50 pb-4 luxury-title">RM <?php echo number_format($property['price'], 2); ?></h3>
                     <input type="hidden" id="propertyPrice" value="<?php echo $property['price']; ?>">
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Select Finance Bank</label>
-                        <select id="bankSelect" class="form-select border-primary">
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Select Partner Bank</label>
+                        <select id="bankSelect" class="form-select panel-select">
                             <?php while ($bank = $banks_result->fetch_assoc()): ?>
                                 <option data-rate="<?php echo $bank['interest_rate']; ?>"><?php echo htmlspecialchars($bank['bank_name']); ?> (<?php echo $bank['interest_rate']; ?>%)</option>
                             <?php endwhile; ?>
@@ -179,8 +179,8 @@ if ($is_afford) {
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Downpayment (10% - 30%)</label>
-                        <select id="downpayment" class="form-select">
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Initial Deposit</label>
+                        <select id="downpayment" class="form-select panel-select">
                             <option value="10">10% (Minimum)</option>
                             <option value="20">20%</option>
                             <option value="30">30%</option>
@@ -188,16 +188,22 @@ if ($is_afford) {
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label fw-bold">Tenure: <span id="tenureLabel" class="text-primary fs-4 fw-bold">35</span> Years</label>
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Tenure: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
                         </div>
                     </div>
 
-                    <div class="p-4 bg-white border border-primary border-opacity-25 rounded text-center shadow-sm mb-4">
-                        <p class="mb-1 text-muted fw-bold small">MONTHLY REPAYMENT</p>
-                        <h2 class="text-primary fw-bold m-0" id="monthlyResult">RM 0.00</h2>
-                        <small class="text-muted d-block mt-2">Rate Applied: <strong id="displayRate">0.00</strong>% (p.a)</small>
+                    <div class="p-4 rounded-4 text-center shadow-sm mb-4 monthly-card">
+                        <p class="mb-2 panel-label text-uppercase tracking-wider" style="font-size: 0.7rem;">Estimated Monthly</p>
+                        <h2 class="text-gold fw-light m-0 luxury-title" id="monthlyResult">RM 0.00</h2>
+                        <small class="panel-note d-block mt-3" style="font-size: 0.75rem;">Effective Rate: <strong id="displayRate" class="text-white">0.00</strong>% (p.a)</small>
+                    </div>
+
+                    <div class="d-grid mt-auto">
+                        <button type="button" class="btn btn-outline-secondary btn-lg fw-bold py-3 shadow text-uppercase tracking-wider" disabled>
+                            <i class="fas fa-lock me-2"></i>INTERNAL DISABLE
+                        </button>
                     </div>
                 </div>
             </div>
@@ -286,9 +292,46 @@ if ($is_afford) {
     .reveal-card { animation: driftUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
     .zoom-overlay { opacity: 0; transition: 0.3s; }
     .zoom-container:hover .zoom-overlay { opacity: 1; }
-    .custom-slider { -webkit-appearance: none; width: 100%; height: 12px; border-radius: 6px; background: #ced4da; outline: none; }
-    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
-    .custom-slider::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #0d6efd; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 10px rgba(13,110,253,0.5); }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+    
+    .luxury-title { font-family: 'Playfair Display', serif; }
+    .tracking-wider { letter-spacing: 0.1em; }
+    .text-gold { color: #FFC000 !important; }
+    .bg-gold { background-color: #FFC000 !important; }
+
+    .estimator-card {
+        background: linear-gradient(145deg, #101318 0%, #07090d 100%) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        box-shadow: 0 22px 50px rgba(0,0,0,0.28) !important;
+        overflow: hidden;
+    }
+    .estimator-header {
+        background: rgba(0,0,0,0.45);
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    .panel-label,
+    .panel-note,
+    .estimator-card label,
+    .estimator-card small {
+        color: #f8f5ed !important;
+    }
+    .panel-select {
+        background-color: #05070a !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255,255,255,0.32) !important;
+        min-height: 48px;
+    }
+    .panel-select:focus {
+        border-color: #FFC000 !important;
+        box-shadow: 0 0 0 0.18rem rgba(255,192,0,0.25) !important;
+    }
+    .monthly-card {
+        background: #020304;
+        border: 1px solid rgba(255,192,0,0.35);
+    }
+    .custom-slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #f8f5ed; outline: none; }
+    .custom-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #FFC000; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(255,192,0,0.5); }
+    .custom-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #FFC000; border: 2px solid #000; cursor: pointer; box-shadow: 0 0 10px rgba(255,192,0,0.5); }
     .hover-place { transition: background-color 0.2s; }
     .hover-place:hover { background-color: #f8f9fa; }
     
