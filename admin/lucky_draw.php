@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['load_pool'])) {
 }
 
 // FETCH HISTORICAL WINNERS
-$winners = $conn->query("SELECT aha.application_id, aha.application_date, c.full_name, c.phone_number, c.monthly_income, p.project_name, p.state 
+$winners = $conn->query("SELECT aha.application_id, aha.application_date, aha.notification_count, c.full_name, c.phone_number, c.monthly_income, p.project_name, p.state 
                          FROM affordable_housing_applications aha 
                          JOIN customers c ON aha.customer_id = c.customer_id 
                          JOIN properties p ON aha.property_id = p.property_id 
@@ -260,6 +260,7 @@ include '../includes/header.php';
                             <th>Income (RM)</th>
                             <th>Property Scheme</th>
                             <th>State</th>
+                            <th>Notification Status</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -272,6 +273,7 @@ include '../includes/header.php';
                             $appDate = date('Y-m-d', strtotime($w['application_date']));
                             $waText = urlencode("Hello {$w['full_name']}, we are from SYS Property Holdings, congratulations on being selected for the {$w['project_name']}, your application date is {$appDate}.");
                             $waLink = "https://wa.me/{$phone}?text={$waText}";
+                            $notifCount = (int)($w['notification_count'] ?? 0);
                         ?>
                             <tr>
                                 <td class="font-monospace text-muted">WIN-<?php echo str_pad($w['application_id'], 4, '0', STR_PAD_LEFT); ?></td>
@@ -279,8 +281,15 @@ include '../includes/header.php';
                                 <td class="fw-bold text-dark"><?php echo number_format($w['monthly_income'], 2); ?></td>
                                 <td class="fw-bold text-secondary"><?php echo htmlspecialchars($w['project_name']); ?></td>
                                 <td><span class="badge bg-primary px-3 py-2 rounded-pill"><?php echo htmlspecialchars($w['state']); ?></span></td>
+                                <td>
+                                    <?php if ($notifCount > 0): ?>
+                                        <span class="badge bg-success rounded-pill notify-status-badge" data-app-id="<?php echo $w['application_id']; ?>">Notified (<?php echo $notifCount; ?>)</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary rounded-pill notify-status-badge" data-app-id="<?php echo $w['application_id']; ?>">Not Notified</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-end">
-                                    <a href="<?php echo $waLink; ?>" target="_blank" class="btn btn-sm btn-success rounded-pill shadow-sm" title="Send WhatsApp">
+                                    <a href="<?php echo $waLink; ?>" target="_blank" class="btn btn-sm btn-success rounded-pill shadow-sm wa-notify-btn" title="Send WhatsApp" data-app-id="<?php echo $w['application_id']; ?>">
                                         <i class="fab fa-whatsapp"></i> Notify
                                     </a>
                                 </td>
@@ -401,24 +410,67 @@ include '../includes/header.php';
         });
 
         $('#bulkWaBtn').on('click', function() {
+            let stateFilterVal = $('#histStateFilter').val() || 'All States';
+            let propFilterVal = $('#histPropFilter').val() || 'All Properties';
             let count = 0;
+            let nodesToNotify = [];
+            
             // Get all rows currently matching the filter (search: 'applied')
             table.rows({search: 'applied'}).nodes().each(function(node) {
-                const waLink = $(node).find('a[title="Send WhatsApp"]').attr('href');
+                const btn = $(node).find('a.wa-notify-btn');
+                const waLink = btn.attr('href');
+                const appId = btn.data('app-id');
                 if (waLink) {
-                    setTimeout(() => {
-                        window.open(waLink, '_blank');
-                    }, count * 1000); // 1 second delay per tab to prevent popup blocking
+                    nodesToNotify.push({ link: waLink, appId: appId, node: node });
                     count++;
                 }
             });
             
             if (count > 0) {
-                Swal.fire('Processing WhatsApp Notifications', `Opening ${count} WhatsApp Web tabs based on your current filter.<br><br><small class="text-danger">Ensure pop-ups are allowed in your browser.</small>`, 'info');
+                Swal.fire({
+                    title: 'Confirm Bulk Notification',
+                    html: `You are about to notify <b>${count}</b> winners.<br><br><div class="text-start bg-light p-3 rounded border"><b>Current Filters:</b><br>State: ${stateFilterVal}<br>Property: ${propFilterVal}</div>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'CONFIRM',
+                    cancelButtonText: 'CANCEL',
+                    confirmButtonColor: '#198754'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire('Processing Notifications', `Opening ${count} WhatsApp Web tabs...<br><br><small class="text-danger">Ensure pop-ups are allowed in your browser.</small>`, 'info');
+                        
+                        nodesToNotify.forEach((item, index) => {
+                            setTimeout(() => {
+                                window.open(item.link, '_blank');
+                                updateNotificationStatus(item.appId, item.node);
+                            }, index * 1000);
+                        });
+                    }
+                });
             } else {
                 Swal.fire('No Records', 'No winners displayed to notify. Please adjust your filters.', 'warning');
             }
         });
+
+        // Individual notify button click
+        $('#winnersTable').on('click', '.wa-notify-btn', function() {
+            const appId = $(this).data('app-id');
+            const node = $(this).closest('tr');
+            updateNotificationStatus(appId, node);
+        });
+
+        function updateNotificationStatus(appId, rowNode) {
+            $.post('update_notification_count.php', { application_id: appId }, function(response) {
+                try {
+                    const res = JSON.parse(response);
+                    if (res.success) {
+                        const badge = $(rowNode).find('.notify-status-badge');
+                        badge.removeClass('bg-secondary').addClass('bg-success');
+                        badge.text(`Notified (${res.new_count})`);
+                    }
+                } catch(e) {}
+            });
+        }
     });
 
     // WHEEL LOGIC
