@@ -16,15 +16,14 @@ $allowed_roles = ['CUSTOMER', 'STAFF'];
 
 function request_password_reset_otp($conn, $post_data, $allowed_roles, &$error_message, &$otp_message, &$show_otp_modal) {
     $email = trim($post_data['email'] ?? '');
-    $role = strtoupper(trim($post_data['role'] ?? ''));
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !in_array($role, $allowed_roles, true)) {
-        $error_message = 'Please enter a valid email and account type.';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = 'Please enter a valid email address.';
         return;
     }
 
-    $stmt = $conn->prepare("SELECT account_id, email, role FROM accounts WHERE email = ? AND role = ? LIMIT 1");
-    $stmt->bind_param("ss", $email, $role);
+    $stmt = $conn->prepare("SELECT account_id, email, role FROM accounts WHERE email = ? AND role IN ('CUSTOMER', 'STAFF') LIMIT 1");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $account = $stmt->get_result()->fetch_assoc();
     $stmt->close();
@@ -184,14 +183,7 @@ include 'includes/header.php';
                             <label class="form-label fw-bold">Email Address</label>
                             <input type="email" name="email" class="form-control" value="<?php echo isset($form_values['email']) ? htmlspecialchars($form_values['email']) : ''; ?>" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Account Type</label>
-                            <select name="role" class="form-select" required>
-                                <option value="" disabled <?php echo empty($form_values['role']) ? 'selected' : ''; ?>>Select account type</option>
-                                <option value="CUSTOMER" <?php echo (($form_values['role'] ?? '') === 'CUSTOMER') ? 'selected' : ''; ?>>Customer</option>
-                                <option value="STAFF" <?php echo (($form_values['role'] ?? '') === 'STAFF') ? 'selected' : ''; ?>>Staff</option>
-                            </select>
-                        </div>
+                        <div class="mb-4"></div>
                         <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold">Send Reset OTP</button>
                         </div>
