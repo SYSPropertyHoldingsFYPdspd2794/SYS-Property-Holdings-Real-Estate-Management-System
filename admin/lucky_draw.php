@@ -271,7 +271,20 @@ include '../includes/header.php';
                                 $phone = '60' . substr($phone, 1);
                             }
                             $appDate = date('Y-m-d', strtotime($w['application_date']));
-                            $waText = urlencode("Hello {$w['full_name']}, we are from SYS Property Holdings, congratulations on being selected for the {$w['project_name']}, your application date is {$appDate}.");
+                            
+                            $waTextRaw = "Dear *{$w['full_name']}*,\n\n"
+                                       . "Warm greetings from *SYS Property Holdings*.\n\n"
+                                       . "We are pleased to officially inform you that your application for the Affordable Housing Scheme (Application Date: {$appDate}) has been SUCCESSFUL. You have been selected for the *{$w['project_name']}* project.\n\n"
+                                       . "To view your official allocation status and proceed with the next steps, please follow these instructions:\n"
+                                       . "1. Visit our official portal: https://syspropertyholdings.infinityfreeapp.com/\n"
+                                       . "2. Log in to your Customer Account.\n"
+                                       . "3. Navigate to your Dashboard or 'My Applications' section.\n"
+                                       . "4. Your application status will now be reflected as 'WINNER'.\n\n"
+                                       . "Congratulations once again. Should you require any assistance, please do not hesitate to reply to this message.\n\n"
+                                       . "Best Regards,\n"
+                                       . "Management of SYS Property Holdings";
+                                       
+                            $waText = urlencode($waTextRaw);
                             $waLink = "https://wa.me/{$phone}?text={$waText}";
                             $notifCount = (int)($w['notification_count'] ?? 0);
                         ?>
