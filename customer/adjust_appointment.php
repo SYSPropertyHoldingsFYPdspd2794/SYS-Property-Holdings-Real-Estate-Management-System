@@ -80,7 +80,7 @@ if ($type === 'appointment') {
     $stmt->execute();
     $data = $stmt->get_result()->fetch_assoc();
 } elseif ($type === 'housing') {
-    $stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price, p.property_code, p.income_limit_rm, c.marital_status, c.dependents_count as dependents, c.occupation, c.full_name, c.ic_number, c.monthly_income 
+    $stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price, p.property_code, p.income_limit_rm, c.marital_status, c.dependents_count as dependents, c.occupation, c.full_name, c.phone_number, c.monthly_income 
                             FROM affordable_housing_applications ah 
                             JOIN properties p ON ah.property_id = p.property_id 
                             JOIN customers c ON ah.customer_id = c.customer_id
@@ -374,8 +374,8 @@ include '../includes/header.php';
                             <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['full_name']); ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">IC Number:</span>
-                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['ic_number']); ?></span>
+                            <span class="text-muted">Contact Reference:</span>
+                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['phone_number']); ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Marital Profile:</span>
