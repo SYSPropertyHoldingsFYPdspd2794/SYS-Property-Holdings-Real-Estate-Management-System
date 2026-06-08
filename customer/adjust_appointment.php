@@ -75,12 +75,12 @@ function document_meta_for_type($type) {
 // BACKEND DATA FETCH WITH EXTENDED APPLICANT PROFILE MATRICES
 $data = null;
 if ($type === 'appointment') {
-    $stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, p.price, p.property_code FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.appointment_id = ? AND a.customer_id = ? AND a.customer_deleted_at IS NULL");
+    $stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, p.price, p.property_code, s.full_name AS staff_name FROM appointments a JOIN properties p ON a.property_id = p.property_id LEFT JOIN staff s ON a.assigned_staff_id = s.staff_id WHERE a.appointment_id = ? AND a.customer_id = ? AND a.customer_deleted_at IS NULL");
     $stmt->bind_param("ii", $id, $account_id);
     $stmt->execute();
     $data = $stmt->get_result()->fetch_assoc();
 } elseif ($type === 'housing') {
-    $stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price, p.property_code, p.income_limit_rm, c.marital_status, c.dependents_count, c.occupation 
+    $stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, p.price, p.property_code, p.income_limit_rm, c.marital_status, c.dependents_count as dependents, c.occupation, c.full_name, c.ic_number, c.monthly_income 
                             FROM affordable_housing_applications ah 
                             JOIN properties p ON ah.property_id = p.property_id 
                             JOIN customers c ON ah.customer_id = c.customer_id
@@ -99,9 +99,13 @@ if (!$data) {
 $current_status = $data['status'];
 $appointmentDateTime = null;
 if ($type === 'appointment') {
-    $appointmentDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['appointment_date'] . ' ' . $data['appointment_time']);
-    if (in_array($current_status, ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime && $appointmentDateTime <= new DateTime()) {
-        $current_status = 'EXPIRED';
+    try {
+        $appointmentDateTime = new DateTime($data['appointment_date'] . ' ' . $data['appointment_time']);
+        if (in_array($current_status, ['REQUESTED', 'ASSIGNED'], true) && $appointmentDateTime <= new DateTime()) {
+            $current_status = 'EXPIRED';
+        }
+    } catch (Exception $e) {
+        $appointmentDateTime = null;
     }
 }
 $allow_document_adjustment = false;
@@ -237,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
         $date_errors = DateTime::getLastErrors();
         $valid_datetime = $appointment_dt && ($date_errors === false || ($date_errors['warning_count'] === 0 && $date_errors['error_count'] === 0));
         $today = new DateTime();
-        $current_dt = $current_appt ? DateTime::createFromFormat('Y-m-d H:i:s', $current_appt['appointment_date'] . ' ' . $current_appt['appointment_time']) : null;
+        $current_dt = $current_appt ? new DateTime($current_appt['appointment_date'] . ' ' . $current_appt['appointment_time']) : null;
         
         if (!$current_appt || !in_array($current_appt['status'], ['REQUESTED', 'ASSIGNED'], true) || !$current_dt || $current_dt <= $today) {
             $error = "Reschedule unavailable. This slot has either expired or been closed by administrative actions.";
@@ -285,6 +289,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'appointment') {
             $current_status = 'CANCELLED';
         } else {
             $error = "Cancellation criteria mismatch. Expired or completed logs cannot be adjusted.";
+        }
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $type === 'housing') {
+    if (isset($_POST['action_type']) && $_POST['action_type'] === 'cancel_housing') {
+        $can_stmt = $conn->prepare("UPDATE affordable_housing_applications SET status = 'CANCELLED' WHERE application_id = ? AND customer_id = ? AND status = 'PENDING_REVIEW'");
+        $can_stmt->bind_param("ii", $id, $account_id);
+        if ($can_stmt->execute() && $can_stmt->affected_rows > 0) {
+            $success = "Application successfully withdrawn and flagged as CANCELLED. You may re-apply if necessary.";
+            $current_status = 'CANCELLED';
+        } else {
+            $error = "Cancellation unavailable. The application may have already been processed or reviewed.";
         }
     }
 }
@@ -353,20 +370,44 @@ include '../includes/header.php';
                     <?php if ($type === 'housing'): ?>
                         <h5 class="fw-bold mb-3 text-secondary text-uppercase border-bottom pb-2 pt-3 small"><i class="fas fa-user-tie me-2"></i>Applicant Demographics</h5>
                         <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Applicant Name:</span>
+                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['full_name']); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">IC Number:</span>
+                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['ic_number']); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Marital Profile:</span>
-                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['marital_status']); ?></span>
+                            <span class="fw-bold text-dark"><?php echo str_replace('_', ' ', htmlspecialchars($data['marital_status'])); ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Dependents:</span>
-                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['dependents_count']); ?></span>
+                            <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['dependents']); ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Occupation:</span>
                             <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['occupation']); ?></span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Declared Income:</span>
+                            <span class="fw-bold text-dark">RM <?php echo number_format($data['monthly_income'], 2); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Income Limit Ceiling:</span>
                             <span class="fw-bold text-danger">RM <?php echo number_format($data['income_limit_rm'], 2); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Qualification Match:</span>
+                            <?php if ((float)$data['monthly_income'] <= (float)$data['income_limit_rm']): ?>
+                                <span class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i>Within Limit</span>
+                            <?php else: ?>
+                                <span class="fw-bold text-danger"><i class="fas fa-times-circle me-1"></i>Exceeds Limit</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-top pt-3 mt-3">
+                            <span class="text-muted">Draw Reference ID:</span>
+                            <span class="fw-bold text-primary fs-5">HOU-<?php echo str_pad($data['application_id'], 5, '0', STR_PAD_LEFT); ?></span>
                         </div>
                     <?php endif; ?>
 
@@ -402,6 +443,13 @@ include '../includes/header.php';
                         ?>
                         <span class="badge bg-<?php echo $badge; ?> fs-6 px-3 py-2 text-uppercase"><?php echo htmlspecialchars(str_replace('_', ' ', $current_status)); ?></span>
                     </div>
+
+                    <?php if ($type === 'appointment' && !empty($data['staff_remarks'])): ?>
+                    <div class="mb-3 mt-2 p-3 bg-light rounded border-start border-warning border-4">
+                        <p class="m-0 small fw-bold text-dark mb-1"><i class="fas fa-comment-dots me-2 text-warning"></i>Remarks from <?php echo htmlspecialchars($data['staff_name'] ?? 'Staff'); ?>:</p>
+                        <p class="m-0 text-muted fs-6"><?php echo nl2br(htmlspecialchars($data['staff_remarks'])); ?></p>
+                    </div>
+                    <?php endif; ?>
 
                     <div class="mt-4 p-3 bg-light rounded border">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
@@ -471,6 +519,24 @@ include '../includes/header.php';
                     </div>
                 <?php endif; ?>
 
+                <?php if ($type === 'housing' && $current_status === 'PENDING_REVIEW'): ?>
+                    <div class="row g-3 mt-4 pt-2 border-top">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-dark btn-lg w-100 fw-bold py-3 fs-6 rounded-pill" data-bs-toggle="modal" data-bs-target="#incomeProfileWarningModal">
+                                <i class="fas fa-user-edit me-2"></i>Edit Info
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <form method="POST" id="cancelHousingForm" class="m-0">
+                                <input type="hidden" name="action_type" value="cancel_housing">
+                                <button type="button" id="cancelHousingBtn" class="btn btn-danger btn-lg w-100 fw-bold py-3 fs-6 rounded-pill text-white shadow-sm">
+                                    <i class="fas fa-ban me-2"></i>Cancel Slot
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div class="text-center mt-5 pt-3 border-top border-dashed">
                     <a href="track_status.php<?php echo $type === 'housing' ? '?tab=housing' : ''; ?>" class="btn btn-sm btn-link text-decoration-none text-muted fw-bold"><i class="fas fa-arrow-left me-2"></i>Back to Tracker Matrix</a>
                 </div>
@@ -506,6 +572,26 @@ include '../includes/header.php';
                     <button type="submit" class="btn btn-dark px-4 rounded-pill fw-bold">Save Configuration</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php if ($type === 'housing'): ?>
+<div class="modal fade" id="incomeProfileWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold"><i class="fas fa-scale-balanced me-2"></i>Income Declaration Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-dark">
+                <p class="mb-0">Your monthly income and demographic profile must be accurate and supported by your financial documents. False or misleading information may cause rejection, cancellation of approval, and possible legal action for fraud.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal">Dismiss</button>
+                <a href="profile.php" class="btn btn-warning fw-bold">I Understand, Go to Profile</a>
+            </div>
         </div>
     </div>
 </div>
@@ -627,6 +713,27 @@ if (cancelAppointmentBtn) {
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('cancelAppointmentForm').submit();
+            }
+        });
+    });
+}
+
+const cancelHousingBtn = document.getElementById('cancelHousingBtn');
+if (cancelHousingBtn) {
+    cancelHousingBtn.addEventListener('click', function () {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Cancel Housing Application?',
+            text: 'Are you sure you want to withdraw this application? You can re-apply again later if you wish.',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('cancelHousingForm').submit();
             }
         });
     });

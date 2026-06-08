@@ -81,15 +81,25 @@ if ((isset($_GET['tab']) && $_GET['tab'] === 'housing') || $success_msg === 'app
     $active_tab = 'housing';
 }
 
-$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state FROM appointments a JOIN properties p ON a.property_id = p.property_id WHERE a.customer_id = ? AND a.customer_deleted_at IS NULL ORDER BY a.appointment_date DESC");
+$appt_stmt = $conn->prepare("SELECT a.*, p.project_name, p.state, s.full_name AS staff_name FROM appointments a JOIN properties p ON a.property_id = p.property_id LEFT JOIN staff s ON a.assigned_staff_id = s.staff_id WHERE a.customer_id = ? AND a.customer_deleted_at IS NULL ORDER BY a.appointment_date DESC");
 $appt_stmt->bind_param("i", $account_id);
 $appt_stmt->execute();
 $appointments = $appt_stmt->get_result();
 
-$app_stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state FROM affordable_housing_applications ah JOIN properties p ON ah.property_id = p.property_id WHERE ah.customer_id = ? ORDER BY ah.application_date DESC");
+$app_stmt = $conn->prepare("SELECT ah.*, p.project_name, p.state, s.full_name AS staff_name FROM affordable_housing_applications ah JOIN properties p ON ah.property_id = p.property_id LEFT JOIN staff s ON ah.reviewed_by_staff_id = s.staff_id WHERE ah.customer_id = ? ORDER BY ah.application_date DESC");
 $app_stmt->bind_param("i", $account_id);
 $app_stmt->execute();
 $applications = $app_stmt->get_result();
+
+$feedback_query = $conn->prepare("SELECT COUNT(*) as cnt FROM appointments WHERE customer_id = ? AND staff_remarks IS NOT NULL AND staff_remarks != '' AND customer_deleted_at IS NULL");
+$feedback_query->bind_param("i", $account_id);
+$feedback_query->execute();
+$feedback_count = $feedback_query->get_result()->fetch_assoc()['cnt'];
+
+$housing_feedback_query = $conn->prepare("SELECT COUNT(*) as cnt FROM affordable_housing_applications WHERE customer_id = ? AND status IN ('REJECTED', 'WINNER', 'APPROVED_FOR_DRAW')");
+$housing_feedback_query->bind_param("i", $account_id);
+$housing_feedback_query->execute();
+$feedback_count += $housing_feedback_query->get_result()->fetch_assoc()['cnt'];
 
 include '../includes/header.php';
 ?>
@@ -118,9 +128,19 @@ include '../includes/header.php';
                 <button class="nav-link <?php echo $active_tab === 'housing' ? 'active' : ''; ?> px-4 py-3 fw-bold fs-5 shadow-sm rounded-pill" id="housing-tab" data-bs-toggle="pill" data-bs-target="#housing" type="button" role="tab"><i class="fas fa-home me-2"></i>Housing Applications</button>
             </li>
         </ul>
-        <a href="<?php echo $active_tab === 'housing' ? 'properties.php?filter_type=AFFORDABLE' : 'properties.php'; ?>" id="dynamicPlusBtn" class="btn btn-outline-primary btn-lg rounded-circle shadow-sm" title="Browse Properties Catalog">
-            <i class="fas fa-plus"></i>
-        </a>
+        <div class="d-flex gap-2">
+            <a href="feedback.php" class="btn btn-primary btn-lg rounded-circle shadow-sm position-relative text-white" title="Feedback Inbox" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: white !important;">
+                <i class="fas fa-bell"></i>
+                <?php if ($feedback_count > 0): ?>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-light" style="font-size: 0.65rem;">
+                    <?php echo $feedback_count; ?>
+                </span>
+                <?php endif; ?>
+            </a>
+            <a href="<?php echo $active_tab === 'housing' ? 'properties.php?filter_type=AFFORDABLE' : 'properties.php'; ?>" id="dynamicPlusBtn" class="btn btn-primary btn-lg rounded-circle shadow-sm text-white" title="Browse Properties Catalog" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: white !important;">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
     </div>
 
     <form id="deleteAppointmentsForm" method="POST" action="track_status.php">
@@ -169,7 +189,7 @@ include '../includes/header.php';
                                         
                                         <?php if (!empty($row['staff_remarks'])): ?>
                                             <div class="mt-3 p-3 bg-light rounded-3 border-start border-warning border-4">
-                                                <p class="m-0 small fw-bold text-dark"><i class="fas fa-comment-dots me-2"></i>Staff Remarks:</p>
+                                                <p class="m-0 small fw-bold text-dark"><i class="fas fa-comment-dots me-2"></i>Remarks from <?php echo htmlspecialchars($row['staff_name'] ?? 'Staff'); ?>:</p>
                                                 <p class="m-0 text-muted small"><?php echo htmlspecialchars($row['staff_remarks']); ?></p>
                                             </div>
                                         <?php endif; ?>
@@ -225,7 +245,7 @@ include '../includes/header.php';
                                                     <?php if ($row['status'] !== 'PENDING_REVIEW'): ?>
                                                         <div class="step-icon bg-success text-white shadow"><i class="fas fa-user-check"></i></div>
                                                         <div class="fw-bold text-dark mt-2 small">2. Regional Verification</div>
-                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-check me-1"></i>Verified Complete</div>
+                                                        <div class="text-success font-monospace tiny-time fw-bold"><i class="fas fa-check me-1"></i>Verified by <?php echo htmlspecialchars($row['staff_name'] ?? 'Staff'); ?></div>
                                                     <?php else: ?>
                                                         <div class="step-icon bg-warning text-dark shadow"><i class="fas fa-spinner fa-spin"></i></div>
                                                         <div class="fw-bold text-muted mt-2 small">2. Regional Verification</div>

@@ -74,7 +74,7 @@ include '../includes/header.php';
                                                 <h5 class="fw-bold text-dark">Assign Representative</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div class="modal-body text-dark">
                                                 <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
                                                 <p>Assigning staff for: <strong><?php echo htmlspecialchars($row['project_name']); ?></strong> in <strong><?php echo htmlspecialchars($state); ?></strong></p>
                                                 <?php if (count($staff_members) > 0): ?>

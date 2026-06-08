@@ -565,7 +565,7 @@ include '../includes/header.php';
     <div class="row">
         <!-- Structured Sidebar Navigation -->
         <div class="col-md-3 col-lg-2 mb-4 d-print-none">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 130px; max-height: calc(100vh - 150px); overflow-y: auto;">
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush rounded">
                         
