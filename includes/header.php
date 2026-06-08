@@ -54,7 +54,45 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SYS Property Holdings</title>
+<?php
+// Get the filename of the currently running webpage.
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// 1. SEO settings for the default homepage (index.php)
+$seo_title = "SYS Property Holdings | Real Estate Management System";
+$seo_desc = "Welcome to SYS Property Holdings Real Estate Management System. Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.";
+
+// 2. Automatically switch and change the title to the appropriate professional search engine title based on the different pages.
+if ($current_page == 'about_us.php') {
+    $seo_title = "About Us | SYS Property Holdings";
+    $seo_desc = "Learn more about SYS Property Holdings. Discover our vision, mission, and the professional team behind Malaysia's leading real estate O2O tech evolution.";
+} elseif ($current_page == 'government_housing.php') {
+    $seo_title = "Government Housing Schemes | Affordable Homes Malaysia";
+    $seo_desc = "Explore regional state housing programs and affordable housing schemes with equal allocation rights via SYS Property Holdings.";
+} elseif ($current_page == 'showrooms.php') {
+    $seo_title = "Book Physical Showroom Visits | Malaysia Real Estate";
+    $seo_desc = "Select your state, view live map locations, and seamlessly book your physical showroom appointments online.";
+} elseif ($current_page == 'financial_planner.php') {
+    $seo_title = "Property Financial Planner & Loan Calculator";
+    $seo_desc = "Calculate your property loan eligibility, estimate monthly installments, and structure your housing budget accurately.";
+} elseif ($current_page == 'bank_rates.php') {
+    $seo_title = "Latest Bank Housing Interest Rates | Malaysia";
+    $seo_desc = "Compare up-to-date home loan interest rates across major Malaysian banks to optimize your property financing.";
+} elseif ($current_page == 'login.php') {
+    $seo_title = "Portal Login | SYS Property Holdings";
+    $seo_desc = "Sign in to your SYS Property Holdings account to manage your property applications, wishlists, and showroom bookings.";
+}
+?>
+
+<title><?php echo $seo_title; ?></title>
+<meta name="description" content="<?php echo $seo_desc; ?>">
+<meta name="keywords" content="SYS Property Holdings, Real Estate Management System, UTM SPACE, Malaysia Property, O2O Real Estate, Affordable Housing, Bank Rates Malaysia">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://syspropertyholdings.infinityfreeapp.com/">
+<meta property="og:title" content="<?php echo $seo_title; ?>">
+<meta property="og:description" content="<?php echo $seo_desc; ?>">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
