@@ -21,7 +21,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'CUSTOMER') {
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Portfolios</h6>
                 <ul class="list-unstyled footer-menu-links font-monospace small">
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Market Houses</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=AFFORDABLE'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Affordable Units</a></li>
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=TERRACE'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Landed Terrace</a></li>
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=BUNGALOW'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Luxury Bungalows</a></li>
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=COMMERCIAL'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Commercial Hubs</a></li>

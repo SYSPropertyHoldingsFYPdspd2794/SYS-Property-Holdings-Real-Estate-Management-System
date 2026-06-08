@@ -151,6 +151,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $form_values = $_POST;
+$from_settings = (($_GET['from'] ?? '') === 'settings') || (($_POST['from_settings'] ?? '') === '1');
+$back_link = 'login.php';
+$back_text = 'Back to login';
+
+if ($from_settings && isset($_SESSION['role'], $_SESSION['account_id']) && in_array($_SESSION['role'], $allowed_roles, true)) {
+    $back_link = strtolower($_SESSION['role']) . '/change_password.php';
+    $back_text = 'Back to setting';
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        $stmt_prefill = $conn->prepare("SELECT email FROM accounts WHERE account_id = ? AND role IN ('CUSTOMER', 'STAFF') LIMIT 1");
+        $stmt_prefill->bind_param("i", $_SESSION['account_id']);
+        $stmt_prefill->execute();
+        $prefill_account = $stmt_prefill->get_result()->fetch_assoc();
+        $stmt_prefill->close();
+
+        if ($prefill_account) {
+            $form_values['email'] = $prefill_account['email'];
+        }
+    }
+}
+
 if (!empty($_SESSION['pending_password_reset']) && (($_POST['reset_action'] ?? '') === 'verify_otp' || ($_POST['reset_action'] ?? '') === 'resend_otp')) {
     $form_values = $_SESSION['pending_password_reset'];
 }
@@ -179,6 +200,9 @@ include 'includes/header.php';
 
                     <form method="POST" action="forgot_password.php">
                         <input type="hidden" name="reset_action" value="request_otp">
+                        <?php if ($from_settings): ?>
+                            <input type="hidden" name="from_settings" value="1">
+                        <?php endif; ?>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Email Address</label>
                             <input type="email" name="email" class="form-control" value="<?php echo isset($form_values['email']) ? htmlspecialchars($form_values['email']) : ''; ?>" required>
@@ -188,7 +212,7 @@ include 'includes/header.php';
                             <button type="submit" class="btn btn-primary btn-lg fw-bold">Send Reset OTP</button>
                         </div>
                         <div class="text-center">
-                            <a href="login.php" class="text-decoration-none fw-bold">Back to login</a>
+                            <a href="<?php echo htmlspecialchars($back_link); ?>" class="text-decoration-none fw-bold"><?php echo htmlspecialchars($back_text); ?></a>
                         </div>
                     </form>
                 </div>
@@ -220,6 +244,9 @@ include 'includes/header.php';
 
                 <form method="POST" action="forgot_password.php" id="passwordResetOtpForm">
                     <input type="hidden" name="reset_action" value="verify_otp">
+                    <?php if ($from_settings): ?>
+                        <input type="hidden" name="from_settings" value="1">
+                    <?php endif; ?>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Verification Code</label>
                         <input type="text" name="otp" class="form-control form-control-lg text-center fw-bold" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required>
@@ -246,6 +273,9 @@ include 'includes/header.php';
             <div class="modal-footer border-0 pt-0 justify-content-between">
                 <form method="POST" action="forgot_password.php" class="m-0">
                     <input type="hidden" name="reset_action" value="resend_otp">
+                    <?php if ($from_settings): ?>
+                        <input type="hidden" name="from_settings" value="1">
+                    <?php endif; ?>
                     <button type="submit" class="btn btn-outline-secondary">
                         <i class="fas fa-rotate-right me-1"></i>Resend Code
                     </button>
