@@ -136,7 +136,7 @@ The system connects to the database via `includes/db_connect.php`. For a standar
 ```php
 $servername = "localhost";
 $username   = "root";
-$password   = "";                // Default XAMPP has no password
+$password   = "";                
 $dbname     = "sys_property_db";
 ```
 *(If your local MySQL has a password, update the `$password` variable accordingly.)*
@@ -156,15 +156,15 @@ The project is also deployed and accessible live via InfinityFree hosting:
 
 ---
 
-## 🧪 10. System Test Credentials
+## 🧪 10. System Test Credentials (InfinityFree Web Hosting)
 
 To evaluate the system fully, please utilize the following pre-configured test accounts. Passwords are case-sensitive. Note that these accounts are seeded with initial data for immediate demonstration.
 
 | Role | Email Address | Password | Permissions & Testing Focus |
 | :--- | :--- | :--- | :--- |
-| **Customer** | `testc@gmail.com` | `Password123!` | Access to frontend catalog, testing financial calculators, uploading PDF applications, and booking appointments. |
-| **Staff Officer** | `tests@gmail.com` | `Password123!` | Access to the staff portal. Focus on verifying uploaded customer PDFs and updating the status of showroom appointments. |
-| **Administrator** | `test@gmail.com` | `Password123!` | Full backend access. Focus on assigning staff to leads, managing property CRUD, executing the Lucky Draw wheel, and viewing BI charts. |
+| **Customer** | `testcustomer@gmail.com` | `Password123!` | Access to frontend catalog, testing financial calculators, uploading PDF applications, and booking appointments. |
+| **Staff Officer** | `teststaff@gmail.com` | `Password123!` | Access to the staff portal. Focus on verifying uploaded customer PDFs and updating the status of showroom appointments. |
+| **Administrator** | `testadmin@gmail.com` | `Password123!` | Full backend access. Focus on assigning staff to leads, managing property CRUD, executing the Lucky Draw wheel, and viewing BI charts. |
 
 ---
 
@@ -173,18 +173,18 @@ To evaluate the system fully, please utilize the following pre-configured test a
 To experience the full business lifecycle, follow these specialized testing scenarios:
 
 ### Scenario A: Standard Appointment Booking Workflow
-1. **Customer:** Login as `testc@gmail.com`. Go to **Properties**, select a "Standard" or "Luxury" property, and click **Book Appointment**. Choose a date and submit.
-2. **Admin:** Login as `test@gmail.com`. Navigate to **Leads & Appointments**. Find the new appointment and click **Assign Staff** to allocate it to a sales officer.
-3. **Staff:** Login as `tests@gmail.com`. Go to **Assigned Viewings**. Assume the customer arrived at the showroom, and update the status to `Completed`.
+1. **Customer:** Login as `testcustomer@gmail.com`. Go to **Properties**, select a "Standard" or "Luxury" property, and click **Book Appointment**. Choose a date and submit.
+2. **Admin:** Login as `testadmin@gmail.com`. Navigate to **Leads & Appointments**. Find the new appointment and click **Assign Staff** to allocate it to a sales officer.
+3. **Staff:** Login as `teststaff@gmail.com`. Go to **Assigned Viewings**. Assume the customer arrived at the showroom, and update the status to `Completed`.
 
 ### Scenario B: Affordable Housing Application & Allocation Workflow
-1. **Customer:** Login as `testc@gmail.com`. Find an "Affordable" property. Instead of booking, submit an **Affordable Housing Application** by uploading a sample PDF document (simulating an income slip).
-2. **Staff:** Login as `tests@gmail.com`. Navigate to **Document Verification**. Review the customer's PDF safely. If the income matches the requirements, click to change the status to `APPROVED_FOR_DRAW`.
-3. **Admin:** Login as `test@gmail.com`. Go to the **Lucky Draw Allocation** module. Select the specific affordable property. The system will load all `APPROVED_FOR_DRAW` users. Spin the wheel to select the winner!
+1. **Customer:** Login as `testcustomer@gmail.com`. Find an "Affordable" property. Instead of booking, submit an **Affordable Housing Application** by uploading a sample PDF document (simulating an income slip).
+2. **Staff:** Login as `teststaff@gmail.com`. Navigate to **Document Verification**. Review the customer's PDF safely. If the income matches the requirements, click to change the status to `APPROVED_FOR_DRAW`.
+3. **Admin:** Login as `testadmin@gmail.com`. Go to the **Lucky Draw Allocation** module. Select the specific affordable property. The system will load all `APPROVED_FOR_DRAW` users. Spin the wheel to select the winner!
 
 ### Additional Special Functions to Test
 * **Customer:** Try the **Financial Planner** tools from the navigation bar. Input a salary of RM5,000 and debts of RM2,000 to see how the system generates a dynamic DSR report. Add properties to your **Wishlist**.
-* **Staff:** Go to the dashboard to view your personal KPIs (e.g., number of viewings completed this month).
+* **Staff:** Go to the dashboard to view your personal KPIs (number of viewings completed this month).
 * **Admin:** Navigate to the **Business Reports** section to view interactive pie and bar charts regarding sales distributions. Try deleting a test property or updating its price to see changes reflected on the frontend.
 
 ---
@@ -194,8 +194,8 @@ To experience the full business lifecycle, follow these specialized testing scen
 **Universiti Teknologi Malaysia (UTM) SPACE - Final Year Project**  
 *Section 42 - Group 3*
 
-* **Jason Pow Cheng Wang** – Scrum Master / Project Lead
-* **Engku Afif Aizat Bin Che Engku Suhaimi** – Quality Assurance / Test Lead
+* **Jason Pow Cheng Wang** – Scrum Master / Project Leader
+* **Engku Afif Aizat Bin Che Engku Suhaimi** – Quality Assurance / Test Leader
 * **Har Kah Jun** – Frontend Programmer
 * **Khairunnisa Binti Kamal** – Backend Programmer
 
@@ -216,7 +216,7 @@ To experience the full business lifecycle, follow these specialized testing scen
 
 ## 📜 14. License & Academic Integrity
 
-This project is developed solely for academic purposes as part of the **Final Year Project** at Universiti Teknologi Malaysia (UTM) SPACE. All business logic, algorithms, and code logic are created by the development team. 
+This project is developed solely for academic purposes as part of the **Final Year Project** at Universiti Teknologi Malaysia (UTM) SPACE. All business logic, algorithms and code logic are created by the development team. 
 
 ---
 
