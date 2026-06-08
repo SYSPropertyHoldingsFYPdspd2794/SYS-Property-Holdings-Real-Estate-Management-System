@@ -4,9 +4,26 @@ if (!isset($root_prefix)) {
     $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
 }
 
-$footer_catalog_path = $root_prefix . 'properties.php';
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'CUSTOMER') {
-    $footer_catalog_path = $root_prefix . 'customer/properties.php';
+$footer_catalog_path = $root_prefix . 'login.php';
+if (isset($_SESSION['role'])) {
+    $footer_catalog_path = $root_prefix . 'properties.php';
+
+    if ($_SESSION['role'] === 'CUSTOMER') {
+        $footer_catalog_path = $root_prefix . 'customer/properties.php';
+    }
+}
+
+$footer_portfolio_links = [
+    'market' => $footer_catalog_path,
+    'terrace' => $footer_catalog_path,
+    'bungalow' => $footer_catalog_path,
+    'commercial' => $footer_catalog_path,
+];
+
+if (isset($_SESSION['role'])) {
+    $footer_portfolio_links['terrace'] = $footer_catalog_path . '?filter_type=TERRACE';
+    $footer_portfolio_links['bungalow'] = $footer_catalog_path . '?filter_type=BUNGALOW';
+    $footer_portfolio_links['commercial'] = $footer_catalog_path . '?filter_type=COMMERCIAL';
 }
 ?>
 <footer class="luxury-footer text-light py-5 mt-5 border-top border-secondary border-opacity-25">
@@ -20,11 +37,10 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'CUSTOMER') {
             <div class="col-md-4 col-lg-2 mb-4 mb-md-0">
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Portfolios</h6>
                 <ul class="list-unstyled footer-menu-links font-monospace small">
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Market Houses</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=AFFORDABLE'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Affordable Units</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=TERRACE'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Landed Terrace</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=BUNGALOW'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Luxury Bungalows</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_catalog_path . '?filter_type=COMMERCIAL'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Commercial Hubs</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['market']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Market Houses</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['terrace']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Landed Terrace</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['bungalow']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Luxury Bungalows</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['commercial']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Commercial Hubs</a></li>
                 </ul>
             </div>
 

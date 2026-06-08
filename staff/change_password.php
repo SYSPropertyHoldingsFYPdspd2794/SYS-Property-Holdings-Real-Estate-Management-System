@@ -86,7 +86,7 @@ include '../includes/header.php';
                             <input type="password" name="confirm_password" class="form-control" required>
                         </div>
                         <button type="submit" name="update_password" class="btn btn-primary fw-bold px-4">Update Password</button>
-                        <a href="https://wa.link/bzspzh" target="_blank" rel="noopener noreferrer" class="btn btn-link fw-bold text-decoration-none ms-2">
+                        <a href="../forgot_password.php?from=settings" class="btn btn-link fw-bold text-decoration-none ms-2">
                             Forgot Password?
                         </a>
                     </form>

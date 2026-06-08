@@ -313,16 +313,30 @@ footer.luxury-footer {
 }
 @media (max-width: 991.98px) {
     .navbar-collapse {
-        padding: 1rem 0 0.5rem;
+        padding: 0.85rem 0 0.4rem;
+    }
+    .navbar .navbar-nav {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 0.25rem !important;
     }
     .navbar .nav-link {
-        padding: 0.75rem 0.85rem !important;
+        width: 100%;
+        padding: 0.72rem 0.85rem !important;
     }
-    .navbar .d-flex {
-        align-items: stretch;
-        flex-direction: column;
+    .navbar .container > .d-flex:first-child {
+        flex-wrap: wrap;
         gap: 0.65rem;
-        padding-top: 0.75rem;
+    }
+    .navbar-account-actions {
+        gap: 0.45rem !important;
+    }
+    .navbar-account-actions .btn {
+        font-size: 0.82rem;
+        padding: 0.5rem 0.65rem;
+    }
+    .navbar-toggler {
+        margin-left: auto;
     }
 }
 @media (max-width: 767.98px) {
@@ -347,11 +361,11 @@ footer.luxury-footer {
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand navbar-dark bg-dark sticky-top shadow-sm py-2">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
 <a class="navbar-brand fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
-<div class="d-flex align-items-center gap-2">
+<div class="d-flex align-items-center gap-2 navbar-account-actions">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">
 <button class="btn btn-outline-light dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
@@ -365,8 +379,11 @@ footer.luxury-footer {
 <a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary shadow-sm">Sign In</a>
 <?php endif;?>
 </div>
+<button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
 </div>
-<div class="w-100" id="navbarNav">
+<div class="collapse navbar-collapse w-100" id="navbarNav">
 <ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>"><i class="fas fa-building me-1"></i>Catalog</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
