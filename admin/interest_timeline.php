@@ -54,16 +54,10 @@ $query = "
         p.income_limit_rm,
         p.status,
         p.image_filename,
-        p.is_affordable,
-        popularity.total_interest
+        p.is_affordable
     FROM wishlists w
     JOIN customers c ON w.customer_id = c.customer_id
     JOIN properties p ON w.property_id = p.property_id
-    JOIN (
-        SELECT property_id, COUNT(*) AS total_interest
-        FROM wishlists
-        GROUP BY property_id
-    ) popularity ON popularity.property_id = p.property_id
     ORDER BY w.created_at DESC, w.wishlist_id DESC
     LIMIT 100
 ";
@@ -124,7 +118,7 @@ $result = $conn->query($query);
                         <th>Specs</th>
                         <th>Units</th>
                         <th>Status</th>
-                        <th>Total</th>
+                        <th>Interest</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -181,7 +175,7 @@ $result = $conn->query($query);
                                 </td>
                                 <td>
                                     <span class="heat-pill">
-                                        <i class="fas fa-heart me-1"></i><?php echo number_format((int)$log['total_interest']); ?>
+                                        <i class="fas fa-heart"></i>
                                     </span>
                                 </td>
                                 <td class="text-end">
