@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include_once __DIR__ . '/db_connect.php';
 
-// 設定 PHP 與 MySQL 為馬來西亞時間 (GMT+8)
+// Set PHP and MySQL to Malaysian time (GMT+8).
 date_default_timezone_set('Asia/Kuala_Lumpur');
 if (isset($conn)) {
     $conn->query("SET time_zone = '+08:00'");
@@ -54,6 +54,15 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php 
+    // Check if the current page belongs to private administrative or client directories
+    if (isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true)): 
+    ?>
+        <meta name="robots" content="noindex, nofollow">
+    <?php else: ?>
+        <meta name="robots" content="index, follow">
+    <?php endif; ?>
+    
 <?php
 // Get the filename of the currently running webpage.
 $current_page = basename($_SERVER['PHP_SELF']);
