@@ -62,7 +62,7 @@ if (isset($_SESSION['role'])) {
     <?php else: ?>
         <meta name="robots" content="index, follow">
     <?php endif; ?>
-    
+
 <?php
 // Get the filename of the currently running webpage.
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -96,7 +96,20 @@ if ($current_page == 'about_us.php') {
 <title><?php echo $seo_title; ?></title>
 <meta name="description" content="<?php echo $seo_desc; ?>">
 <meta name="keywords" content="SYS Property Holdings, Real Estate Management System, UTM SPACE, Malaysia Property, O2O Real Estate, Affordable Housing, Bank Rates Malaysia">
-<meta name="robots" content="index, follow">
+<?php 
+// 1. Get the current page file name
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// 2. Check if it belongs to a private management folder or is a sensitive authentication page.
+$is_private_folder = isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true);
+$is_sensitive_page = in_array($current_page, ['login.php', 'reset_action.php'], true);
+
+if ($is_private_folder || $is_sensitive_page): 
+?>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+<?php else: ?>
+    <meta name="robots" content="index, follow">
+<?php endif; ?>
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://syspropertyholdings.infinityfreeapp.com/">
