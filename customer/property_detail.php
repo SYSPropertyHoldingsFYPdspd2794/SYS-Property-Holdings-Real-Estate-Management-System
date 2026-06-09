@@ -271,7 +271,7 @@ $proximityHtml .= '</div>';
                 <div class="position-relative zoom-container" style="cursor: zoom-in;" data-bs-toggle="modal" data-bs-target="#imageZoom">
                     <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 450px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-black bg-opacity-25 zoom-overlay">
-                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Click to Enlarge</span>
+                        <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Click to View Full Image</span>
                     </div>
                 </div>
 
@@ -350,7 +350,7 @@ $proximityHtml .= '</div>';
                     </div>
 
                     <div class="mb-5">
-                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Tenure: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
+                        <label class="form-label fw-light text-uppercase tracking-wider small panel-label">Loan Period: <span id="tenureLabel" class="text-gold fs-5 fw-bold">35</span> Years</label>
                         <div class="pt-3">
                             <input type="range" id="tenure" class="form-range custom-slider" value="35" min="5" max="35">
                         </div>
@@ -397,8 +397,8 @@ $proximityHtml .= '</div>';
 
             <div class="card border-0 bg-white shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card content-card">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom border-secondary border-opacity-25 pb-3 mb-4">
-                    <h3 class="luxury-title text-dark m-0"><i class="fas fa-map-marked-alt text-gold me-3"></i> Interactive Regional Proximity</h3>
-                    <span class="badge bg-dark text-gold px-3 py-2 rounded-pill"><i class="fas fa-location-dot me-1"></i> Regional Amenities</span>
+                    <h3 class="luxury-title text-dark m-0"><i class="fas fa-map-marked-alt text-gold me-3"></i> What’s Nearby?</h3>
+                    <span class="badge bg-dark text-gold px-3 py-2 rounded-pill"><i class="fas fa-location-dot me-1"></i> Area Overview</span>
                 </div>
 
                 <div class="row mt-3 g-4">
@@ -417,7 +417,7 @@ $proximityHtml .= '</div>';
                         <div class="bg-white border rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
                             <div class="p-3 d-flex justify-content-between align-items-center gap-3 flex-wrap" style="background: #020617;">
                                 <h6 class="m-0 fw-bold" style="color: #fff !important; font-size: 1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.75);">
-                                    <i class="fas fa-location-arrow text-gold me-2"></i>Surrounding Amenities
+                                    <i class="fas fa-location-arrow text-gold me-2"></i>Places Nearby
                                 </h6>
                                 <span class="badge bg-light text-dark" id="placesCount"><?php echo count($proximityAmenities); ?> Found</span>
                             </div>

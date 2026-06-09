@@ -35,7 +35,7 @@ include_once 'includes/header.php';
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link rounded-pill fw-bold py-3 fs-5" id="rent-buy-tab" data-bs-toggle="pill" data-bs-target="#rent-buy" type="button" role="tab">
-                <i class="fas fa-balance-scale me-2"></i> Rent vs Buy Simulator
+                <i class="fas fa-balance-scale me-2"></i> Renting vs. Buying
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -186,7 +186,7 @@ include_once 'includes/header.php';
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="card bg-white border-0 shadow-sm rounded-4 p-4 h-100 border-top border-danger border-4">
-                        <h5 class="fw-bold text-dark mb-4"><i class="fas fa-home text-danger me-2"></i> Current Renting Trajectory</h5>
+                        <h5 class="fw-bold text-dark mb-4"><i class="fas fa-home text-danger me-2"></i> Your Renting Future</h5>
                         <div class="row g-3">
                             <div class="col-sm-6">
                                 <label class="form-label text-muted small fw-bold">Current Monthly Rent (RM)</label>
@@ -201,7 +201,7 @@ include_once 'includes/header.php';
                 </div>
                 <div class="col-md-6">
                     <div class="card bg-white border-0 shadow-sm rounded-4 p-4 h-100 border-top border-success border-4">
-                        <h5 class="fw-bold text-dark mb-4"><i class="fas fa-building text-success me-2"></i> Buying Asset Trajectory</h5>
+                        <h5 class="fw-bold text-dark mb-4"><i class="fas fa-building text-success me-2"></i> Your Buying Future</h5>
                         <div class="row g-3">
                             <div class="col-sm-4">
                                 <label class="form-label text-muted small fw-bold">Property Value (RM)</label>
@@ -222,7 +222,7 @@ include_once 'includes/header.php';
 
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0 text-white"><i class="fas fa-chart-area text-warning me-2"></i> <span id="projection-years-display">30</span>-Year Wealth Accumulation Projection</h5>
+                    <h5 class="fw-bold m-0 text-white"><i class="fas fa-chart-area text-warning me-2"></i> <span id="projection-years-display">30</span>-Year Financial Outlook</h5>
                     <select id="rb-tenure" class="form-select form-select-sm w-auto bg-primary text-white border-0 fw-bold shadow-sm">
                         <option value="10">10 Year Projection</option>
                         <option value="20">20 Year Projection</option>
@@ -234,16 +234,16 @@ include_once 'includes/header.php';
                     <div class="row g-4 mb-5">
                         <div class="col-md-6">
                             <div class="p-4 bg-danger bg-opacity-10 rounded-4 border border-danger border-opacity-25 text-center h-100">
-                                <h6 class="text-danger fw-bold text-uppercase mb-2">Total Sunk Cost (Renting)</h6>
+                                <h6 class="text-danger fw-bold text-uppercase mb-2">Total Rent Expenses</h6>
                                 <h2 class="display-6 fw-bold text-danger m-0" id="rb-sunk-cost">RM 0.00</h2>
-                                <p class="text-muted small mt-2 m-0">Zero equity retained. 100% expense.</p>
+                                <p class="text-muted small mt-2 m-0">Total funds spent with no wealth retained.</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="p-4 bg-success bg-opacity-10 rounded-4 border border-success border-opacity-25 text-center h-100">
-                                <h6 class="text-success fw-bold text-uppercase mb-2">Net Property Equity (Buying)</h6>
+                                <h6 class="text-success fw-bold text-uppercase mb-2">Estimated Asset Value</h6>
                                 <h2 class="display-6 fw-bold text-success m-0" id="rb-net-equity">RM 0.00</h2>
-                                <p class="text-muted small mt-2 m-0">Property Value minus Remaining Loan Balance.</p>
+                                <p class="text-muted small mt-2 m-0">Estimated property value minus unpaid loan.</p>
                             </div>
                         </div>
                     </div>

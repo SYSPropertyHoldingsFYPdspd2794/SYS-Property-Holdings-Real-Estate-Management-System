@@ -152,10 +152,10 @@ include '../includes/header.php';
                         </div>
                         <div class="mb-5 p-4 bg-light rounded border border-primary">
                             <label class="form-label fw-bold"><i class="fas fa-file-pdf text-danger me-2"></i>Income Declaration / EPF Abstract *</label>
-                            <p class="small text-muted mb-3">This upload is mandatory for eligibility verification. Max size: 5MB (PDF only).</p>
+                            <p class="small text-muted mb-3">Please upload a PDF file to verify your income eligibility. Max size: 5MB (PDF only).</p>
                             <input type="file" name="document" class="form-control form-control-lg" accept="application/pdf" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow rounded-pill">Submit Secure Application</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow rounded-pill">Submit Your Application</button>
                     </form>
                 </div>
             </div>
