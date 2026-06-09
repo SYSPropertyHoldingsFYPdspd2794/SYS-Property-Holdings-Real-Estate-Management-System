@@ -565,7 +565,7 @@ include '../includes/header.php';
     <div class="row">
         <!-- Structured Sidebar Navigation -->
         <div class="col-md-3 col-lg-2 mb-4 d-print-none">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 130px; max-height: calc(100vh - 150px); overflow-y: auto; z-index: 1000;">
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush rounded">
                         
@@ -732,7 +732,7 @@ include '../includes/header.php';
                 <!-- Single Report Export Button -->
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Demographics Report to PDF
                         </button>
                     </div>
@@ -811,7 +811,7 @@ include '../includes/header.php';
                 <?php if ($report_type === 'operations'): ?>
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Operations Report to PDF
                         </button>
                     </div>
@@ -841,7 +841,7 @@ include '../includes/header.php';
                 <?php if ($report_type === 'staff'): ?>
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Staff Report to PDF
                         </button>
                     </div>
@@ -916,7 +916,7 @@ include '../includes/header.php';
                 <?php if ($report_type === 'market'): ?>
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Market Intelligence to PDF
                         </button>
                     </div>
@@ -946,7 +946,7 @@ include '../includes/header.php';
                 <?php if ($report_type === 'pricing'): ?>
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Pricing Analysis to PDF
                         </button>
                     </div>
@@ -1033,7 +1033,7 @@ include '../includes/header.php';
                 <?php if ($report_type === 'affordable'): ?>
                 <div class="row mt-2 mb-5 d-print-none">
                     <div class="col-12">
-                        <button onclick="window.print()" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm">
+                        <button onclick="window.print()" class="btn btn-dark btn-lg w-100 fw-bold shadow-sm text-white">
                             <i class="bi bi-printer-fill me-2"></i> Export Affordable Housing Report to PDF
                         </button>
                     </div>

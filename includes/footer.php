@@ -3,6 +3,28 @@ if (!isset($root_prefix)) {
     $current_folder = basename(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')));
     $root_prefix = in_array($current_folder, ['admin', 'customer', 'staff'], true) ? '../' : '';
 }
+
+$footer_catalog_path = $root_prefix . 'login.php';
+if (isset($_SESSION['role'])) {
+    $footer_catalog_path = $root_prefix . 'properties.php';
+
+    if ($_SESSION['role'] === 'CUSTOMER') {
+        $footer_catalog_path = $root_prefix . 'customer/properties.php';
+    }
+}
+
+$footer_portfolio_links = [
+    'market' => $footer_catalog_path,
+    'terrace' => $footer_catalog_path,
+    'bungalow' => $footer_catalog_path,
+    'commercial' => $footer_catalog_path,
+];
+
+if (isset($_SESSION['role'])) {
+    $footer_portfolio_links['terrace'] = $footer_catalog_path . '?filter_type=TERRACE';
+    $footer_portfolio_links['bungalow'] = $footer_catalog_path . '?filter_type=BUNGALOW';
+    $footer_portfolio_links['commercial'] = $footer_catalog_path . '?filter_type=COMMERCIAL';
+}
 ?>
 <footer class="luxury-footer text-light py-5 mt-5 border-top border-secondary border-opacity-25">
     <div class="container py-3">
@@ -10,22 +32,15 @@ if (!isset($root_prefix)) {
             <div class="col-lg-4 mb-4 mb-lg-0">
                 <h5 class="text-uppercase fw-bold mb-3 text-white tracking-wider"><i class="fas fa-hotel text-warning me-2"></i>SYS Property</h5>
                 <p class="text-white small lh-lg mb-4">SYS Property Holdings is a premier integrated real estate community developer in Malaysia. We engineer digital O2O solutions to simplify first-time homebuyer journeys, unlocking transparent housing data across multiple states.</p>
-                <div class="d-flex gap-3 social-links">
-                    <a href="https://www.facebook.com/login/" target="_blank" class="btn btn-sm btn-outline-light rounded-circle text-white" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/accounts/login/" target="_blank" class="btn btn-sm btn-outline-light rounded-circle text-white" title="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/login/" target="_blank" class="btn btn-sm btn-outline-light rounded-circle text-white" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.youtube.com/login" target="_blank" class="btn btn-sm btn-outline-light rounded-circle text-white" title="YouTube"><i class="fab fa-youtube"></i></a>
-                </div>
             </div>
             
             <div class="col-md-4 col-lg-2 mb-4 mb-md-0">
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">Portfolios</h6>
                 <ul class="list-unstyled footer-menu-links font-monospace small">
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Market Houses</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php?filter_type=AFFORDABLE'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Affordable Units</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php?property_type=Terrace'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Landed Terrace</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php?property_type=Bungalow'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Luxury Bungalows</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'properties.php?property_type=Commercial'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Commercial Hubs</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['market']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Market Houses</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['terrace']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Landed Terrace</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['bungalow']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Luxury Bungalows</a></li>
+                    <li class="mb-2"><a href="<?php echo htmlspecialchars($footer_portfolio_links['commercial']); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-chevron-right me-1 text-light"></i> Commercial Hubs</a></li>
                 </ul>
             </div>
 
@@ -34,8 +49,6 @@ if (!isset($root_prefix)) {
                 <ul class="list-unstyled footer-menu-links font-monospace small">
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-shield-alt me-1 text-light"></i> Corporate Identity</a></li>
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-calculator me-1 text-light"></i> Loan Estimator Matrix</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'about_us.php#privacy'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-user-shield me-1 text-light"></i> PDPA Privacy 2010</a></li>
-                    <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'about_us.php#terms'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-file-contract me-1 text-light"></i> Terms of Use</a></li>
                     <li class="mb-2"><a href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>" class="text-white text-decoration-none d-block py-1"><i class="fas fa-gavel me-1 text-light"></i> HDA Regulation Policy</a></li>
                 </ul>
             </div>
@@ -43,12 +56,12 @@ if (!isset($root_prefix)) {
             <div class="col-md-4 col-lg-3">
                 <h6 class="text-uppercase fw-bold mb-3 text-warning tracking-wider small">HQ Contact Center</h6>
                 <p class="text-white small mb-2"><i class="fas fa-map-marker-alt text-danger me-2 fa-fw"></i> SYS Tower HQ, Menara Iskandar, Johor Bahru, Malaysia</p>
-                <p class="text-white small mb-2"><i class="fas fa-phone text-success me-2 fa-fw"></i> +60 7-123 4567</p>
-                <p class="text-white small mb-3"><i class="fas fa-envelope text-info me-2 fa-fw"></i> solutions@sysproperty.com.my</p>
+                <p class="text-white small mb-2"><i class="fas fa-phone text-success me-2 fa-fw"></i><a href="tel:+6071234567" class="text-white text-decoration-none">+60 7-123 4567</a></p>
+                <p class="text-white small mb-3"><i class="fas fa-envelope text-info me-2 fa-fw"></i><a href="mailto:solutions@sysproperty.com.my" class="text-white text-decoration-none">solutions@sysproperty.com.my</a></p>
                 <div class="p-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-3">
                     <small class="text-white d-block fw-bold mb-1"><i class="far fa-clock text-warning me-1"></i> Customer Desk Hours</small>
-                    <small class="text-white d-block font-monospace">Mon — Fri: 09:00 AM - 06:00 PM</small>
-                    <small class="text-white d-block font-monospace">Sat — Sun: 10:00 AM - 04:00 PM</small>
+                    <small class="text-white d-block font-monospace">Mon - Fri: 09:00 AM - 06:00 PM</small>
+                    <small class="text-white d-block font-monospace">Sat - Sun: 10:00 AM - 04:00 PM</small>
                 </div>
             </div>
         </div>

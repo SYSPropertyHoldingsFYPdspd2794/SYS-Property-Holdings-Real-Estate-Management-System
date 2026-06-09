@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include_once __DIR__ . '/db_connect.php';
 
-// 設定 PHP 與 MySQL 為馬來西亞時間 (GMT+8)
+// Set PHP and MySQL to Malaysian time (GMT+8).
 date_default_timezone_set('Asia/Kuala_Lumpur');
 if (isset($conn)) {
     $conn->query("SET time_zone = '+08:00'");
@@ -54,7 +54,67 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SYS Property Holdings</title>
+<?php 
+    // Check if the current page belongs to private administrative or client directories
+    if (isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true)): 
+    ?>
+        <meta name="robots" content="noindex, nofollow">
+    <?php else: ?>
+        <meta name="robots" content="index, follow">
+    <?php endif; ?>
+
+<?php
+// Get the filename of the currently running webpage.
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// 1. SEO settings for the default homepage (index.php)
+$seo_title = "SYS Property Holdings | Real Estate Management System";
+$seo_desc = "Welcome to SYS Property Holdings Real Estate Management System. Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.";
+
+// 2. Automatically switch and change the title to the appropriate professional search engine title based on the different pages.
+if ($current_page == 'about_us.php') {
+    $seo_title = "About Us | SYS Property Holdings";
+    $seo_desc = "Learn more about SYS Property Holdings. Discover our vision, mission, and the professional team behind Malaysia's leading real estate O2O tech evolution.";
+} elseif ($current_page == 'government_housing.php') {
+    $seo_title = "Government Housing Schemes | Affordable Homes Malaysia";
+    $seo_desc = "Explore regional state housing programs and affordable housing schemes with equal allocation rights via SYS Property Holdings.";
+} elseif ($current_page == 'showrooms.php') {
+    $seo_title = "Book Physical Showroom Visits | Malaysia Real Estate";
+    $seo_desc = "Select your state, view live map locations, and seamlessly book your physical showroom appointments online.";
+} elseif ($current_page == 'financial_planner.php') {
+    $seo_title = "Property Financial Planner & Loan Calculator";
+    $seo_desc = "Calculate your property loan eligibility, estimate monthly installments, and structure your housing budget accurately.";
+} elseif ($current_page == 'bank_rates.php') {
+    $seo_title = "Latest Bank Housing Interest Rates | Malaysia";
+    $seo_desc = "Compare up-to-date home loan interest rates across major Malaysian banks to optimize your property financing.";
+} elseif ($current_page == 'login.php') {
+    $seo_title = "Portal Login | SYS Property Holdings";
+    $seo_desc = "Sign in to your SYS Property Holdings account to manage your property applications, wishlists, and showroom bookings.";
+}
+?>
+
+<title><?php echo $seo_title; ?></title>
+<meta name="description" content="<?php echo $seo_desc; ?>">
+<meta name="keywords" content="SYS Property Holdings, Real Estate Management System, UTM SPACE, Malaysia Property, O2O Real Estate, Affordable Housing, Bank Rates Malaysia">
+<?php 
+// 1. Get the current page file name
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// 2. Check if it belongs to a private management folder or is a sensitive authentication page.
+$is_private_folder = isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true);
+$is_sensitive_page = in_array($current_page, ['login.php', 'reset_action.php'], true);
+
+if ($is_private_folder || $is_sensitive_page): 
+?>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+<?php else: ?>
+    <meta name="robots" content="index, follow">
+<?php endif; ?>
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://syspropertyholdings.infinityfreeapp.com/">
+<meta property="og:title" content="<?php echo $seo_title; ?>">
+<meta property="og:description" content="<?php echo $seo_desc; ?>">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,16 +373,30 @@ footer.luxury-footer {
 }
 @media (max-width: 991.98px) {
     .navbar-collapse {
-        padding: 1rem 0 0.5rem;
+        padding: 0.85rem 0 0.4rem;
+    }
+    .navbar .navbar-nav {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 0.25rem !important;
     }
     .navbar .nav-link {
-        padding: 0.75rem 0.85rem !important;
+        width: 100%;
+        padding: 0.72rem 0.85rem !important;
     }
-    .navbar .d-flex {
-        align-items: stretch;
-        flex-direction: column;
+    .navbar .container > .d-flex:first-child {
+        flex-wrap: wrap;
         gap: 0.65rem;
-        padding-top: 0.75rem;
+    }
+    .navbar-account-actions {
+        gap: 0.45rem !important;
+    }
+    .navbar-account-actions .btn {
+        font-size: 0.82rem;
+        padding: 0.5rem 0.65rem;
+    }
+    .navbar-toggler {
+        margin-left: auto;
     }
 }
 @media (max-width: 767.98px) {
@@ -347,11 +421,11 @@ footer.luxury-footer {
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand navbar-dark bg-dark sticky-top shadow-sm py-2">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
 <a class="navbar-brand fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
-<div class="d-flex align-items-center gap-2">
+<div class="d-flex align-items-center gap-2 navbar-account-actions">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">
 <button class="btn btn-outline-light dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
@@ -365,8 +439,11 @@ footer.luxury-footer {
 <a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary shadow-sm">Sign In</a>
 <?php endif;?>
 </div>
+<button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
 </div>
-<div class="w-100" id="navbarNav">
+<div class="collapse navbar-collapse w-100" id="navbarNav">
 <ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>"><i class="fas fa-building me-1"></i>Catalog</a></li>
     <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>

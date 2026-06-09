@@ -228,9 +228,9 @@ include '../includes/header.php';
                 document.getElementById('statAssigned').textContent = data.stats.assigned;
 
                 // Update labels
-                document.getElementById('appliedLabel').textContent = `Applied for Appointments (${monthText} ${year})`;
-                document.getElementById('waitingLabel').textContent = `Waiting for Assignment (${monthText} ${year})`;
-                document.getElementById('assignedLabel').textContent = `Received Assignment (${monthText} ${year})`;
+                document.getElementById('appliedLabel').innerHTML = `Applied for Appointments<br>(${monthText} ${year})`;
+                document.getElementById('waitingLabel').innerHTML = `Waiting for Assignment<br>(${monthText} ${year})`;
+                document.getElementById('assignedLabel').innerHTML = `Received Assignment<br>(${monthText} ${year})`;
 
                 // Update chart
                 leadsChart.data.labels = data.chart.labels;
