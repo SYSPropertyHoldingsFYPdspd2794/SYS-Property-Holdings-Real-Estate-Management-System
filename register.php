@@ -23,8 +23,8 @@ function email_exists($conn, $email) {
     return $exists;
 }
 
-function is_valid_malaysia_mobile($phone_number) {
-    return preg_match('/^01\d{8,9}$/', $phone_number) === 1;
+function is_valid_mobile($phone_number) {
+    return preg_match('/^\d{10,11}$/', $phone_number) === 1;
 }
 
 function create_pending_registration_otp($conn, $post_data, &$error_message, &$show_duplicate_alert, &$duplicate_email, &$otp_message, &$show_otp_modal) {
@@ -48,8 +48,8 @@ function create_pending_registration_otp($conn, $post_data, &$error_message, &$s
         return;
     }
 
-    if (!is_valid_malaysia_mobile($phone_number)) {
-        $error_message = 'Phone number must be a valid Malaysia mobile number with 10 or 11 digits, starting with 01.';
+    if (!is_valid_mobile($phone_number)) {
+        $error_message = 'Phone number must be a valid mobile number with 10 or 11 digits.';
         return;
     }
 
@@ -250,7 +250,6 @@ if (!empty($_SESSION['pending_registration']) && (($_POST['register_action'] ?? 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone Number</label>
                                 <input type="tel" name="phone_number" class="form-control py-2" value="<?php echo isset($form_values['phone_number']) ? htmlspecialchars($form_values['phone_number']) : ''; ?>" inputmode="numeric" minlength="10" maxlength="11" title="Enter a Malaysia mobile number with 10 or 11 digits, starting with 01. Example: 0123456789" required>
-                                <div class="form-text">Example: 0123456789 or 01123456789</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
