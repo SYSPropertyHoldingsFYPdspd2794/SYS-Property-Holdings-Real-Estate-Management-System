@@ -158,8 +158,8 @@ include '../includes/header.php';
                             </div>
                         </div>
                         <div class="mb-5 p-4 bg-light rounded-4 border border-secondary border-opacity-25">
-                            <label class="form-label fw-bold"><i class="fas fa-file-upload me-2 text-primary"></i>Optional Financial Abstract (Payslip Summary)</label>
-                            <p class="small text-muted mb-3">Uploading a document allows our consultants to perform an early financial pre-check before your visit. Max size: 5MB (PDF only).</p>
+                            <label class="form-label fw-bold"><i class="fas fa-file-upload me-2 text-primary"></i>Payslip / Income Summary (Optional)</label>
+                            <p class="small text-muted mb-3">Upload your latest payslip to help our consultants run a quick, early financial assessment before your appointment. PDF only, max size 5MB.</p>
                             <input type="file" name="document" class="form-control" accept="application/pdf">
                         </div>
                         <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold py-3 rounded-pill shadow-sm">Confirm Booking Request</button>
