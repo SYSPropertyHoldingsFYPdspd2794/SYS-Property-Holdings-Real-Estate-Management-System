@@ -54,6 +54,8 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($root_prefix . 'favicon.png'); ?>">
+<link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'favicon.png'); ?>">
 <?php 
     // Check if the current page belongs to private administrative or client directories
     if (isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true)): 
