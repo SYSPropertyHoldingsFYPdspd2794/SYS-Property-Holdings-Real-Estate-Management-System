@@ -278,6 +278,7 @@ $proximityHtml .= '</div>';
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
+                            <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 40px; border-radius: 4px;">
                             <h2 class="luxury-title fw-light text-dark mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                             <form method="POST" class="m-0 wishlist-detail-form">
                                 <button type="submit" name="toggle_wishlist" class="btn <?php echo $is_wishlisted ? 'bg-dark text-white' : 'btn-outline-dark'; ?> rounded-circle d-flex align-items-center justify-content-center shadow-sm wishlist-detail-btn" style="width: 45px; height: 45px; border-color: #212529 !important;">

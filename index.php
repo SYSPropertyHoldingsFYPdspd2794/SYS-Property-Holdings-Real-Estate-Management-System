@@ -24,6 +24,7 @@ include 'includes/header.php';
         <div class="row align-items-center g-5">
             <div class="col-lg-8">
                 <div class="section-kicker mb-3">Online to offline real estate</div>
+                <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 60px; margin-bottom: 20px; border-radius: 8px;">
                 <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
                 <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
                 <div class="d-flex flex-wrap gap-3">

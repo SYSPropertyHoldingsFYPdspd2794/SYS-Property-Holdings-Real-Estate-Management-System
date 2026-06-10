@@ -11,6 +11,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
 <div class="container-fluid bg-dark text-white py-5 text-center shadow-sm">
     <div class="section-kicker mb-2 pt-3">Nationwide showroom network</div>
+    <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
     <h1 class="display-4 fw-bold mb-3">Locate Our Showrooms</h1>
     <p class="lead mx-auto opacity-75 mb-4" style="max-width: 760px;">Bridging the digital divide. Explore properties online, but finalize your purchase securely at our physical branches nationwide.</p>
     

@@ -62,9 +62,12 @@ include '../includes/header.php';
     <!-- Welcome Banner -->
     <div class="card border-0 rounded-4 shadow-sm mb-4" style="background: linear-gradient(135deg, #101827, #1e293b); color: white;">
         <div class="card-body p-4 d-flex justify-content-between align-items-center">
-            <div>
-                <h3 class="fw-bold mb-1">Hello, <?php echo htmlspecialchars($first_name); ?>!</h3>
-                <p class="mb-0 text-light opacity-75"><i class="fas fa-map-marker-alt text-danger me-2"></i>Assigned Region: <strong class="text-white"><?php echo htmlspecialchars($assigned_state); ?></strong></p>
+            <div class="d-flex align-items-center gap-3">
+                <img src="../SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg" alt="Logo" style="height: 56px; border-radius: 8px;" class="shadow-sm">
+                <div>
+                    <h3 class="fw-bold mb-1">Hello, <?php echo htmlspecialchars($first_name); ?>!</h3>
+                    <p class="mb-0 text-light opacity-75"><i class="fas fa-map-marker-alt text-danger me-2"></i>Assigned Region: <strong class="text-white"><?php echo htmlspecialchars($assigned_state); ?></strong></p>
+                </div>
             </div>
             <div class="d-none d-md-block text-end">
                 <p class="mb-0 fs-5 fw-bold text-info"><?php echo date('l, d M Y'); ?></p>

@@ -20,6 +20,9 @@ include_once 'includes/header.php';
     <div class="position-relative overflow-hidden text-white py-5" style="background: linear-gradient(rgba(10, 15, 20, 0.8), rgba(10, 15, 20, 0.9)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2073&auto=format&fit=crop') center center / cover no-repeat; padding-top: 100px !important; padding-bottom: 100px !important;">
         <div class="container py-5 text-center position-relative z-3">
             <span class="badge bg-danger text-white px-3 py-2 rounded-pill mb-3 fw-bold tracking-widest text-uppercase">The Master Blueprint</span>
+            <div class="mb-3 mt-2">
+                <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
+            </div>
             <h1 class="display-3 fw-bold text-white mb-4 tracking-tight">The Homebuyer's Odyssey</h1>
             <p class="lead w-75 mx-auto text-light opacity-75 fs-5">Navigate the complexities of the Malaysian real estate landscape with absolute confidence. From initial financial health checks to collecting the keys to your new empire, follow our definitive 7-step roadmap guided by official regulatory standards.</p>
             <div class="mt-5">

@@ -81,6 +81,7 @@ include_once '../includes/header.php';
 <div class="container my-5 property-catalog-page">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
+            <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 15px; border-radius: 8px;">
             <h2 class="display-5 text-uppercase tracking-widest luxury-title mt-4 catalog-title">Exclusive Collections</h2>
             <p class="catalog-subtitle tracking-wider mb-4">Discover unparalleled living across 13 states and 3 federal territories.</p>
             <hr class="w-10 mx-auto bg-gold" style="height: 2px; opacity: 1;">

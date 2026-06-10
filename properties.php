@@ -39,6 +39,7 @@ $result = $stmt->get_result();
 <div class="container my-5 py-4">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
+            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 15px; border-radius: 8px;">
             <div class="section-kicker mb-2">Property inventory</div>
             <h2 class="fw-bold display-5 text-white">Inventory Catalog</h2>
             <p class="lead text-light opacity-75">Internal staff and administration management view</p>

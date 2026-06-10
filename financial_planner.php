@@ -20,6 +20,9 @@ include_once 'includes/header.php';
 <div class="position-relative overflow-hidden bg-dark text-white py-5" style="background: linear-gradient(rgba(17, 20, 24, 0.85), rgba(17, 20, 24, 0.95)), url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat; padding-top: 80px !important; padding-bottom: 80px !important;">
     <div class="container py-5 text-center position-relative z-3">
         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 fw-bold tracking-widest text-uppercase">PropTech Intelligence</span>
+        <div class="mb-3">
+            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
+        </div>
         <h1 class="display-3 fw-bold text-white mb-4 tracking-tight">Smart Financial Planner</h1>
         <p class="lead w-75 mx-auto text-light opacity-75 fs-5">Make data-driven property decisions. Uncover hidden transaction costs, simulate long-term rent vs. buy trajectories, and stress-test your lifestyle affordability using real Malaysian banking algorithms.</p>
     </div>

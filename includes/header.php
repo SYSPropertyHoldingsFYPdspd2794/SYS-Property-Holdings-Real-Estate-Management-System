@@ -426,7 +426,10 @@ footer.luxury-footer {
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
-<a class="navbar-brand fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
+<a class="navbar-brand d-flex align-items-center gap-2 fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">
+    <img src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
+    SYS Property
+</a>
 <div class="d-flex align-items-center gap-2 navbar-account-actions">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">

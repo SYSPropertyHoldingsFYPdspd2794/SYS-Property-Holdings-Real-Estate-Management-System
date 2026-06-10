@@ -10,6 +10,7 @@ include_once 'includes/header.php';
 <div class="position-relative overflow-hidden bg-dark text-white py-5 mb-5" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat; padding-top: 100px !important; padding-bottom: 100px !important;">
     <div class="container py-5 text-center position-relative z-3">
         <h6 class="text-uppercase fw-bold text-warning tracking-widest mb-3" style="letter-spacing: 4px;">Master Community Developer</h6>
+        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-2 fw-bold text-white mb-4">Architecting Sustainable Tomorrow</h1>
         <p class="lead mx-auto text-light opacity-75 fs-4" style="max-width: 900px;">SYS Property Holdings stands at the vanguard of Malaysia's real estate tech evolution. We blend state-of-the-art structural craftsmanship with our proprietary Online-to-Offline (O2O) deployment ecosystem to shape liveable future cities.</p>
     </div>

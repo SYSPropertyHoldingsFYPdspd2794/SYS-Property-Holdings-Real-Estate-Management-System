@@ -104,7 +104,10 @@ $feedback_count += $housing_feedback_query->get_result()->fetch_assoc()['cnt'];
 include '../includes/header.php';
 ?>
 <div class="container my-5">
-    <h2 class="fw-bold mb-5"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
+    <div class="d-flex align-items-center mb-5">
+        <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 60px; margin-right: 20px; border-radius: 8px;">
+        <h2 class="fw-bold m-0"><i class="fas fa-route text-primary me-2"></i>Universal Status Tracker</h2>
+    </div>
     
     <?php if ($success_msg === 'appointment_booked'): ?>
         <div class="alert alert-success shadow-sm border-0 mb-4 rounded-3 fw-bold"><i class="fas fa-check-circle me-2"></i>Your showroom appointment request has been successfully submitted!</div>

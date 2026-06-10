@@ -65,8 +65,10 @@ include '../includes/header.php';
     <!-- Welcome Banner -->
     <div class="card border-0 rounded-4 shadow-sm mb-4" style="background: linear-gradient(135deg, var(--luxury-bg), var(--luxury-ink)); color: white;">
         <div class="card-body p-4 p-md-5 d-flex justify-content-between align-items-center">
-            <div>
-                <?php if ($appt_count > 0): ?>
+            <div class="d-flex align-items-center gap-4">
+                <img src="../SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg" alt="Logo" style="height: 80px; border-radius: 12px;" class="shadow d-none d-sm-block">
+                <div>
+                    <?php if ($appt_count > 0): ?>
                     <span class="badge bg-warning text-dark mb-2 fw-bold px-3 py-2 rounded-pill"><i class="fas fa-bell me-1"></i> You have upcoming appointments!</span>
                 <?php endif; ?>
                 <h2 class="fw-bold mb-2">Welcome back, <?php echo htmlspecialchars($first_name); ?>!</h2>

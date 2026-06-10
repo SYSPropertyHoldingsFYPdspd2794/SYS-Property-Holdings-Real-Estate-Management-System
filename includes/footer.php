@@ -30,7 +30,10 @@ if (isset($_SESSION['role'])) {
     <div class="container py-3">
         <div class="row g-4">
             <div class="col-lg-4 mb-4 mb-lg-0">
-                <h5 class="text-uppercase fw-bold mb-3 text-white tracking-wider"><i class="fas fa-hotel text-warning me-2"></i>SYS Property</h5>
+                <h5 class="text-uppercase fw-bold mb-3 text-white tracking-wider d-flex align-items-center gap-2">
+                    <img src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 38px; width: auto; border-radius: 6px; object-fit: contain;">
+                    SYS Property
+                </h5>
                 <p class="text-white small lh-lg mb-4">SYS Property Holdings is a premier integrated real estate community developer in Malaysia. We engineer digital O2O solutions to simplify first-time homebuyer journeys, unlocking transparent housing data across multiple states.</p>
             </div>
             

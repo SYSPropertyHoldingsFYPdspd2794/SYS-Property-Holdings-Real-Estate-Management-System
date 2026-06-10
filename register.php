@@ -197,6 +197,7 @@ if (!empty($_SESSION['pending_registration']) && (($_POST['register_action'] ?? 
             <div class="card shadow-sm border-0 auth-card">
                 <div class="card-body p-5">
                     <div class="text-center mb-5">
+                        <img src="SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Logo" style="height: 60px; width: auto; border-radius: 8px; object-fit: contain;" class="mb-3 shadow-sm">
                         <div class="section-kicker mb-2">Start your home journey</div>
                         <h2 class="fw-bold mb-2">Create an Account</h2>
                         <p class="text-muted mb-0">Save properties, book visits, and track affordable housing applications.</p>
