@@ -248,7 +248,7 @@ if (!empty($_SESSION['pending_registration']) && (($_POST['register_action'] ?? 
 
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Phone Number</label>
+                                <label class="form-label fw-bold">Phone Number (0123456789/01234567890)</label>
                                 <input type="tel" name="phone_number" class="form-control py-2" value="<?php echo isset($form_values['phone_number']) ? htmlspecialchars($form_values['phone_number']) : ''; ?>" inputmode="numeric" minlength="10" maxlength="11" title="Enter a Malaysia mobile number with 10 or 11 digits, starting with 01. Example: 0123456789" required>
                             </div>
                             <div class="col-md-6">
