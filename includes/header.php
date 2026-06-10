@@ -54,8 +54,8 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($root_prefix . 'sysLogo.png'); ?>">
-<link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'sysLogo.png'); ?>">
+<link rel="icon" type="image/jpeg" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
+<link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
 <?php 
     // Check if the current page belongs to private administrative or client directories
     if (isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true)): 
