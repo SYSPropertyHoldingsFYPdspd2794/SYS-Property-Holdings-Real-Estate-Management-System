@@ -7,6 +7,24 @@ protect_admin_page('ADMIN', $conn);
 $alert = '';
 $allowed_roles = ['CUSTOMER', 'STAFF', 'ADMIN'];
 $allowed_marital = ['SINGLE', 'MARRIED'];
+$allowed_states = [
+    'Johor',
+    'Kedah',
+    'Kelantan',
+    'Kuala Lumpur',
+    'Labuan',
+    'Melaka',
+    'Negeri Sembilan',
+    'Pahang',
+    'Penang',
+    'Perak',
+    'Perlis',
+    'Putrajaya',
+    'Sabah',
+    'Sarawak',
+    'Selangor',
+    'Terengganu',
+];
 
 function redirect_user_page($message)
 {
@@ -45,6 +63,16 @@ function table_exists($conn, $table)
     } catch (Throwable $e) {
         return false;
     }
+}
+
+function render_state_options($selected_state, $allowed_states)
+{
+    $html = '<option value="">Select assigned state</option>';
+    foreach ($allowed_states as $state) {
+        $selected = ($selected_state === $state) ? ' selected' : '';
+        $html .= '<option value="' . htmlspecialchars($state) . '"' . $selected . '>' . htmlspecialchars($state) . '</option>';
+    }
+    return $html;
 }
 
 function execute_account_delete($conn, $account_id)
@@ -163,6 +191,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $st->execute();
             } elseif ($role === 'STAFF') {
                 $state = trim($_POST['assigned_state'] ?? '');
+                if (!in_array($state, $allowed_states, true)) {
+                    throw new Exception('Please select a valid assigned state for staff.');
+                }
+
                 $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?)");
                 $st->bind_param("isss", $new_id, $name, $phone, $state);
                 $st->execute();
@@ -223,6 +255,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             } elseif ($role === 'STAFF') {
                 $phone = trim($_POST['phone'] ?? '');
                 $state = trim($_POST['assigned_state'] ?? '');
+                if (!in_array($state, $allowed_states, true)) {
+                    throw new Exception('Please select a valid assigned state for staff.');
+                }
 
                 $st = $conn->prepare("INSERT INTO staff (staff_id, full_name, phone_number, assigned_state) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), phone_number = VALUES(phone_number), assigned_state = VALUES(assigned_state)");
                 $st->bind_param("isss", $account_id, $name, $phone, $state);
