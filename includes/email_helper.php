@@ -142,4 +142,42 @@ function send_password_reset_otp($to_email, $role, $otp) {
 
     return smtp_send_mail($to_email, $subject, $message, $config);
 }
+
+function send_email_change_otp($to_email, $full_name, $otp) {
+    $config_path = __DIR__ . '/mail_config.php';
+    if (!file_exists($config_path)) {
+        return false;
+    }
+
+    $config = require $config_path;
+    $subject = 'SYS Property Holdings Email Change OTP';
+    $safe_name = trim($full_name) !== '' ? trim($full_name) : 'User';
+    $message = "Hi {$safe_name},\n\n";
+    $message .= "Your SYS Property Holdings email change verification code is: {$otp}\n\n";
+    $message .= "This code will expire in 10 minutes. If you did not request this email change, please ignore this email.\n\n";
+    $message .= "Regards,\nSYS Property Holdings";
+
+    return smtp_send_mail($to_email, $subject, $message, $config);
+}
+
+function send_email_change_approval($to_email, $full_name, $old_email, $new_email, $approve_url, $reject_url) {
+    $config_path = __DIR__ . '/mail_config.php';
+    if (!file_exists($config_path)) {
+        return false;
+    }
+
+    $config = require $config_path;
+    $safe_name = trim($full_name) !== '' ? trim($full_name) : 'User';
+    $subject = 'SYS Property Holdings Email Change Approval';
+    $message = "Hi {$safe_name},\n\n";
+    $message .= "A request was made to change your SYS Property Holdings account email.\n\n";
+    $message .= "Current email: {$old_email}\n";
+    $message .= "Requested new email: {$new_email}\n\n";
+    $message .= "Approve this change:\n{$approve_url}\n\n";
+    $message .= "Reject this change:\n{$reject_url}\n\n";
+    $message .= "If you did not request this change, reject it immediately or contact SYS Property Holdings support.\n\n";
+    $message .= "Regards,\nSYS Property Holdings";
+
+    return smtp_send_mail($to_email, $subject, $message, $config);
+}
 ?>

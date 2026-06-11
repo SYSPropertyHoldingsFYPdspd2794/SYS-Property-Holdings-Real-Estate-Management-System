@@ -2,15 +2,39 @@
 include '../includes/db_connect.php';
 include '../includes/auth_check.php';
 include '../includes/functions.php';
+include '../includes/email_change_helper.php';
 
 protect_customer_page('CUSTOMER', $conn);
 
 $account_id = $_SESSION['account_id'];
 $alert_msg = ''; $alert_type = '';
 $profile_image_ready = ensure_profile_image_column($conn, 'customers');
+$show_email_change_otp_modal = false;
+
+function customer_profile_name($conn, $account_id) {
+    $stmt = $conn->prepare("SELECT full_name FROM customers WHERE customer_id = ? LIMIT 1");
+    $stmt->bind_param("i", $account_id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    return $row['full_name'] ?? 'Customer';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['save_details'])) {
+    $email_change_action = $_POST['email_change_action'] ?? '';
+
+    if ($email_change_action === 'verify_otp') {
+        $email_change_error = '';
+        $email_change_success = '';
+        email_change_verify_otp($conn, $account_id, trim($_POST['email_change_otp'] ?? ''), $email_change_error, $email_change_success, $show_email_change_otp_modal);
+        $alert_msg = $email_change_success !== '' ? $email_change_success : $email_change_error;
+        $alert_type = $email_change_success !== '' ? 'success' : 'danger';
+    } elseif ($email_change_action === 'resend_otp') {
+        $email_change_error = '';
+        $email_change_success = '';
+        email_change_resend_otp($conn, $account_id, customer_profile_name($conn, $account_id), $email_change_error, $email_change_success, $show_email_change_otp_modal);
+        $alert_msg = $email_change_success !== '' ? $email_change_success : $email_change_error;
+        $alert_type = $email_change_success !== '' ? 'success' : 'danger';
+    } elseif (isset($_POST['save_details'])) {
         $email = trim($_POST['email'] ?? '');
         $full_name = trim($_POST['full_name'] ?? '');
         $phone = trim($_POST['phone_number'] ?? '');
@@ -34,10 +58,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($can_save_details) {
-            $upd_acc = $conn->prepare("UPDATE accounts SET email = ? WHERE account_id = ?");
-            $upd_acc->bind_param("si", $email, $account_id);
-            $upd_acc->execute();
+            $email_change_error = '';
+            $email_change_success = '';
 
+            if (!email_change_start_request($conn, $account_id, $email, $full_name, $email_change_error, $email_change_success, $show_email_change_otp_modal)) {
+                $alert_msg = $email_change_error;
+                $alert_type = 'danger';
+                $can_save_details = false;
+            }
+        }
+
+        if ($can_save_details) {
             if ($profile_image !== null) {
                 $stmt_upd = $conn->prepare("UPDATE customers SET full_name = ?, phone_number = ?, marital_status = ?, dependents_count = ?, occupation = ?, monthly_income = ?, profile_image = ? WHERE customer_id = ?");
                 $stmt_upd->bind_param("sssisdsi", $full_name, $phone, $marital, $dependents, $occupation, $income, $profile_image, $account_id);
@@ -48,8 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($stmt_upd->execute()) {
                 $alert_msg = $profile_image !== null ? 'Profile details and avatar updated successfully.' : 'Profile details updated successfully.';
+                if ($email_change_success !== '') {
+                    $alert_msg .= ' ' . $email_change_success;
+                }
                 $alert_type = 'success';
-                $_SESSION['user_email'] = $email;
             }
         }
     }
@@ -62,6 +95,7 @@ $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 $avatar_src = !empty($user['profile_image']) ? '..' . $user['profile_image'] : '';
 $avatar_initial = strtoupper(substr($user['full_name'] ?? 'C', 0, 1));
+$pending_email_change = email_change_pending_notice($conn, $account_id);
 
 include '../includes/header.php';
 ?>
@@ -77,6 +111,13 @@ include '../includes/header.php';
 
     <?php if ($alert_msg): ?>
         <div class="alert alert-<?php echo $alert_type; ?> shadow-sm"><?php echo htmlspecialchars($alert_msg); ?></div>
+    <?php endif; ?>
+    <?php if ($pending_email_change): ?>
+        <div class="alert alert-warning shadow-sm">
+            Pending email change from <?php echo htmlspecialchars($pending_email_change['old_email']); ?> to <?php echo htmlspecialchars($pending_email_change['new_email']); ?>.
+            Old email approval: <?php echo empty($pending_email_change['old_approved_at']) ? 'waiting' : 'approved'; ?>,
+            new email OTP: <?php echo empty($pending_email_change['new_verified_at']) ? 'waiting' : 'verified'; ?>.
+        </div>
     <?php endif; ?>
     <div class="row g-4">
         <div class="col-lg-3 col-md-4">
@@ -96,7 +137,7 @@ include '../includes/header.php';
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
                     <h4 class="fw-bold mb-4 border-bottom pb-2">Profile</h4>
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data" data-email-change-form="1">
                         <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
                             <label for="customerProfileImage" class="avatar-upload-wrap position-relative flex-shrink-0" title="Upload profile avatar">
                                 <?php if ($avatar_src !== ''): ?>
@@ -119,7 +160,7 @@ include '../includes/header.php';
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Email</label>
-                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                                <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" data-original-email="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Full Name</label>
@@ -219,6 +260,7 @@ if (customerProfileImage && customerProfileImageName) {
     });
 }
 </script>
+<?php include '../includes/email_change_modal.php'; ?>
 <?php include '../includes/footer.php'; ?>
 .files.length ? this.files[0].name : '';
     });
