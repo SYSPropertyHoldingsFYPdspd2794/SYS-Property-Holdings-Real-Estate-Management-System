@@ -63,8 +63,8 @@ if (isset($_SESSION['role'])) {
                 <p class="text-white small mb-3"><i class="fas fa-envelope text-info me-2 fa-fw"></i><a href="mailto:solutions@sysproperty.com.my" class="text-white text-decoration-none">solutions@sysproperty.com.my</a></p>
                 <div class="p-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded-3">
                     <small class="text-white d-block fw-bold mb-1"><i class="far fa-clock text-warning me-1"></i> Customer Desk Hours</small>
-                    <small class="text-white d-block font-monospace">Mon - Fri: 09:00 AM - 06:00 PM</small>
-                    <small class="text-white d-block font-monospace">Sat - Sun: 10:00 AM - 04:00 PM</small>
+                    <small class="text-white d-block font-monospace footer-hours-line">Mon - Fri: 09:00 AM - 06:00 PM</small>
+                    <small class="text-white d-block font-monospace footer-hours-line">Sat - Sun: 10:00 AM - 04:00 PM</small>
                 </div>
             </div>
         </div>

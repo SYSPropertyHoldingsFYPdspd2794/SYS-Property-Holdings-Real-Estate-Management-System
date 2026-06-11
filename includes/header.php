@@ -293,6 +293,10 @@ h1, h2, h3, h4, h5, h6 {
 footer.luxury-footer {
     background: #07101d !important;
 }
+.footer-hours-line {
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
 .hero-banner {
     position: relative;
     isolation: isolate;
@@ -418,6 +422,9 @@ footer.luxury-footer {
     }
     .card-body.p-5 {
         padding: 1.5rem !important;
+    }
+    .footer-hours-line {
+        white-space: normal;
     }
 }
 </style>
