@@ -411,7 +411,25 @@ include '../includes/header.php';
         });
 
         $('#histStateFilter').on('change', function() {
-            table.column(4).search(this.value).draw();
+            const selectedState = this.value;
+            table.column(4).search(selectedState).draw();
+            
+            const propFilter = $('#histPropFilter');
+            propFilter.empty().append(new Option('All Properties', ''));
+            
+            let filteredProps = [];
+            if (selectedState) {
+                filteredProps = propertiesData.filter(p => p.state === selectedState);
+            } else {
+                filteredProps = propertiesData;
+            }
+            
+            const uniqueProps = [...new Set(filteredProps.map(p => p.project_name))].sort();
+            uniqueProps.forEach(name => {
+                propFilter.append(new Option(name, name));
+            });
+            
+            table.column(3).search('').draw();
         });
 
         $('#histPropFilter').on('change', function() {

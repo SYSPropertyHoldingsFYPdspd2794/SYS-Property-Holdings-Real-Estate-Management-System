@@ -98,17 +98,19 @@ $result = $conn->query($query);
                 <strong><?php echo number_format((int)$summary['unique_properties']); ?></strong>
             </div>
         </div>
-        <div class="col-6 col-xl-3">
-            <div class="timeline-metric">
-                <span>Hottest Property Adds</span>
-                <strong><?php echo number_format((int)$summary['top_interest']); ?></strong>
-            </div>
+        <div class="col-12 col-xl-3 d-flex flex-column justify-content-center gap-2">
+            <select id="filterState" class="form-select border-0 shadow-sm fw-bold text-secondary">
+                <option value="">All States</option>
+            </select>
+            <select id="filterProperty" class="form-select border-0 shadow-sm fw-bold text-secondary">
+                <option value="">All Properties</option>
+            </select>
         </div>
     </div>
 
     <div class="interest-grid-wrap bg-white text-dark shadow-sm">
         <div class="table-responsive">
-            <table class="table align-middle interest-grid mb-0">
+            <table id="timelineTable" class="table align-middle interest-grid mb-0">
                 <thead>
                     <tr>
                         <th>Time</th>
@@ -291,5 +293,77 @@ $result = $conn->query($query);
     .property-cell-inner { min-width: 240px; }
 }
 </style>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script>
+$(document).ready(function() {
+    const table = $('#timelineTable').DataTable({
+        "order": [], // Keep original query order
+        "dom": "<'row'<'col-sm-12'tr>>" +
+               "<'row mt-3 align-items-center'<'col-sm-12 col-md-4 text-start'i><'col-sm-12 col-md-4 d-flex justify-content-center'p><'col-sm-12 col-md-4 d-flex justify-content-end'l>>",
+        "pageLength": 10
+    });
+
+    const stateSet = new Set();
+    const propMap = new Map();
+
+    table.rows().every(function() {
+        const data = this.data();
+        const stateNode = document.createElement('div');
+        stateNode.innerHTML = data[3];
+        const state = stateNode.textContent.trim();
+
+        const propNode = document.createElement('div');
+        propNode.innerHTML = data[2];
+        const propStrong = propNode.querySelector('strong');
+        const propName = propStrong ? propStrong.textContent.trim() : '';
+
+        if (state) {
+            stateSet.add(state);
+            if (!propMap.has(state)) {
+                propMap.set(state, new Set());
+            }
+            if (propName) {
+                propMap.get(state).add(propName);
+            }
+        }
+    });
+
+    const stateFilter = $('#filterState');
+    const propertyFilter = $('#filterProperty');
+
+    Array.from(stateSet).sort().forEach(s => {
+        stateFilter.append(new Option(s, s));
+    });
+
+    stateFilter.on('change', function() {
+        const selectedState = this.value;
+        table.column(3).search(selectedState).draw();
+        
+        propertyFilter.empty().append(new Option('All Properties', ''));
+        if (selectedState && propMap.has(selectedState)) {
+            Array.from(propMap.get(selectedState)).sort().forEach(p => {
+                propertyFilter.append(new Option(p, p));
+            });
+        } else if (!selectedState) {
+            const allProps = new Set();
+            propMap.forEach(props => props.forEach(p => allProps.add(p)));
+            Array.from(allProps).sort().forEach(p => {
+                propertyFilter.append(new Option(p, p));
+            });
+        }
+        table.column(2).search('').draw();
+    });
+
+    stateFilter.trigger('change');
+
+    propertyFilter.on('change', function() {
+        table.column(2).search(this.value).draw();
+    });
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>

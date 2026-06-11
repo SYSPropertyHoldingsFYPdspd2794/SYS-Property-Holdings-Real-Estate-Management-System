@@ -28,7 +28,12 @@ include '../includes/header.php';
 <div class="container mt-5">
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <h4 class="fw-bold mb-4">Appointment Assignments</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0">Appointment Assignments</h4>
+                <select id="filterState" class="form-select border-0 shadow-sm w-auto fw-bold text-secondary">
+                    <option value="">All States</option>
+                </select>
+            </div>
             <div class="table-responsive">
                 <table id="assignTable" class="table table-striped table-hover align-middle">
                     <thead class="table-dark">
@@ -120,7 +125,25 @@ include '../includes/header.php';
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#assignTable').DataTable();
+        const table = $('#assignTable').DataTable();
+
+        const stateSet = new Set();
+        table.rows().every(function() {
+            const data = this.data();
+            const stateNode = document.createElement('div');
+            stateNode.innerHTML = data[4];
+            const state = stateNode.textContent.trim();
+            if (state) stateSet.add(state);
+        });
+
+        const stateFilter = $('#filterState');
+        Array.from(stateSet).sort().forEach(s => {
+            stateFilter.append(new Option(s, s));
+        });
+
+        stateFilter.on('change', function() {
+            table.column(4).search(this.value).draw();
+        });
     });
 </script>
 

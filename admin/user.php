@@ -329,6 +329,7 @@ include '../includes/header.php';
                             <th>Full Name</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>State</th>
                             <th>Detail</th>
                             <th>Action</th>
                         </tr>
@@ -347,6 +348,7 @@ include '../includes/header.php';
                                 <td class="fw-bold"><?php echo htmlspecialchars($u['full_name'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($u['email']); ?></td>
                                 <td><span class="badge bg-<?php echo $badge; ?>"><?php echo htmlspecialchars($role); ?></span></td>
+                                <td><span class="badge border border-secondary text-secondary"><?php echo htmlspecialchars($u['assigned_state'] ?: 'N/A'); ?></span></td>
                                 <td><?php echo htmlspecialchars($u['detail'] ?? 'N/A'); ?></td>
                                 <td>
                                     <div class="d-flex gap-2">
@@ -546,9 +548,44 @@ include '../includes/header.php';
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#usersTable').DataTable({
+        const table = $('#usersTable').DataTable({
             order: [[0, 'desc']]
         });
+        
+        const filterHtml = `
+            <select id="dtRoleFilter" class="form-select form-select-sm d-inline-block w-auto me-2">
+                <option value="">All Roles</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="STAFF">STAFF</option>
+                <option value="CUSTOMER">CUSTOMER</option>
+            </select>
+            <select id="dtStateFilter" class="form-select form-select-sm d-inline-block w-auto me-2">
+                <option value="">All States</option>
+            </select>
+        `;
+        $('.dataTables_filter').prepend(filterHtml);
+
+        const stateSet = new Set();
+        table.rows().every(function() {
+            const data = this.data();
+            const stateNode = document.createElement('div');
+            stateNode.innerHTML = data[4];
+            const state = stateNode.textContent.trim();
+            if (state && state !== 'N/A') stateSet.add(state);
+        });
+        
+        const stateFilter = $('#dtStateFilter');
+        Array.from(stateSet).sort().forEach(s => {
+            stateFilter.append(new Option(s, s));
+        });
+        
+        $('#dtRoleFilter').on('change', function() {
+            table.column(3).search(this.value).draw();
+        });
+        $('#dtStateFilter').on('change', function() {
+            table.column(4).search(this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '', true, false).draw();
+        });
+
         toggleCreateFields();
     });
 

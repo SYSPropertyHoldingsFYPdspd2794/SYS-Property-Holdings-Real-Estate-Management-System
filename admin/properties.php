@@ -92,11 +92,11 @@ include '../includes/header.php';
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Project Name</label>
-                    <input type="text" id="filterName" class="form-control" placeholder="Search project...">
+                    <input type="text" id="filterName" class="form-control" placeholder="Search project..." disabled>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold">State Location</label>
-                    <select id="filterState" class="form-select">
+                    <select id="filterState" class="form-select" disabled>
                         <option value="">All Regions</option>
                         <optgroup label="States">
                             <option value="Johor">Johor</option>
@@ -122,7 +122,7 @@ include '../includes/header.php';
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Property Type Layout</label>
-                    <select id="filterType" class="form-select">
+                    <select id="filterType" class="form-select" disabled>
                         <option value="">All Types</option>
                         <option value="TERRACE">Terrace</option>
                         <option value="BUNGALOW">Bungalow</option>
@@ -394,7 +394,10 @@ include '../includes/header.php';
         const table = $('#propsTable').DataTable({
             "order": [[0, "desc"]],
             "dom": "<'row'<'col-sm-12'tr>>" +
-                   "<'row mt-3 align-items-center'<'col-sm-12 col-md-4 text-start'i><'col-sm-12 col-md-4 d-flex justify-content-center'p><'col-sm-12 col-md-4 d-flex justify-content-end'l>>"
+                   "<'row mt-3 align-items-center'<'col-sm-12 col-md-4 text-start'i><'col-sm-12 col-md-4 d-flex justify-content-center'p><'col-sm-12 col-md-4 d-flex justify-content-end'l>>",
+            "initComplete": function() {
+                $('#filterName, #filterState, #filterType').prop('disabled', false);
+            }
         });
 
         $('#filterName').on('keyup change', function() {
