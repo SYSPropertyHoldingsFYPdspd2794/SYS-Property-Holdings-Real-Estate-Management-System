@@ -563,7 +563,7 @@ include '../includes/header.php';
                 <option value="">All States</option>
             </select>
         `;
-        $('.dataTables_filter').prepend(filterHtml);
+        $('.dataTables_filter').addClass('d-flex align-items-center justify-content-end').prepend(filterHtml);
 
         const stateSet = new Set();
         table.rows().every(function() {

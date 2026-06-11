@@ -30,9 +30,6 @@ include '../includes/header.php';
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">Appointment Assignments</h4>
-                <select id="filterState" class="form-select border-0 shadow-sm w-auto fw-bold text-secondary">
-                    <option value="">All States</option>
-                </select>
             </div>
             <div class="table-responsive">
                 <table id="assignTable" class="table table-striped table-hover align-middle">
@@ -136,13 +133,23 @@ include '../includes/header.php';
             if (state) stateSet.add(state);
         });
 
+        const filterHtml = `<select id="filterState" class="form-select form-select-sm d-inline-block w-auto ms-2">
+                                <option value="">All States</option>
+                            </select>`;
+        
+        $('.dataTables_filter').addClass('d-flex align-items-center justify-content-end').append(filterHtml);
+        
         const stateFilter = $('#filterState');
-        Array.from(stateSet).sort().forEach(s => {
-            stateFilter.append(new Option(s, s));
-        });
+        if (stateSet.size > 0) {
+            Array.from(stateSet).sort().forEach(s => {
+                stateFilter.append(new Option(s, s));
+            });
+        } else {
+            stateFilter.hide();
+        }
 
         stateFilter.on('change', function() {
-            table.column(4).search(this.value).draw();
+            table.column(4).search(this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '', true, false).draw();
         });
     });
 </script>

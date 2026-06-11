@@ -335,20 +335,31 @@ $(document).ready(function() {
     const stateFilter = $('#filterState');
     const propertyFilter = $('#filterProperty');
 
-    Array.from(stateSet).sort().forEach(s => {
+    const allStates = [
+        'Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Penang', 'Perak', 'Perlis', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu',
+        'Kuala Lumpur', 'Labuan', 'Putrajaya'
+    ];
+
+    allStates.forEach(s => {
         stateFilter.append(new Option(s, s));
     });
 
     stateFilter.on('change', function() {
         const selectedState = this.value;
-        table.column(3).search(selectedState).draw();
+        table.column(3).search(selectedState ? '^' + $.fn.dataTable.util.escapeRegex(selectedState) + '$' : '', true, false).draw();
         
-        propertyFilter.empty().append(new Option('All Properties', ''));
-        if (selectedState && propMap.has(selectedState)) {
-            Array.from(propMap.get(selectedState)).sort().forEach(p => {
-                propertyFilter.append(new Option(p, p));
-            });
-        } else if (!selectedState) {
+        propertyFilter.empty();
+        if (selectedState) {
+            if (propMap.has(selectedState) && propMap.get(selectedState).size > 0) {
+                propertyFilter.append(new Option('All Properties', ''));
+                Array.from(propMap.get(selectedState)).sort().forEach(p => {
+                    propertyFilter.append(new Option(p, p));
+                });
+            } else {
+                propertyFilter.append(new Option('没人兴趣', '', true, true));
+            }
+        } else {
+            propertyFilter.append(new Option('All Properties', ''));
             const allProps = new Set();
             propMap.forEach(props => props.forEach(p => allProps.add(p)));
             Array.from(allProps).sort().forEach(p => {
