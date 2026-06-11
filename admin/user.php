@@ -325,6 +325,7 @@ $query = "
 ";
 $users = $conn->query($query);
 $edit_modals = '';
+$state_filter_options = json_encode($allowed_states);
 
 include '../includes/header.php';
 ?>
@@ -588,6 +589,7 @@ include '../includes/header.php';
 <script>
     $(document).ready(function() {
         const table = $('#usersTable').DataTable({
+            deferRender: true,
             order: [[0, 'desc']]
         });
         
@@ -603,18 +605,10 @@ include '../includes/header.php';
             </select>
         `;
         $('.dataTables_filter').addClass('d-flex align-items-center justify-content-end').prepend(filterHtml);
-
-        const stateSet = new Set();
-        table.rows().every(function() {
-            const data = this.data();
-            const stateNode = document.createElement('div');
-            stateNode.innerHTML = data[4];
-            const state = stateNode.textContent.trim();
-            if (state && state !== 'N/A') stateSet.add(state);
-        });
         
         const stateFilter = $('#dtStateFilter');
-        Array.from(stateSet).sort().forEach(s => {
+        const stateOptions = <?php echo $state_filter_options ?: '[]'; ?>;
+        stateOptions.forEach(s => {
             stateFilter.append(new Option(s, s));
         });
         
