@@ -39,6 +39,11 @@ function alert_box($type, $message)
         . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
 }
 
+function h_attr($value)
+{
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
 function table_column_exists($conn, $table, $column)
 {
     try {
@@ -324,7 +329,6 @@ $query = "
     ORDER BY a.account_id DESC
 ";
 $users = $conn->query($query);
-$edit_modals = '';
 $state_filter_options = json_encode($allowed_states);
 
 include '../includes/header.php';
@@ -388,7 +392,23 @@ include '../includes/header.php';
                                 <td><?php echo htmlspecialchars($u['detail'] ?? 'N/A'); ?></td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-dark fw-bold" data-bs-toggle="modal" data-bs-target="#editModal<?php echo (int)$u['account_id']; ?>">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-dark fw-bold edit-user-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editUserModal"
+                                            data-account-id="<?php echo (int)$u['account_id']; ?>"
+                                            data-role="<?php echo h_attr($role); ?>"
+                                            data-full-name="<?php echo h_attr($u['full_name'] ?? ''); ?>"
+                                            data-email="<?php echo h_attr($u['email']); ?>"
+                                            data-phone="<?php echo h_attr($u['phone_number'] ?? ''); ?>"
+                                            data-marital-status="<?php echo h_attr($u['marital_status'] ?? 'SINGLE'); ?>"
+                                            data-dependents-count="<?php echo h_attr($u['dependents_count'] ?? 0); ?>"
+                                            data-occupation="<?php echo h_attr($u['occupation'] ?? ''); ?>"
+                                            data-monthly-income="<?php echo h_attr($u['monthly_income'] ?? 0); ?>"
+                                            data-assigned-state="<?php echo h_attr($u['assigned_state'] ?? ''); ?>"
+                                            data-department="<?php echo h_attr($u['department'] ?? 'HQ Administration'); ?>"
+                                        >
                                             Edit
                                         </button>
                                         <form method="POST" class="m-0 confirm-action-form" data-confirm-title="Remove Account" data-confirm-message="Remove this account permanently?">
@@ -402,100 +422,6 @@ include '../includes/header.php';
                                 </td>
                             </tr>
 
-                            <?php ob_start(); ?>
-                            <div class="modal fade" id="editModal<?php echo (int)$u['account_id']; ?>" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content bg-white text-dark">
-                                        <div class="modal-header bg-dark text-white">
-                                            <h5 class="modal-title fw-bold">Edit <?php echo htmlspecialchars($role); ?> Account</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form method="POST">
-                                            <div class="modal-body p-4">
-                                                <input type="hidden" name="action" value="update">
-                                                <input type="hidden" name="account_id" value="<?php echo (int)$u['account_id']; ?>">
-                                                <div class="row g-3">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Full Name</label>
-                                                        <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($u['full_name'] ?? ''); ?>" required>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Email Address</label>
-                                                        <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($u['email']); ?>" required>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">New Password</label>
-                                                        <input type="password" name="password" class="form-control" placeholder="Enter the new password">
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold">Role</label>
-                                                        <select name="role" class="form-select edit-role-select" required onchange="toggleEditFields(this)">
-                                                            <option value="CUSTOMER" <?php echo ($role === 'CUSTOMER') ? 'selected' : ''; ?>>Customer</option>
-                                                            <option value="STAFF" <?php echo ($role === 'STAFF') ? 'selected' : ''; ?>>Staff</option>
-                                                            <option value="ADMIN" <?php echo ($role === 'ADMIN') ? 'selected' : ''; ?>>Administrator</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-12 edit-role-field edit-customer-field">
-                                                        <hr class="my-2">
-                                                        <h6 class="fw-bold text-muted mb-0">Customer Fields</h6>
-                                                    </div>
-                                                    <div class="col-md-6 edit-role-field edit-customer-field edit-staff-field">
-                                                        <label class="form-label fw-bold">Phone Number</label>
-                                                        <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($u['phone_number'] ?? ''); ?>">
-                                                    </div>
-                                                    <div class="col-md-6 edit-role-field edit-customer-field">
-                                                        <label class="form-label fw-bold">Marital Status</label>
-                                                        <select name="marital_status" class="form-select">
-                                                            <option value="SINGLE" <?php echo ($u['marital_status'] === 'SINGLE') ? 'selected' : ''; ?>>Single</option>
-                                                            <option value="MARRIED" <?php echo ($u['marital_status'] === 'MARRIED') ? 'selected' : ''; ?>>Married</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4 edit-role-field edit-customer-field">
-                                                        <label class="form-label fw-bold">Dependents</label>
-                                                        <input type="number" name="dependents_count" class="form-control" min="0" value="<?php echo htmlspecialchars($u['dependents_count'] ?? 0); ?>">
-                                                    </div>
-                                                    <div class="col-md-4 edit-role-field edit-customer-field">
-                                                        <label class="form-label fw-bold">Occupation</label>
-                                                        <input type="text" name="occupation" class="form-control" value="<?php echo htmlspecialchars($u['occupation'] ?? ''); ?>">
-                                                    </div>
-                                                    <div class="col-md-4 edit-role-field edit-customer-field">
-                                                        <label class="form-label fw-bold">Monthly Income (RM)</label>
-                                                        <input type="number" step="0.01" name="monthly_income" class="form-control" value="<?php echo htmlspecialchars($u['monthly_income'] ?? 0); ?>">
-                                                    </div>
-
-                                                    <div class="col-12 edit-role-field edit-staff-field">
-                                                        <hr class="my-2">
-                                                        <h6 class="fw-bold text-muted mb-0">Staff Fields</h6>
-                                                    </div>
-                                                    <div class="col-md-6 edit-role-field edit-staff-field">
-                                                        <label class="form-label fw-bold">Assigned State</label>
-                                                        <select name="assigned_state" class="form-select">
-                                                            <?php echo render_state_options($u['assigned_state'] ?? '', $allowed_states); ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <?php if ($admin_has_department): ?>
-                                                        <div class="col-12 edit-role-field edit-admin-field">
-                                                            <hr class="my-2">
-                                                            <h6 class="fw-bold text-muted mb-0">Admin Fields</h6>
-                                                        </div>
-                                                        <div class="col-md-6 edit-role-field edit-admin-field">
-                                                            <label class="form-label fw-bold">Department</label>
-                                                            <input type="text" name="department" class="form-control" value="<?php echo htmlspecialchars($u['department'] ?? 'HQ Administration'); ?>">
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary fw-bold px-4">Save Changes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php $edit_modals .= ob_get_clean(); ?>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
@@ -504,7 +430,98 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php echo $edit_modals; ?>
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-white text-dark">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="editUserModalTitle">Edit User Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="editUserForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="account_id" value="">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">New Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Enter the new password">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Role</label>
+                            <select name="role" class="form-select edit-role-select" required onchange="toggleEditFields(this)">
+                                <option value="CUSTOMER">Customer</option>
+                                <option value="STAFF">Staff</option>
+                                <option value="ADMIN">Administrator</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 edit-role-field edit-customer-field">
+                            <hr class="my-2">
+                            <h6 class="fw-bold text-muted mb-0">Customer Fields</h6>
+                        </div>
+                        <div class="col-md-6 edit-role-field edit-customer-field edit-staff-field">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <input type="text" name="phone" class="form-control">
+                        </div>
+                        <div class="col-md-6 edit-role-field edit-customer-field">
+                            <label class="form-label fw-bold">Marital Status</label>
+                            <select name="marital_status" class="form-select">
+                                <option value="SINGLE">Single</option>
+                                <option value="MARRIED">Married</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 edit-role-field edit-customer-field">
+                            <label class="form-label fw-bold">Dependents</label>
+                            <input type="number" name="dependents_count" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-4 edit-role-field edit-customer-field">
+                            <label class="form-label fw-bold">Occupation</label>
+                            <input type="text" name="occupation" class="form-control">
+                        </div>
+                        <div class="col-md-4 edit-role-field edit-customer-field">
+                            <label class="form-label fw-bold">Monthly Income (RM)</label>
+                            <input type="number" step="0.01" name="monthly_income" class="form-control" value="0">
+                        </div>
+
+                        <div class="col-12 edit-role-field edit-staff-field">
+                            <hr class="my-2">
+                            <h6 class="fw-bold text-muted mb-0">Staff Fields</h6>
+                        </div>
+                        <div class="col-md-6 edit-role-field edit-staff-field">
+                            <label class="form-label fw-bold">Assigned State</label>
+                            <select name="assigned_state" class="form-select">
+                                <?php echo render_state_options('', $allowed_states); ?>
+                            </select>
+                        </div>
+
+                        <?php if ($admin_has_department): ?>
+                            <div class="col-12 edit-role-field edit-admin-field">
+                                <hr class="my-2">
+                                <h6 class="fw-bold text-muted mb-0">Admin Fields</h6>
+                            </div>
+                            <div class="col-md-6 edit-role-field edit-admin-field">
+                                <label class="form-label fw-bold">Department</label>
+                                <input type="text" name="department" class="form-control" value="HQ Administration">
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -619,6 +636,15 @@ include '../includes/header.php';
             table.column(4).search(this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '', true, false).draw();
         });
 
+        document.addEventListener('click', function(event) {
+            const button = event.target.closest('.edit-user-btn');
+            if (!button) {
+                return;
+            }
+
+            populateEditModal(button);
+        });
+
         toggleCreateFields();
     });
 
@@ -653,6 +679,35 @@ include '../includes/header.php';
         if (role === 'ADMIN') {
             modal.querySelectorAll('.edit-admin-field').forEach((field) => field.classList.remove('d-none'));
         }
+    }
+
+    function setEditField(form, name, value) {
+        if (form.elements[name]) {
+            form.elements[name].value = value ?? '';
+        }
+    }
+
+    function populateEditModal(button) {
+        const modal = document.getElementById('editUserModal');
+        const form = document.getElementById('editUserForm');
+        const role = button.dataset.role || 'CUSTOMER';
+
+        document.getElementById('editUserModalTitle').textContent = `Edit ${role} Account`;
+
+        setEditField(form, 'account_id', button.dataset.accountId);
+        setEditField(form, 'full_name', button.dataset.fullName);
+        setEditField(form, 'email', button.dataset.email);
+        setEditField(form, 'password', '');
+        setEditField(form, 'role', role);
+        setEditField(form, 'phone', button.dataset.phone);
+        setEditField(form, 'marital_status', button.dataset.maritalStatus || 'SINGLE');
+        setEditField(form, 'dependents_count', button.dataset.dependentsCount || '0');
+        setEditField(form, 'occupation', button.dataset.occupation);
+        setEditField(form, 'monthly_income', button.dataset.monthlyIncome || '0');
+        setEditField(form, 'assigned_state', button.dataset.assignedState);
+        setEditField(form, 'department', button.dataset.department || 'HQ Administration');
+
+        toggleEditFields(modal.querySelector('.edit-role-select'));
     }
 
     document.querySelectorAll('.edit-role-select').forEach((select) => toggleEditFields(select));
