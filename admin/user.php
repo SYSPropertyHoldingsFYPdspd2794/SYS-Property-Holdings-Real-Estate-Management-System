@@ -469,7 +469,9 @@ include '../includes/header.php';
                                                     </div>
                                                     <div class="col-md-6 edit-role-field edit-staff-field">
                                                         <label class="form-label fw-bold">Assigned State</label>
-                                                        <input type="text" name="assigned_state" class="form-control" value="<?php echo htmlspecialchars($u['assigned_state'] ?? ''); ?>">
+                                                        <select name="assigned_state" class="form-select">
+                                                            <?php echo render_state_options($u['assigned_state'] ?? '', $allowed_states); ?>
+                                                        </select>
                                                     </div>
 
                                                     <?php if ($admin_has_department): ?>
@@ -540,7 +542,9 @@ include '../includes/header.php';
                         </div>
                         <div class="col-md-6 role-field staff-field">
                             <label class="form-label fw-bold">Assigned State</label>
-                            <input type="text" name="assigned_state" class="form-control">
+                            <select name="assigned_state" class="form-select">
+                                <?php echo render_state_options('', $allowed_states); ?>
+                            </select>
                         </div>
                         <?php if ($admin_has_department): ?>
                             <div class="col-md-6 role-field admin-field">
