@@ -5,27 +5,42 @@ require_once '../includes/auth_check.php';
 protect_admin_page('ADMIN', $conn);
 
 $account_id = $_SESSION['account_id'];
+$assign_error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_id'], $_POST['assigned_staff_id'])) {
-    $appt_id = $_POST['appointment_id'];
-    $staff_id = $_POST['assigned_staff_id'];
-    $stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id =?, status = 'ASSIGNED' WHERE appointment_id =?");
+    $appt_id = (int)$_POST['appointment_id'];
+    $staff_id = (int)$_POST['assigned_staff_id'];
+    $stmt = $conn->prepare("UPDATE appointments SET assigned_staff_id = ?, status = 'ASSIGNED' WHERE appointment_id = ? AND status = 'REQUESTED' AND TIMESTAMP(appointment_date, appointment_time) > NOW()");
     $stmt->bind_param("ii", $staff_id, $appt_id);
-    if ($stmt->execute()) {
+    if ($stmt->execute() && $stmt->affected_rows > 0) {
         $log_stmt = $conn->prepare("INSERT INTO audit_logs (account_id, action_type, entity_type, entity_id) VALUES (?, 'LEAD_ASSIGNED', 'appointment_id',?)");
         $log_stmt->bind_param("ii", $account_id, $appt_id);
         $log_stmt->execute();
+        header("Location: appointments.php?msg=assigned");
+        exit();
     }
-    header("Location: appointments.php");
+    header("Location: appointments.php?msg=expired");
     exit();
 }
 
-$res = $conn->query("SELECT a.appointment_id, a.appointment_date, a.appointment_time, c.full_name, p.project_name, p.state FROM appointments a JOIN customers c ON a.customer_id = c.customer_id JOIN properties p ON a.property_id = p.property_id WHERE a.status = 'REQUESTED'");
+$res = $conn->query("SELECT a.appointment_id, a.appointment_date, a.appointment_time, c.full_name, p.project_name, p.state FROM appointments a JOIN customers c ON a.customer_id = c.customer_id JOIN properties p ON a.property_id = p.property_id WHERE a.status = 'REQUESTED' AND TIMESTAMP(a.appointment_date, a.appointment_time) > NOW() ORDER BY a.appointment_date ASC, a.appointment_time ASC");
 
 include '../includes/header.php';
 ?>
 
 <div class="container mt-5">
+    <?php if (($_GET['msg'] ?? '') === 'assigned'): ?>
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            Appointment assigned successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php elseif (($_GET['msg'] ?? '') === 'expired'): ?>
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+            This appointment is no longer available for assignment because it has expired or is no longer pending.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">

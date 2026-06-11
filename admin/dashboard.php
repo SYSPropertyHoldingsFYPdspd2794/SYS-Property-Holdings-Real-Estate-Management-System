@@ -10,7 +10,7 @@ if (isset($_GET['ajax_chart'])) {
 
     // Stats
     $stmt = $conn->prepare("SELECT 
-        SUM(CASE WHEN status = 'REQUESTED' THEN 1 ELSE 0 END) as waiting,
+        SUM(CASE WHEN status = 'REQUESTED' AND TIMESTAMP(appointment_date, appointment_time) > NOW() THEN 1 ELSE 0 END) as waiting,
         SUM(CASE WHEN assigned_staff_id IS NOT NULL THEN 1 ELSE 0 END) as assigned
         FROM appointments
         WHERE MONTH(appointment_date) = ? AND YEAR(appointment_date) = ?");
@@ -20,7 +20,7 @@ if (isset($_GET['ajax_chart'])) {
 
     // Chart
     $stmt_chart = $conn->prepare("SELECT p.state,
-        SUM(CASE WHEN a.status = 'REQUESTED' THEN 1 ELSE 0 END) as waiting,
+        SUM(CASE WHEN a.status = 'REQUESTED' AND TIMESTAMP(a.appointment_date, a.appointment_time) > NOW() THEN 1 ELSE 0 END) as waiting,
         SUM(CASE WHEN a.assigned_staff_id IS NOT NULL THEN 1 ELSE 0 END) as assigned
         FROM appointments a
         JOIN properties p ON a.property_id = p.property_id
@@ -57,7 +57,7 @@ if (isset($_GET['ajax_chart'])) {
 $res_prop = $conn->query("SELECT COUNT(*) as count FROM properties");
 $total_prop = $res_prop->fetch_assoc()['count'];
 
-$res_leads = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'REQUESTED'");
+$res_leads = $conn->query("SELECT COUNT(*) as count FROM appointments WHERE status = 'REQUESTED' AND TIMESTAMP(appointment_date, appointment_time) > NOW()");
 $total_leads = $res_leads->fetch_assoc()['count'];
 
 $res_app = $conn->query("SELECT COUNT(*) as count FROM affordable_housing_applications WHERE status = 'PENDING_REVIEW'");
