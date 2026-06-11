@@ -53,6 +53,7 @@ include_once '../includes/header.php';
 
 <div class="container my-5">
     <div class="d-flex align-items-center mb-5 border-bottom pb-3">
+        <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 50px; border-radius: 6px; margin-right: 15px;">
         <i class="fas fa-heart text-danger fa-2x me-3"></i>
         <h2 class="fw-bold mb-0 text-white">My Wishlist Properties</h2>
     </div>

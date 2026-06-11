@@ -126,6 +126,7 @@ include '../includes/header.php';
         <div class="col-md-8">
             <div class="card shadow border-0 border-top border-primary border-5 rounded-3">
                 <div class="card-body p-5">
+                    <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 50px; margin-bottom: 15px; border-radius: 6px;">
                     <h2 class="fw-bold mb-3 text-primary"><i class="fas fa-home me-2"></i>Affordable Housing Application</h2>
                     <p class="text-muted mb-4">Complete your submission for government-subsidized housing. Please ensure your income data aligns with state policies.</p>
                     

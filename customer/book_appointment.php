@@ -117,7 +117,8 @@ include '../includes/header.php';
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow border-0 rounded-4">
-                <div class="card-header bg-dark text-white p-4 rounded-top-4">
+                <div class="card-header bg-dark text-white p-4 rounded-top-4 d-flex align-items-center">
+                    <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 40px; margin-right: 15px; border-radius: 4px;">
                     <h3 class="fw-bold mb-0"><i class="far fa-calendar-check text-warning me-2"></i>Book Showroom Appointment</h3>
                 </div>
                 <div class="card-body p-5">

@@ -125,6 +125,7 @@ if ($is_afford) {
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
+                            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 40px; border-radius: 4px;">
                             <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                         </div>
                         <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">

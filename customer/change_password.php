@@ -44,9 +44,12 @@ include '../includes/header.php';
 ?>
 
 <div class="container my-5">
-    <div class="mb-4">
-        <h2 class="fw-bold text-white mb-1">Setting</h2>
-        <p class="text-light opacity-75 mb-0">Manage your account profile and security preferences.</p>
+    <div class="d-flex align-items-center mb-4">
+        <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 50px; margin-right: 15px; border-radius: 6px;">
+        <div>
+            <h2 class="fw-bold text-white mb-1">Setting</h2>
+            <p class="text-light opacity-75 mb-0">Manage your account profile and security preferences.</p>
+        </div>
     </div>
 
     <?php if ($alert_msg): ?>

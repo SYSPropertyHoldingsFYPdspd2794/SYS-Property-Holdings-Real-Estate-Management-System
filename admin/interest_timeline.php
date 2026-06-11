@@ -67,6 +67,7 @@ $result = $conn->query($query);
 <div class="container-fluid px-4 px-lg-5 my-5 interest-timeline-page">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
         <div>
+            <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 60px; margin-bottom: 15px; border-radius: 6px;">
             <p class="text-uppercase tracking-wider text-gold mb-2 small">Admin Market Signal</p>
             <h2 class="fw-bold m-0 text-white">Property Demand Analytics</h2>
             <p class="text-light opacity-75 mt-2 mb-0">

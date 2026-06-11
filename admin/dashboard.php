@@ -69,8 +69,9 @@ $total_cust = $res_cust->fetch_assoc()['count'];
 include '../includes/header.php';
 ?>
 
-<div class="container my-5">
-    <h2 class="fw-bold mb-4">Global Administrator Dashboard</h2> 
+<div class="container my-5 d-flex align-items-center gap-3">
+    <img src="../SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Logo" style="height: 48px; width: auto; border-radius: 6px; object-fit: contain;" class="shadow-sm">
+    <h2 class="fw-bold mb-0">Global Administrator Dashboard</h2> 
 </div>
 
 <div class="container mt-5">

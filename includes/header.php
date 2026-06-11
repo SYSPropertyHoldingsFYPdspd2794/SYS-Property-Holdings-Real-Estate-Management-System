@@ -54,8 +54,8 @@ if (isset($_SESSION['role'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($root_prefix . 'sysLogo.png'); ?>">
-<link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'sysLogo.png'); ?>">
+<link rel="icon" type="image/jpeg" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
+<link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
 <?php 
     // Check if the current page belongs to private administrative or client directories
     if (isset($current_folder) && in_array($current_folder, ['admin', 'customer', 'staff'], true)): 
@@ -426,7 +426,10 @@ footer.luxury-footer {
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
-<a class="navbar-brand fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">SYS Property</a>
+<a class="navbar-brand d-flex align-items-center gap-2 fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">
+    <img src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
+    SYS Property
+</a>
 <div class="d-flex align-items-center gap-2 navbar-account-actions">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">

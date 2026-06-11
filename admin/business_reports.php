@@ -482,6 +482,7 @@ include '../includes/header.php';
 <div class="container-fluid my-5">
     <!-- Print Official Header (Visible only in PDF/Print mode) -->
     <div class="print-title">
+        <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 10px; border-radius: 6px;">
         <h1 class="m-0">SYS Property Holdings</h1>
         <h3>Official Business Report</h3>
         <p class="text-muted m-0">Generated on: <?= date('d M Y, h:i A') ?></p>

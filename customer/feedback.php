@@ -26,6 +26,7 @@ include '../includes/header.php';
 <div class="container my-5" style="max-width: 800px;">
     <div class="d-flex align-items-center mb-5">
         <a href="track_status.php" class="btn btn-outline-secondary rounded-circle me-3 shadow-sm" style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-arrow-left"></i></a>
+        <img src="../SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 50px; margin-right: 15px; border-radius: 6px;">
         <h2 class="fw-bold m-0"><i class="fas fa-bell text-warning me-3"></i>Feedback Inbox</h2>
     </div>
 

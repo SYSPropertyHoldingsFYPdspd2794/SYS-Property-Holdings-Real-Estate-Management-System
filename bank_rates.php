@@ -20,6 +20,7 @@ $result = $conn->query($sql);
 
     <div class="text-center mb-5">
         <div class="section-kicker mb-2">Financing comparison</div>
+        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-4 fw-bold text-white mb-3">Current Bank Loan Rates</h1>
         <p class="lead text-light mx-auto" style="max-width: 760px;">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
     </div>

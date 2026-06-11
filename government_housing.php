@@ -10,6 +10,7 @@ include_once 'includes/header.php';
 <div class="container my-5 py-4">
     <div class="text-center mb-5">
         <div class="section-kicker mb-2">KPKT Authorized Partner</div>
+        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-4 fw-bold text-white mb-3">Affordable Housing Initiative</h1>
         <p class="lead text-light mx-auto" style="max-width: 780px;">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
     </div>
