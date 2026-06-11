@@ -356,7 +356,7 @@ $(document).ready(function() {
                     propertyFilter.append(new Option(p, p));
                 });
             } else {
-                propertyFilter.append(new Option('没人兴趣', '', true, true));
+                propertyFilter.append(new Option('No Interest', '', true, true));
             }
         } else {
             propertyFilter.append(new Option('All Properties', ''));

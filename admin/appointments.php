@@ -133,11 +133,13 @@ include '../includes/header.php';
             if (state) stateSet.add(state);
         });
 
-        const filterHtml = `<select id="filterState" class="form-select form-select-sm d-inline-block w-auto ms-2">
+        const filterHtml = `<select id="filterState" class="form-select form-select-sm d-inline-block w-auto ms-2" style="height: 31px; font-size: 0.875rem; padding-top: 0.25rem; padding-bottom: 0.25rem;">
                                 <option value="">All States</option>
                             </select>`;
         
-        $('.dataTables_filter').addClass('d-flex align-items-center justify-content-end').append(filterHtml);
+        $('.dataTables_filter').addClass('d-flex align-items-center justify-content-end');
+        $('.dataTables_filter label').addClass('d-flex align-items-center mb-0');
+        $('.dataTables_filter').append(filterHtml);
         
         const stateFilter = $('#filterState');
         if (stateSet.size > 0) {
