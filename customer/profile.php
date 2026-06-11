@@ -129,7 +129,7 @@ include '../includes/header.php';
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Phone</label>
-                                <input type="text" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" required>
+                                <input type="tel" name="phone_number" class="form-control" value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>" inputmode="numeric" minlength="10" maxlength="11" title="Enter a valid mobile number with 10 or 11 digits. Example: 1234567890" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Marital Status</label>
@@ -216,6 +216,11 @@ const customerProfileImageName = document.getElementById('customerProfileImageNa
 if (customerProfileImage && customerProfileImageName) {
     customerProfileImage.addEventListener('change', function () {
         customerProfileImageName.textContent = this.files.length ? this.files[0].name : '';
+    });
+}
+</script>
+<?php include '../includes/footer.php'; ?>
+.files.length ? this.files[0].name : '';
     });
 }
 </script>

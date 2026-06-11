@@ -18,7 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $profile_image = null;
         $can_update_staff = true;
 
-        if (!$profile_image_ready) {
+        if (preg_match('/^\d{10,11}$/', $phone) !== 1) {
+            $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Phone number must be a valid mobile number with 10 or 11 digits.</div>';
+            $can_update_staff = false;
+        } else if (!$profile_image_ready) {
             $alert_msg = '<div class="alert alert-danger fw-bold shadow-sm">Profile image column is not ready. Please check database permissions.</div>';
             $can_update_staff = false;
         } else {
