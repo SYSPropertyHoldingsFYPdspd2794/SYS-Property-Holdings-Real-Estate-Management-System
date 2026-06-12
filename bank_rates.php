@@ -20,7 +20,7 @@ $result = $conn->query($sql);
 
     <div class="text-center mb-5">
         <div class="section-kicker mb-2">Financing comparison</div>
-        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
+        <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-4 fw-bold text-white mb-3">Current Bank Loan Rates</h1>
         <p class="lead text-light mx-auto" style="max-width: 760px;">Compare the latest Base Lending Rates (BLR) from Malaysia's top banks. Use these rates in our property calculator to formulate a precise offline financial plan.</p>
     </div>
@@ -95,7 +95,7 @@ $result = $conn->query($sql);
                                 <span class="position-absolute top-0 end-0 badge <?php echo $badgeClass; ?> m-2 shadow-sm z-3"><?php echo $badgeText; ?></span>
                             <?php endif; ?>
                             <a href="<?php echo $websiteUrl; ?>" target="_blank" class="stretched-link text-decoration-none w-100">
-                                <img src="<?php echo $logoUrl; ?>" style="max-height: 60px; object-fit: contain; width: 100%;" alt="<?php echo $bankName; ?>">
+                                <img loading="lazy" src="<?php echo $logoUrl; ?>" style="max-height: 60px; object-fit: contain; width: 100%;" alt="<?php echo $bankName; ?>">
                             </a>
                         </div>
                         <div class="card-body p-4 text-center bg-light">

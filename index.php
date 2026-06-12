@@ -70,28 +70,28 @@ include 'includes/header.php';
     </div>
     <div class="horizontal-scroll">
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=300&fit=crop" class="card-img-top" alt="Development 1">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=300&fit=crop&auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 1">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Palmwood Residences</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Johor Bahru</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&h=300&fit=crop" class="card-img-top" alt="Development 2">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&h=300&fit=crop&auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 2">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Eco Square Hub</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Shah Alam</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=500&h=300&fit=crop" class="card-img-top" alt="Development 3">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=500&h=300&fit=crop&auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 3">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Citrine Hills Phase 2</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Kulai</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1515263487990-61b07816b324?w=500&h=300&fit=crop" class="card-img-top" alt="Development 4">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1515263487990-61b07816b324?w=500&h=300&fit=crop&auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 4">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Summera Grove</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Petaling Jaya</p>

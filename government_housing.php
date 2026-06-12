@@ -10,14 +10,14 @@ include_once 'includes/header.php';
 <div class="container my-5 py-4">
     <div class="text-center mb-5">
         <div class="section-kicker mb-2">KPKT Authorized Partner</div>
-        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
+        <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-4 fw-bold text-white mb-3">Affordable Housing Initiative</h1>
         <p class="lead text-light mx-auto" style="max-width: 780px;">SYS Property partners with state governments (RMMJ & RSKU) to deliver quality homes. We ensure a transparent, secure, and regulated pathway to homeownership for eligible citizens.</p>
     </div>
 
     <div class="row align-items-center mb-5 bg-white p-4 p-lg-5 shadow-sm rounded-4 border">
         <div class="col-lg-5 mb-4 mb-lg-0 text-center">
-            <img src="SYS Property Catalog/Floor_Plan.webp" class="img-fluid rounded shadow" alt="Standard Floor Plan" style="border: 5px solid #f8f9fa;">
+            <img loading="lazy" src="SYS Property Catalog/Floor_Plan.webp" class="img-fluid rounded shadow" alt="Standard Floor Plan" style="border: 5px solid #f8f9fa;">
             <p class="text-muted small mt-3 fw-bold"><i class="fas fa-search-plus me-1"></i> Standard 3-Bedroom Layout Specification</p>
         </div>
         <div class="col-lg-7 px-lg-5">

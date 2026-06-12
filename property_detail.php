@@ -116,7 +116,7 @@ if ($is_afford) {
         <div class="col-md-7 mb-4">
             <div class="card shadow-sm border-0 overflow-hidden h-100">
                 <div class="position-relative zoom-container" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageZoom">
-                    <img src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
+                    <img loading="lazy" src="<?php echo $finalImg; ?>" class="w-100" style="height: 400px; object-fit: cover;">
                     <div class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-25 zoom-overlay">
                         <span class="badge bg-dark bg-opacity-75 fs-5 py-2 px-3 rounded-pill shadow"><i class="fas fa-search-plus me-2"></i>Click to Enlarge</span>
                     </div>
@@ -125,7 +125,7 @@ if ($is_afford) {
                 <div class="card-body p-5">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center gap-3">
-                            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 40px; border-radius: 4px;">
+                            <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 40px; border-radius: 4px;">
                             <h2 class="fw-bold mb-0"><?php echo htmlspecialchars($property['project_name']); ?></h2>
                         </div>
                         <span class="badge <?php echo $is_afford ? 'bg-success' : 'bg-primary'; ?> px-3 py-2 fs-6 shadow-sm">
@@ -217,7 +217,7 @@ if ($is_afford) {
             <div class="card border-0 bg-light shadow-sm rounded-4 p-4 p-md-5 mb-5 reveal-card">
                 <h3 class="fw-bold text-dark mb-4 border-bottom border-primary border-2 pb-3"><i class="fas fa-drafting-compass text-primary me-2"></i> Architectural Floor Plan</h3>
                 <div class="text-center bg-white p-4 border rounded-3 shadow-sm">
-                    <img src="<?php echo htmlspecialchars($finalFloorPlan); ?>" class="img-fluid rounded" alt="Floor Plan" style="max-height: 500px; object-fit: contain;">
+                    <img loading="lazy" src="<?php echo htmlspecialchars($finalFloorPlan); ?>" class="img-fluid rounded" alt="Floor Plan" style="max-height: 500px; object-fit: contain;">
                 </div>
             </div>
 
@@ -235,7 +235,7 @@ if ($is_afford) {
                 <div class="row mt-3 g-4">
                     <div class="col-lg-8">
                         <div id="propertyMap" class="rounded shadow-sm border border-secondary border-opacity-25" style="height: 480px; width: 100%;">
-                            <iframe
+                            <iframe loading="lazy"
                                 title="Map for <?php echo htmlspecialchars($property['project_name']); ?>"
                                 src="https://maps.google.com/maps?q=<?php echo urlencode($proximityMapQuery); ?>&t=&z=13&ie=UTF8&iwloc=&output=embed"
                                 class="w-100 h-100 rounded border-0"
@@ -280,7 +280,7 @@ if ($is_afford) {
 <div class="modal fade" id="imageZoom" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content bg-transparent border-0">
-            <div class="modal-body text-center p-0"><img src="<?php echo $finalImg; ?>" class="img-fluid rounded shadow-lg"></div>
+            <div class="modal-body text-center p-0"><img loading="lazy" src="<?php echo $finalImg; ?>" class="img-fluid rounded shadow-lg"></div>
         </div>
     </div>
 </div>
