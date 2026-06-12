@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /index.php
+Allow: /about_us.php
+Allow: /showrooms.php
+Allow: /buying_journey.php
+Allow: /financial_planner.php
+Allow: /bank_rates.php
+Allow: /government_housing.php
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /staff/
+Disallow: /includes/
+
+Sitemap: https://syspropertyholdings.infinityfreeapp.com/sitemap.xml
