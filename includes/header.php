@@ -330,7 +330,7 @@ footer.luxury-footer {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: linear-gradient(105deg, rgba(8,17,31,0.95) 0%, rgba(8,17,31,0.74) 45%, rgba(8,17,31,0.34) 100%), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+    background: linear-gradient(105deg, rgba(8,17,31,0.95) 0%, rgba(8,17,31,0.74) 45%, rgba(8,17,31,0.34) 100%), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=70') center/cover no-repeat;
     padding: clamp(6rem, 12vw, 9rem) 0 clamp(4rem, 9vw, 6rem);
 }
 .hero-banner::after {
@@ -463,7 +463,7 @@ footer.luxury-footer {
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
 <a class="navbar-brand d-flex align-items-center gap-2 fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>" aria-label="SYS Property Holdings Homepage">
-    <img src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
+    <img loading="eager" fetchpriority="high" src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
     SYS Property
 </a>
 <div class="d-flex align-items-center gap-2 navbar-account-actions" role="group" aria-label="User Account Actions">

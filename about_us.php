@@ -23,10 +23,10 @@ include_once 'includes/header.php';
 }
 </script>
 
-<div class="position-relative overflow-hidden bg-dark text-white py-5 mb-5" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat; padding-top: 100px !important; padding-bottom: 100px !important;" role="banner" aria-label="About Us Hero Banner">
+<div class="position-relative overflow-hidden bg-dark text-white py-5 mb-5" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=70') center center / cover no-repeat; padding-top: 100px !important; padding-bottom: 100px !important;" role="banner" aria-label="About Us Hero Banner">
     <div class="container py-5 text-center position-relative z-3">
         <h6 class="text-uppercase fw-bold text-warning tracking-widest mb-3" style="letter-spacing: 4px;">Master Community Developer</h6>
-        <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
+        <img loading="eager" fetchpriority="high" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
         <h1 class="display-2 fw-bold text-white mb-4">Architecting Sustainable Tomorrow</h1>
         <p class="lead mx-auto text-light opacity-75 fs-4" style="max-width: 900px;">SYS Property Holdings stands at the vanguard of Malaysia's real estate tech evolution. We blend state-of-the-art structural craftsmanship with our proprietary Online-to-Offline (O2O) deployment ecosystem to shape liveable future cities.</p>
     </div>
@@ -65,7 +65,7 @@ include_once 'includes/header.php';
     <div class="row g-5 align-items-center mb-5 pb-5" role="region" aria-labelledby="vision-mission-title">
         <div class="col-lg-6">
             <div class="position-relative p-2">
-                <img loading="lazy" src="https://images.unsplash.com/photo-1541480601022-2308c0f02487?q=80&w=2070&auto=format&fit=crop" class="img-fluid rounded-4 shadow-lg w-100" style="height: 450px; object-fit: cover;" alt="SYS Enterprise">
+                <img loading="lazy" src="https://images.unsplash.com/photo-1541480601022-2308c0f02487?auto=format&fit=crop&w=800&q=70" class="img-fluid rounded-4 shadow-lg w-100" style="height: 450px; object-fit: cover;" alt="SYS Enterprise">
                 <div class="position-absolute bottom-0 end-0 bg-warning text-dark p-4 rounded-4 m-4 shadow-lg d-none d-sm-block" style="max-width: 250px;" role="note">
                     <h5 class="fw-bold m-0"><i class="fas fa-award me-2" aria-hidden="true"></i>CIDB G7 Certified</h5>
                     <small class="small opacity-75">Highest grade industrial building capability parameters.</small>
