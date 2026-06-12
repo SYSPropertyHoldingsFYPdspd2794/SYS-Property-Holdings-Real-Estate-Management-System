@@ -109,7 +109,7 @@ include 'includes/header.php';
                 <h2 class="section-title text-dark fw-bold mb-4">Locate SYS Property Holdings Offline Showrooms</h2>
                 <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
-                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
+                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm" aria-label="Select state location">
                     <option value="" selected disabled>-- Select a State / Territory --</option>
                     <optgroup label="States">
                         <option value="Johor">Johor</option>
@@ -283,7 +283,7 @@ document.getElementById('stateSelect').addEventListener('change', function() {
                 loading="lazy" 
                 allowfullscreen 
                 referrerpolicy="no-referrer-when-downgrade" 
-                title="Google Maps Showroom Location"
+                title="SYS Property Holdings Showroom Map Locator"
                 src="https://www.google.com/maps?q=${locationData.query},+Malaysia&output=embed">
             </iframe>
         `;
