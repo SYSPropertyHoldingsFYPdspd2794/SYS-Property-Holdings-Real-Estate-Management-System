@@ -23,9 +23,10 @@ include 'includes/header.php';
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-8">
-                <div class="section-kicker mb-3">Online to offline real estate</div>
-                <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
-                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
+                <!-- 注入了品牌词和行业词 -->
+                <div class="section-kicker mb-3">SYS Property Holdings - Online to offline real estate</div>
+                <h1 class="display-2 fw-bold mb-4">SYS Property Holdings: Your First Home Starts Here</h1>
+                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from the trusted SYS Property Holdings real estate management platform.</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3">View Catalog</a>
                     <a href="showrooms.php" class="btn btn-outline-light btn-lg px-4 py-3">Find Showrooms</a>
@@ -61,8 +62,9 @@ include 'includes/header.php';
 <section class="container my-5 py-5">
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
-            <div class="section-kicker mb-2">Featured launches</div>
-            <h2 class="section-title text-white mb-0">New & Upcoming Developments</h2>
+            <!-- 稍微强化了小标题 -->
+            <div class="section-kicker mb-2">SYS Property Featured Launches</div>
+            <h2 class="section-title text-white mb-0">New & Upcoming Real Estate Developments</h2>
         </div>
         <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-light">Browse all</a>
     </div>
@@ -103,7 +105,8 @@ include 'includes/header.php';
         <div class="row align-items-center g-5">
             <div class="col-lg-5 mb-4 mb-lg-0">
                 <div class="section-kicker mb-2">Nationwide support</div>
-                <h2 class="section-title text-dark fw-bold mb-4">Locate Our Offline Showrooms</h2>
+                <!-- 加入品牌名 -->
+                <h2 class="section-title text-dark fw-bold mb-4">Locate SYS Property Holdings Offline Showrooms</h2>
                 <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
                 <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
@@ -175,7 +178,8 @@ include 'includes/header.php';
 <section class="my-5 py-5 text-center bg-white">
     <div class="container">
     <div class="section-kicker mb-2">How it works</div>
-    <h2 class="section-title text-dark fw-bold mb-5">Your O2O Property Journey</h2>
+    <!-- 加入品牌名 -->
+    <h2 class="section-title text-dark fw-bold mb-5">Your SYS Property Holdings O2O Journey</h2>
     <div class="row justify-content-center g-4">
         <div class="col-md-3 col-sm-6 mb-4">
             <i class="fas fa-laptop-house step-icon"></i>
@@ -201,7 +205,8 @@ include 'includes/header.php';
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
             <div>
                 <div class="section-kicker mb-2">Ready to explore</div>
-                <h2 class="section-title text-dark fw-bold mb-0">Featured Active Projects</h2>
+                <!-- 强化列表标题 -->
+                <h2 class="section-title text-dark fw-bold mb-0">Featured SYS Active Projects</h2>
             </div>
             <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-dark">View All <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
