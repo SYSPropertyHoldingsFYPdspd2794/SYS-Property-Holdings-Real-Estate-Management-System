@@ -188,7 +188,7 @@ include 'includes/header.php';
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <div class="section-kicker mb-2">Account recovery</div>
-                        <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 60px; margin-bottom: 15px; border-radius: 6px;">
+                        <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 60px; margin-bottom: 15px; border-radius: 6px;">
                         <h2 class="fw-bold mb-2">Forgot Password</h2>
                         <p class="text-muted mb-0">Receive a 6-digit OTP and set a new password.</p>
                     </div>

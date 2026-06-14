@@ -11,7 +11,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
 <div class="container-fluid bg-dark text-white py-5 text-center shadow-sm">
     <div class="section-kicker mb-2 pt-3">Nationwide showroom network</div>
-    <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
+    <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 20px; border-radius: 8px;">
     <h1 class="display-4 fw-bold mb-3">Locate Our Showrooms</h1>
     <p class="lead mx-auto opacity-75 mb-4" style="max-width: 760px;">Bridging the digital divide. Explore properties online, but finalize your purchase securely at our physical branches nationwide.</p>
     
@@ -62,7 +62,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
     <div class="row align-items-center mb-5 pb-4">
         <div class="col-md-6 mb-4 mb-md-0">
-            <img src="<?php echo $imgBase; ?>Office.jpg" class="img-fluid rounded-4 shadow" alt="Our Offline Office">
+            <img loading="lazy" src="<?php echo $imgBase; ?>Office.jpg" class="img-fluid rounded-4 shadow" alt="Our Offline Office">
         </div>
         <div class="col-md-6 px-lg-5">
             <h3 class="fw-bold text-gold mb-3">Welcome to Our Showrooms</h3>
@@ -72,7 +72,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
     <div class="row align-items-center mb-5 pb-4 flex-md-row-reverse">
         <div class="col-md-6 mb-4 mb-md-0">
-            <img src="<?php echo $imgBase; ?>Service_Staff.jpg" class="img-fluid rounded-4 shadow" alt="Professional Staff">
+            <img loading="lazy" src="<?php echo $imgBase; ?>Service_Staff.jpg" class="img-fluid rounded-4 shadow" alt="Professional Staff">
         </div>
         <div class="col-md-6 px-lg-5 text-md-end">
             <h3 class="fw-bold text-gold mb-3">Professional Consultation</h3>
@@ -82,7 +82,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
     <div class="row align-items-center mb-5 pb-4">
         <div class="col-md-6 mb-4 mb-md-0">
-            <img src="<?php echo $imgBase; ?>Standard_Service.jpg" class="img-fluid rounded-4 shadow" alt="Transparent Standards">
+            <img loading="lazy" src="<?php echo $imgBase; ?>Standard_Service.jpg" class="img-fluid rounded-4 shadow" alt="Transparent Standards">
         </div>
         <div class="col-md-6 px-lg-5">
             <h3 class="fw-bold text-gold mb-3">Transparent Processes</h3>
@@ -92,7 +92,7 @@ $imgBase = $root_prefix . "SYS Property Catalog/";
 
     <div class="row align-items-center mb-5 flex-md-row-reverse">
         <div class="col-md-6 mb-4 mb-md-0">
-            <img src="<?php echo $imgBase; ?>Offline_Service.jpg" class="img-fluid rounded-4 shadow" alt="Secure Offline Services">
+            <img loading="lazy" src="<?php echo $imgBase; ?>Offline_Service.jpg" class="img-fluid rounded-4 shadow" alt="Secure Offline Services">
         </div>
         <div class="col-md-6 px-lg-5 text-md-end">
             <h3 class="fw-bold text-gold mb-3">Secure Offline Transactions</h3>

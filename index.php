@@ -23,9 +23,10 @@ include 'includes/header.php';
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-8">
-                <div class="section-kicker mb-3">Online to offline real estate</div>
-                <h1 class="display-2 fw-bold mb-4">Your First Home Starts Here</h1>
-                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from one secure property platform.</p>
+                <!-- 注入了品牌词和行业词 -->
+                <div class="section-kicker mb-3">SYS Property Holdings - Online to offline real estate</div>
+                <h1 class="display-2 fw-bold mb-4">SYS Property Holdings: Your First Home Starts Here</h1>
+                <p class="mb-5 fs-4 text-white" style="line-height: 1.6; font-weight: 400;">Explore verified homes, compare financing, and book physical showroom visits across Malaysia from the trusted SYS Property Holdings real estate management platform.</p>
                 <div class="d-flex flex-wrap gap-3">
                     <a href="<?php echo $catalog_link; ?>" class="btn btn-primary btn-lg px-5 py-3">View Catalog</a>
                     <a href="showrooms.php" class="btn btn-outline-light btn-lg px-4 py-3">Find Showrooms</a>
@@ -61,35 +62,36 @@ include 'includes/header.php';
 <section class="container my-5 py-5">
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
-            <div class="section-kicker mb-2">Featured launches</div>
-            <h2 class="section-title text-white mb-0">New & Upcoming Developments</h2>
+            <!-- 稍微强化了小标题 -->
+            <div class="section-kicker mb-2">SYS Property Featured Launches</div>
+            <h2 class="section-title text-white mb-0">New & Upcoming Real Estate Developments</h2>
         </div>
         <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-light">Browse all</a>
     </div>
     <div class="horizontal-scroll">
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=300&fit=crop" class="card-img-top" alt="Development 1">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 1">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Palmwood Residences</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Johor Bahru</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&h=300&fit=crop" class="card-img-top" alt="Development 2">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 2">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Eco Square Hub</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Shah Alam</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=500&h=300&fit=crop" class="card-img-top" alt="Development 3">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 3">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Citrine Hills Phase 2</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Kulai</p>
             </div>
         </div>
         <div class="card scroll-card">
-            <img src="https://images.unsplash.com/photo-1515263487990-61b07816b324?w=500&h=300&fit=crop" class="card-img-top" alt="Development 4">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=800&q=70" class="card-img-top" alt="Development 4">
             <div class="card-body">
                 <h5 class="card-title fw-bold">Summera Grove</h5>
                 <p class="card-text text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> Petaling Jaya</p>
@@ -103,10 +105,11 @@ include 'includes/header.php';
         <div class="row align-items-center g-5">
             <div class="col-lg-5 mb-4 mb-lg-0">
                 <div class="section-kicker mb-2">Nationwide support</div>
-                <h2 class="section-title text-dark fw-bold mb-4">Locate Our Offline Showrooms</h2>
+                <!-- 加入品牌名 -->
+                <h2 class="section-title text-dark fw-bold mb-4">Locate SYS Property Holdings Offline Showrooms</h2>
                 <p class="lead mb-4 text-dark" style="line-height: 1.65; font-weight: 500;">Select your state to find the nearest showroom for property tours, eligibility guidance, and financing consultation.</p>
                 
-                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm">
+                <select id="stateSelect" class="form-select form-select-lg mb-4 shadow-sm" aria-label="Select state location">
                     <option value="" selected disabled>-- Select a State / Territory --</option>
                     <optgroup label="States">
                         <option value="Johor">Johor</option>
@@ -175,7 +178,8 @@ include 'includes/header.php';
 <section class="my-5 py-5 text-center bg-white">
     <div class="container">
     <div class="section-kicker mb-2">How it works</div>
-    <h2 class="section-title text-dark fw-bold mb-5">Your O2O Property Journey</h2>
+    <!-- 加入品牌名 -->
+    <h2 class="section-title text-dark fw-bold mb-5">Your SYS Property Holdings O2O Journey</h2>
     <div class="row justify-content-center g-4">
         <div class="col-md-3 col-sm-6 mb-4">
             <i class="fas fa-laptop-house step-icon"></i>
@@ -201,7 +205,8 @@ include 'includes/header.php';
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
             <div>
                 <div class="section-kicker mb-2">Ready to explore</div>
-                <h2 class="section-title text-dark fw-bold mb-0">Featured Active Projects</h2>
+                <!-- 强化列表标题 -->
+                <h2 class="section-title text-dark fw-bold mb-0">Featured SYS Active Projects</h2>
             </div>
             <a href="<?php echo $catalog_link; ?>" class="btn btn-outline-dark">View All <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
@@ -278,6 +283,7 @@ document.getElementById('stateSelect').addEventListener('change', function() {
                 loading="lazy" 
                 allowfullscreen 
                 referrerpolicy="no-referrer-when-downgrade" 
+                title="SYS Property Holdings Showroom Map Locator"
                 src="https://www.google.com/maps?q=${locationData.query},+Malaysia&output=embed">
             </iframe>
         `;

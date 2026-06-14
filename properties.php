@@ -39,7 +39,7 @@ $result = $stmt->get_result();
 <div class="container my-5 py-4">
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 15px; border-radius: 8px;">
+            <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; margin-bottom: 15px; border-radius: 8px;">
             <div class="section-kicker mb-2">Property inventory</div>
             <h2 class="fw-bold display-5 text-white">Inventory Catalog</h2>
             <p class="lead text-light opacity-75">Internal staff and administration management view</p>
@@ -112,7 +112,7 @@ $result = $stmt->get_result();
                 <div class="col-lg-4 col-md-6">
                     <div class="card h-100 border-0 overflow-hidden hover-card clickable-property-card" role="link" tabindex="0" onclick="window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'" onkeydown="if(event.key === 'Enter'){ window.location.href='property_detail.php?id=<?php echo $row['property_id']; ?>'; }">
                         <div class="position-relative" style="height: 220px;">
-                            <img src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
+                            <img loading="lazy" src="<?php echo htmlspecialchars($finalImg); ?>" class="w-100 h-100" style="object-fit: cover;">
                             <span class="badge <?php echo $badge_class; ?> position-absolute top-0 end-0 m-3 shadow z-3"><?php echo $badge_text; ?></span>
                         </div>
                         <div class="card-body p-4 d-flex flex-column">

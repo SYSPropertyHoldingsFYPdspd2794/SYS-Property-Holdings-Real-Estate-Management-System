@@ -21,7 +21,7 @@ include_once 'includes/header.php';
         <div class="container py-5 text-center position-relative z-3">
             <span class="badge bg-danger text-white px-3 py-2 rounded-pill mb-3 fw-bold tracking-widest text-uppercase">The Master Blueprint</span>
             <div class="mb-3 mt-2">
-                <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
+                <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
             </div>
             <h1 class="display-3 fw-bold text-white mb-4 tracking-tight">The Homebuyer's Odyssey</h1>
             <p class="lead w-75 mx-auto text-light opacity-75 fs-5">Navigate the complexities of the Malaysian real estate landscape with absolute confidence. From initial financial health checks to collecting the keys to your new empire, follow our definitive 7-step roadmap guided by official regulatory standards.</p>
@@ -67,7 +67,7 @@ include_once 'includes/header.php';
                     </div>
                     <div class="col-lg-5 order-3 order-lg-3 ps-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Financial Planning" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Financial Planning" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-search-dollar fa-2x mb-2 text-warning"></i>
                                 <h6 class="fw-bold m-0">Determine Purchasing Power</h6>
@@ -79,7 +79,7 @@ include_once 'includes/header.php';
                 <div class="row align-items-center mb-5 pb-5 timeline-item reveal-item">
                     <div class="col-lg-5 order-3 order-lg-1 pe-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1973&auto=format&fit=crop" class="img-fluid w-100" alt="Property Viewing" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?q=80&w=1973&auto=format&fit=crop" class="img-fluid w-100" alt="Property Viewing" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-handshake fa-2x mb-2 text-info"></i>
                                 <h6 class="fw-bold m-0">Securing Your Unit</h6>
@@ -126,7 +126,7 @@ include_once 'includes/header.php';
                     </div>
                     <div class="col-lg-5 order-3 order-lg-3 ps-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Bank Loan" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Bank Loan" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-file-signature fa-2x mb-2 text-success"></i>
                                 <h6 class="fw-bold m-0">Locking The Bank Finance</h6>
@@ -138,7 +138,7 @@ include_once 'includes/header.php';
                 <div class="row align-items-center mb-5 pb-5 timeline-item reveal-item">
                     <div class="col-lg-5 order-3 order-lg-1 pe-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Signing SPA" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Signing SPA" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-pen-nib fa-2x mb-2 text-danger"></i>
                                 <h6 class="fw-bold m-0">The Legal Binding Contract</h6>
@@ -181,7 +181,7 @@ include_once 'includes/header.php';
                     </div>
                     <div class="col-lg-5 order-3 order-lg-3 ps-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=2112&auto=format&fit=crop" class="img-fluid w-100" alt="LHDN Stamping" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=2112&auto=format&fit=crop" class="img-fluid w-100" alt="LHDN Stamping" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-stamp fa-2x mb-2 text-warning"></i>
                                 <h6 class="fw-bold m-0">Legalizing Ownership Transfer</h6>
@@ -193,7 +193,7 @@ include_once 'includes/header.php';
                 <div class="row align-items-center mb-5 pb-5 timeline-item reveal-item">
                     <div class="col-lg-5 order-3 order-lg-1 pe-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-secondary">
-                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Construction Site" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Construction Site" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-hammer fa-2x mb-2 text-info"></i>
                                 <h6 class="fw-bold m-0">Progressive Billing Commences</h6>
@@ -237,7 +237,7 @@ include_once 'includes/header.php';
                     </div>
                     <div class="col-lg-5 order-3 order-lg-3 ps-lg-5 mb-4 mb-lg-0 text-center">
                         <div class="img-wrapper rounded-4 shadow-lg overflow-hidden position-relative border border-5 border-warning">
-                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Getting Keys" style="height: 350px; object-fit: cover;">
+                            <img loading="lazy" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" class="img-fluid w-100" alt="Getting Keys" style="height: 350px; object-fit: cover;">
                             <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white text-start">
                                 <i class="fas fa-door-open fa-2x mb-2 text-warning"></i>
                                 <h6 class="fw-bold m-0 text-warning">Welcome Home.</h6>

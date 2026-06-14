@@ -50,10 +50,14 @@ if (isset($_SESSION['role'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="author" content="SYS Property Holdings">
+<meta name="theme-color" content="#08111f">
+
 <link rel="icon" type="image/jpeg" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
 <link rel="apple-touch-icon" href="<?php echo htmlspecialchars($root_prefix . 'SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>">
 <?php 
@@ -98,6 +102,9 @@ if ($current_page == 'about_us.php') {
 <title><?php echo $seo_title; ?></title>
 <meta name="description" content="<?php echo $seo_desc; ?>">
 <meta name="keywords" content="SYS Property Holdings, Real Estate Management System, UTM SPACE, Malaysia Property, O2O Real Estate, Affordable Housing, Bank Rates Malaysia">
+
+<link rel="canonical" href="https://syspropertyholdings.infinityfreeapp.com/<?php echo htmlspecialchars($current_page); ?>">
+
 <?php 
 // 1. Get the current page file name
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -113,10 +120,32 @@ if ($is_private_folder || $is_sensitive_page):
     <meta name="robots" content="index, follow">
 <?php endif; ?>
 
+<!-- Open Graph Tags -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://syspropertyholdings.infinityfreeapp.com/">
+<meta property="og:url" content="https://syspropertyholdings.infinityfreeapp.com/<?php echo htmlspecialchars($current_page); ?>">
 <meta property="og:title" content="<?php echo $seo_title; ?>">
 <meta property="og:description" content="<?php echo $seo_desc; ?>">
+<meta property="og:site_name" content="SYS Property Holdings">
+<meta property="og:image" content="https://syspropertyholdings.infinityfreeapp.com/SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg">
+
+<!-- Twitter Card Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://syspropertyholdings.infinityfreeapp.com/<?php echo htmlspecialchars($current_page); ?>">
+<meta name="twitter:title" content="<?php echo $seo_title; ?>">
+<meta name="twitter:description" content="<?php echo $seo_desc; ?>">
+<meta name="twitter:image" content="https://syspropertyholdings.infinityfreeapp.com/SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg">
+
+<!-- Structured Data (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SYS Property Holdings",
+  "url": "https://syspropertyholdings.infinityfreeapp.com/",
+  "description": "Real Estate Management System and O2O Tech Evolution in Malaysia."
+}
+</script>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,7 +330,7 @@ footer.luxury-footer {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: linear-gradient(105deg, rgba(8,17,31,0.95) 0%, rgba(8,17,31,0.74) 45%, rgba(8,17,31,0.34) 100%), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+    background: linear-gradient(105deg, rgba(8,17,31,0.95) 0%, rgba(8,17,31,0.74) 45%, rgba(8,17,31,0.34) 100%), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=70') center/cover no-repeat;
     padding: clamp(6rem, 12vw, 9rem) 0 clamp(4rem, 9vw, 6rem);
 }
 .hero-banner::after {
@@ -430,25 +459,25 @@ footer.luxury-footer {
 </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2" role="navigation" aria-label="Main Navigation">
 <div class="container flex-column align-items-stretch gap-2">
 <div class="d-flex w-100 justify-content-between align-items-center">
-<a class="navbar-brand d-flex align-items-center gap-2 fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>">
-    <img src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
+<a class="navbar-brand d-flex align-items-center gap-2 fw-bold m-0 text-white" href="<?php echo htmlspecialchars($root_prefix . 'index.php'); ?>" aria-label="SYS Property Holdings Homepage">
+    <img loading="eager" fetchpriority="high" src="<?php echo htmlspecialchars($root_prefix . 'SYS%20Property%20Catalog/SYS_Property_Holdings_Icon.jpeg'); ?>" alt="SYS Property Holdings Logo" style="height: 32px; width: auto; border-radius: 4px; object-fit: contain;">
     SYS Property
 </a>
-<div class="d-flex align-items-center gap-2 navbar-account-actions">
+<div class="d-flex align-items-center gap-2 navbar-account-actions" role="group" aria-label="User Account Actions">
 <?php if (isset($_SESSION['account_id'])):?>
 <div class="dropdown">
-<button class="btn btn-outline-light dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">My Account</button>
-<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-<li><a class="dropdown-item" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
-<li><a class="dropdown-item" href="<?php echo htmlspecialchars($profile_link); ?>"><?php echo htmlspecialchars($profile_text); ?></a></li>
+<button class="btn btn-outline-light dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-controls="user-dropdown-menu">My Account</button>
+<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="user-dropdown-menu" role="menu">
+<li role="presentation"><a class="dropdown-item" role="menuitem" href="<?php echo htmlspecialchars($dashboard_link); ?>">Dashboard</a></li>
+<li role="presentation"><a class="dropdown-item" role="menuitem" href="<?php echo htmlspecialchars($profile_link); ?>"><?php echo htmlspecialchars($profile_text); ?></a></li>
 </ul>
 </div>
-<a href="<?php echo htmlspecialchars($root_prefix . 'logout.php'); ?>" class="btn btn-danger">Logout</a>
+<a href="<?php echo htmlspecialchars($root_prefix . 'logout.php'); ?>" class="btn btn-danger" role="button">Logout</a>
 <?php else:?>
-<a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary shadow-sm">Sign In</a>
+<a href="<?php echo htmlspecialchars($root_prefix . 'login.php'); ?>" class="btn btn-primary shadow-sm" role="button">Sign In</a>
 <?php endif;?>
 </div>
 <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -456,17 +485,17 @@ footer.luxury-footer {
 </button>
 </div>
 <div class="collapse navbar-collapse w-100" id="navbarNav">
-<ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2">
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($catalog_nav_link); ?>"><i class="fas fa-building me-1"></i>Catalog</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1"></i>Government Housing</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1"></i>Showrooms</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1"></i>Buying Journey</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-1"></i>Financial Planner</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1"></i>Bank Rates</a></li>
+<ul class="navbar-nav flex-row flex-wrap justify-content-start gap-1 gap-lg-2" role="menubar">
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($catalog_nav_link); ?>"><i class="fas fa-building me-1" aria-hidden="true"></i>Catalog</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'government_housing.php'); ?>"><i class="fas fa-house-user me-1" aria-hidden="true"></i>Government Housing</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'showrooms.php'); ?>"><i class="fas fa-map-location-dot me-1" aria-hidden="true"></i>Showrooms</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'buying_journey.php'); ?>"><i class="fas fa-map-signs me-1" aria-hidden="true"></i>Buying Journey</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'financial_planner.php'); ?>"><i class="fas fa-calculator me-1" aria-hidden="true"></i>Financial Planner</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'bank_rates.php'); ?>"><i class="fas fa-university me-1" aria-hidden="true"></i>Bank Rates</a></li>
 <?php if (isset($_SESSION['account_id'])):?>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-1"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($wishlist_link); ?>"><i class="<?php echo htmlspecialchars($wishlist_icon); ?> me-1" aria-hidden="true"></i><?php echo htmlspecialchars($wishlist_text); ?></a></li>
 <?php endif;?>
-    <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1"></i>About Us</a></li>
+    <li class="nav-item" role="none"><a class="nav-link" role="menuitem" href="<?php echo htmlspecialchars($root_prefix . 'about_us.php'); ?>"><i class="fas fa-info-circle me-1" aria-hidden="true"></i>About Us</a></li>
 </ul>
 </div>
 </div>

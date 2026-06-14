@@ -21,7 +21,7 @@ include_once 'includes/header.php';
     <div class="container py-5 text-center position-relative z-3">
         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 fw-bold tracking-widest text-uppercase">PropTech Intelligence</span>
         <div class="mb-3">
-            <img src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
+            <img loading="lazy" src="SYS Property Catalog/SYS_Property_Holdings_Icon.jpeg" alt="SYS Property Holdings" style="max-height: 80px; border-radius: 8px;">
         </div>
         <h1 class="display-3 fw-bold text-white mb-4 tracking-tight">Smart Financial Planner</h1>
         <p class="lead w-75 mx-auto text-light opacity-75 fs-5">Make data-driven property decisions. Uncover hidden transaction costs, simulate long-term rent vs. buy trajectories, and stress-test your lifestyle affordability using real Malaysian banking algorithms.</p>
