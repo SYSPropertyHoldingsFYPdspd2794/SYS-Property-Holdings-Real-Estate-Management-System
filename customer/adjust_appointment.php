@@ -369,6 +369,10 @@ include '../includes/header.php';
                             <span class="text-muted">Assigned Showroom:</span>
                             <span class="fw-bold text-dark text-end" style="max-width: 60%;"><?php echo htmlspecialchars($showroom['label'] . ' - ' . $showroom['city']); ?></span>
                         </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Assigned Staff:</span>
+                            <span class="fw-bold text-dark text-end" style="max-width: 60%;"><?php echo htmlspecialchars($data['staff_name'] ?? 'Pending staff assignment'); ?></span>
+                        </div>
                     <?php endif; ?>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Valuation Price:</span>
