@@ -108,4 +108,42 @@ function document_public_url($file_path, $root_prefix = '') {
     $prefix = trim((string)$root_prefix);
     return $prefix === '' ? $path : rtrim($prefix, '/') . '/' . $path;
 }
+
+function showroom_locations_by_state() {
+    return [
+        'Johor' => 'Johor Bahru',
+        'Kedah' => 'Alor Setar',
+        'Kelantan' => 'Kota Bharu',
+        'Melaka' => 'Melaka City',
+        'Negeri Sembilan' => 'Seremban',
+        'Pahang' => 'Kuantan',
+        'Perak' => 'Ipoh',
+        'Perlis' => 'Kangar',
+        'Penang' => 'George Town Penang',
+        'Pulau Pinang' => 'George Town Penang',
+        'Sabah' => 'Kota Kinabalu',
+        'Sarawak' => 'Kuching',
+        'Selangor' => 'Shah Alam',
+        'Terengganu' => 'Kuala Terengganu',
+        'WP Kuala Lumpur' => 'Kuala Lumpur',
+        'Kuala Lumpur' => 'Kuala Lumpur',
+        'WP Labuan' => 'Labuan',
+        'Labuan' => 'Labuan',
+        'WP Putrajaya' => 'Putrajaya',
+        'Putrajaya' => 'Putrajaya',
+    ];
+}
+
+function showroom_location_for_state($state) {
+    $state = trim((string)$state);
+    $locations = showroom_locations_by_state();
+    $city = $locations[$state] ?? $state;
+
+    return [
+        'state' => $state,
+        'city' => $city,
+        'label' => ($state !== '' ? $state : 'Regional') . ' Showroom',
+        'map_query' => trim($city . ', Malaysia'),
+    ];
+}
 ?>

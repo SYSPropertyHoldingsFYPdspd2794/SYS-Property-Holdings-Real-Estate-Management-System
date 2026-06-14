@@ -11,6 +11,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
     exit();
 }
 include '../includes/db_connect.php';
+include_once '../includes/functions.php';
 
 $account_id = $_SESSION['account_id'];
 $delete_message = '';
@@ -159,6 +160,7 @@ include '../includes/header.php';
                 <div class="row">
                     <?php if ($appointments->num_rows > 0): ?>
                         <?php while ($row = $appointments->fetch_assoc()): ?>
+                            <?php $showroom = showroom_location_for_state($row['state'] ?? ''); ?>
                             <div class="col-md-6 mb-4">
                                 <div class="card shadow-sm border-0 h-100 rounded-4">
                                     <div class="card-body p-4 d-flex flex-column">
@@ -185,6 +187,12 @@ include '../includes/header.php';
                                         </div>
                                         <p class="text-muted fs-5 mb-2"><i class="fas fa-clipboard-list text-primary me-2"></i><?php echo str_replace('_', ' ', htmlspecialchars($row['service_type'])); ?></p>
                                         <p class="text-muted fs-5 mb-3"><i class="far fa-calendar-alt text-danger me-2"></i><?php echo htmlspecialchars(date('d M Y', strtotime($row['appointment_date'])) . ' at ' . date('h:i A', strtotime($row['appointment_time']))); ?></p>
+                                        <div class="p-3 bg-light rounded-3 border mb-3">
+                                            <p class="fw-bold text-dark mb-1"><i class="fas fa-store text-success me-2"></i><?php echo htmlspecialchars($showroom['label']); ?></p>
+                                            <p class="text-muted small mb-0">
+                                                Matched from selected property state: <?php echo htmlspecialchars($row['state']); ?> - <?php echo htmlspecialchars($showroom['city']); ?>
+                                            </p>
+                                        </div>
                                         
                                         <div class="mt-auto pt-2">
                                             <a href="adjust_appointment.php?type=appointment&id=<?php echo $row['appointment_id']; ?>" class="btn btn-outline-dark btn-sm w-100 rounded-pill fw-bold py-2"><i class="fas fa-sliders-h me-2"></i>Manage Appointment Details</a>

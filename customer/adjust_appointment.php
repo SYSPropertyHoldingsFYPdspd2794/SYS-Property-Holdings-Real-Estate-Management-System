@@ -95,6 +95,8 @@ if (!$data) {
     exit();
 }
 
+$showroom = showroom_location_for_state($data['state'] ?? '');
+
 // STATE VALIDATION AND LOCK SECURITY SETUPS
 $current_status = $data['status'];
 $appointmentDateTime = null;
@@ -362,6 +364,12 @@ include '../includes/header.php';
                         <span class="text-muted">State Boundary:</span>
                         <span class="fw-bold text-dark"><?php echo htmlspecialchars($data['state']); ?></span>
                     </div>
+                    <?php if ($type === 'appointment'): ?>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Assigned Showroom:</span>
+                            <span class="fw-bold text-dark text-end" style="max-width: 60%;"><?php echo htmlspecialchars($showroom['label'] . ' - ' . $showroom['city']); ?></span>
+                        </div>
+                    <?php endif; ?>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Valuation Price:</span>
                         <span class="fw-bold text-success">RM <?php echo number_format($data['price'], 2); ?></span>

@@ -11,6 +11,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
     exit();
 }
 include '../includes/db_connect.php';
+include_once '../includes/functions.php';
 
 $account_id = $_SESSION['account_id'];
 $error = '';
@@ -108,7 +109,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$props = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status IN ('ACTIVE', 'AVAILABLE') AND is_affordable = 0 ORDER BY state, project_name");
+$props_result = $conn->query("SELECT property_id, project_name, state FROM properties WHERE status IN ('ACTIVE', 'AVAILABLE') AND is_affordable = 0 ORDER BY state, project_name");
+$props = [];
+while ($p = $props_result->fetch_assoc()) {
+    $showroom = showroom_location_for_state($p['state'] ?? '');
+    $p['showroom_label'] = $showroom['label'];
+    $p['showroom_city'] = $showroom['city'];
+    $props[] = $p;
+}
 $preselect = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 include '../includes/header.php';
@@ -133,12 +141,16 @@ include '../includes/header.php';
                             <label class="form-label fw-bold">Select Property</label>
                             <select name="property_id" class="form-select form-select-lg bg-light" required>
                                 <option value="" disabled <?php echo $preselect === 0 ? 'selected' : ''; ?>>Choose a property...</option>
-                                <?php while ($p = $props->fetch_assoc()): ?>
-                                    <option value="<?php echo $p['property_id']; ?>" <?php echo $preselect === (int)$p['property_id'] ? 'selected' : ''; ?>>
+                                <?php foreach ($props as $p): ?>
+                                    <option value="<?php echo $p['property_id']; ?>" data-state="<?php echo htmlspecialchars($p['state']); ?>" data-showroom="<?php echo htmlspecialchars($p['showroom_label'] . ' - ' . $p['showroom_city']); ?>" <?php echo $preselect === (int)$p['property_id'] ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($p['project_name'] . ' (' . $p['state'] . ')'); ?>
                                     </option>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </select>
+                            <div id="showroomPreview" class="mt-3 p-3 bg-light rounded-3 border d-none">
+                                <div class="fw-bold text-dark"><i class="fas fa-store text-success me-2"></i><span id="showroomPreviewName"></span></div>
+                                <small class="text-muted">Showroom is matched automatically from the selected property's state.</small>
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label class="form-label fw-bold">Service Type</label>
@@ -170,4 +182,31 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const propertySelect = document.querySelector('select[name="property_id"]');
+    const preview = document.getElementById('showroomPreview');
+    const previewName = document.getElementById('showroomPreviewName');
+
+    function updateShowroomPreview() {
+        if (!propertySelect || !preview || !previewName) return;
+
+        const selected = propertySelect.options[propertySelect.selectedIndex];
+        const showroom = selected ? selected.dataset.showroom : '';
+        if (!showroom) {
+            preview.classList.add('d-none');
+            previewName.textContent = '';
+            return;
+        }
+
+        previewName.textContent = showroom;
+        preview.classList.remove('d-none');
+    }
+
+    if (propertySelect) {
+        propertySelect.addEventListener('change', updateShowroomPreview);
+        updateShowroomPreview();
+    }
+});
+</script>
 <?php include '../includes/footer.php'; ?>
